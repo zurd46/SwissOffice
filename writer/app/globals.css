@@ -21,6 +21,7 @@ body {
   font-size: 12pt;
   line-height: 1.5;
   color: #000;
+  background: transparent;
 }
 
 .ProseMirror p {
@@ -383,6 +384,39 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #a1a1a1;
+}
+
+/* Section Break */
+.ProseMirror div[data-section-break] {
+  page-break-after: always;
+  break-after: page;
+  border-top: 2px dashed #9ca3af;
+  margin: 24px 0;
+  height: 0;
+  position: relative;
+}
+
+.ProseMirror div[data-section-break]::after {
+  content: 'Abschnittswechsel';
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  padding: 0 8px;
+  color: #9ca3af;
+  font-size: 10px;
+  font-family: system-ui;
+}
+
+/* Page header/footer overlay styles */
+.page-header,
+.page-footer {
+  user-select: none;
+}
+
+.page-number {
+  user-select: none;
 }
 
 /* AI Spinner Animation */

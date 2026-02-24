@@ -21,7 +21,6 @@ export function PageView({ editor, zoom }: PageViewProps) {
   const [pageCount, setPageCount] = useState(1)
 
   const pageDimensions = getEffectivePageDimensions(settings)
-  const pageWidthPx = pageDimensions.width * MM_TO_PX
   const pageHeightPx = pageDimensions.height * MM_TO_PX
   const marginTopPx = settings.margins.top * MM_TO_PX
   const marginBottomPx = settings.margins.bottom * MM_TO_PX

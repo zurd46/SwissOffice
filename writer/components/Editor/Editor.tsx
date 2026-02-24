@@ -27,6 +27,7 @@ import { PageBreak } from './extensions/PageBreak'
 import { PasteHandler } from './extensions/PasteHandler'
 import { ParagraphSpacing } from './extensions/ParagraphSpacing'
 import { Indent } from './extensions/Indent'
+import { SectionBreak } from './extensions/SectionBreak'
 import { RibbonToolbar } from '../Toolbar/Ribbon/RibbonToolbar'
 import { MenuBar } from '../Toolbar/MenuBar'
 import { StatusBar } from '../StatusBar/StatusBar'
@@ -36,11 +37,14 @@ import { AIChatSidebar } from '../AI/AIChatSidebar'
 import { AISettingsDialog } from '../AI/AISettingsDialog'
 import { SettingsDialog } from '../Dialogs/SettingsDialog'
 import { AIContextProvider } from '../../lib/ai/aiContext'
+import { DocumentProvider, useDocumentSettings } from '../../lib/documentContext'
 import { defaultContent } from '../../lib/defaultContent'
 import { saveDocument, saveAsHTML, loadDocument, newDocument, printDocument } from '../../lib/fileOperations'
 import { exportPDF } from '../Export/exportPDF'
 import { exportDOCX } from '../Export/exportDOCX'
-import { useState, useCallback, useEffect } from 'react'
+import { PageOverlay } from './PageOverlay'
+import { getEffectivePageDimensions } from '../../lib/types/document'
+import { useState, useCallback, useEffect, useRef } from 'react'
 
 // Electron API type
 declare global {
@@ -55,13 +59,27 @@ declare global {
 }
 
 export function WriterEditor() {
+  return (
+    <DocumentProvider>
+      <AIContextProvider>
+        <WriterEditorInner />
+      </AIContextProvider>
+    </DocumentProvider>
+  )
+}
+
+function WriterEditorInner() {
   const [showFindReplace, setShowFindReplace] = useState(false)
   const [showSidebar, setShowSidebar] = useState(false)
   const [showAIChat, setShowAIChat] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
   const [zoom, setZoom] = useState(100)
   const [documentName, setDocumentName] = useState('Unbenannt')
+  const [pageCount, setPageCount] = useState(1)
   const isElectron = typeof window !== 'undefined' && !!window.electronAPI?.isElectron
+
+  const { settings, setSettings } = useDocumentSettings()
+  const editorWrapperRef = useRef<HTMLDivElement>(null)
 
   const editor = useEditor({
     immediatelyRender: false,
@@ -116,6 +134,7 @@ export function WriterEditor() {
       PasteHandler,
       ParagraphSpacing,
       Indent,
+      SectionBreak,
     ],
     content: defaultContent,
     editorProps: {
@@ -124,6 +143,43 @@ export function WriterEditor() {
       },
     },
   })
+
+  // Calculate page count based on content height
+  const calculatePageCount = useCallback(() => {
+    if (!editorWrapperRef.current) return
+
+    const proseMirrorEl = editorWrapperRef.current.querySelector('.ProseMirror')
+    if (!proseMirrorEl) return
+
+    const pageDims = getEffectivePageDimensions(settings)
+    const mmToPx = 3.7795275591
+    const pageHeightPx = pageDims.height * mmToPx
+    const marginTopPx = settings.margins.top * mmToPx
+    const marginBottomPx = settings.margins.bottom * mmToPx
+    const contentHeightPerPage = pageHeightPx - marginTopPx - marginBottomPx
+
+    const contentHeight = proseMirrorEl.scrollHeight
+    const pages = Math.max(1, Math.ceil(contentHeight / contentHeightPerPage))
+
+    setPageCount(pages)
+  }, [settings])
+
+  // Recalculate pages on editor updates
+  useEffect(() => {
+    if (!editor) return
+    calculatePageCount()
+    const handleUpdate = () => requestAnimationFrame(calculatePageCount)
+    editor.on('update', handleUpdate)
+    return () => { editor.off('update', handleUpdate) }
+  }, [editor, calculatePageCount])
+
+  // Recalculate on resize
+  useEffect(() => {
+    if (!editorWrapperRef.current) return
+    const observer = new ResizeObserver(() => requestAnimationFrame(calculatePageCount))
+    observer.observe(editorWrapperRef.current)
+    return () => observer.disconnect()
+  }, [calculatePageCount])
 
   const toggleFindReplace = useCallback(() => {
     setShowFindReplace(prev => !prev)
@@ -146,12 +202,16 @@ export function WriterEditor() {
         case 'new':
           newDocument(editor)
           setDocumentName('Unbenannt')
+          setSettings(({ ...settings }))
           break
         case 'open':
-          loadDocument(editor)
+          loadDocument(editor, (result) => {
+            if (result.settings) setSettings(result.settings)
+            if (result.documentName) setDocumentName(result.documentName)
+          })
           break
         case 'save':
-          saveDocument(editor, documentName)
+          saveDocument(editor, documentName, settings)
           break
         case 'export-pdf':
           exportPDF(editor, documentName)
@@ -238,7 +298,7 @@ export function WriterEditor() {
     })
 
     return cleanup
-  }, [editor, documentName])
+  }, [editor, documentName, settings, setSettings])
 
   // Sync document title with Electron window
   useEffect(() => {
@@ -255,8 +315,13 @@ export function WriterEditor() {
     )
   }
 
+  // Page dimensions for rendering
+  const pageDimensions = getEffectivePageDimensions(settings)
+  const scale = zoom / 100
+  const scaledPageWidthMm = pageDimensions.width * scale
+  const pageGapMm = 10 // gap between pages in mm
+
   return (
-    <AIContextProvider>
     <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: '#f5f5f5', overflow: 'hidden' }}>
       {/* Menu Bar - hidden in Electron (native menu takes over) */}
       {!isElectron && (
@@ -293,20 +358,55 @@ export function WriterEditor() {
         {/* Sidebar */}
         {showSidebar && <Sidebar editor={editor} />}
 
-        {/* Editor Area with A4 Page */}
+        {/* Editor Area with paginated view */}
         <div style={{ flex: 1, overflow: 'auto', backgroundColor: '#e5e5e5', padding: '32px 0', display: 'flex', justifyContent: 'center' }}>
-          <div
-            style={{
-              backgroundColor: 'white',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
-              border: '1px solid #d0d0d0',
-              position: 'relative',
-              width: `${210 * (zoom / 100)}mm`,
-              minHeight: `${297 * (zoom / 100)}mm`,
-              transformOrigin: 'top center',
-            }}
-          >
-            <EditorContent editor={editor} />
+          <div style={{ position: 'relative' }}>
+            {/* Page backgrounds with overlays */}
+            {Array.from({ length: pageCount }, (_, i) => (
+              <div
+                key={`page-bg-${i}`}
+                style={{
+                  width: `${scaledPageWidthMm}mm`,
+                  height: `${pageDimensions.height * scale}mm`,
+                  backgroundColor: 'white',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
+                  border: '1px solid #d0d0d0',
+                  position: 'relative',
+                  marginBottom: i < pageCount - 1 ? `${pageGapMm * scale}mm` : 0,
+                  overflow: 'hidden',
+                }}
+              >
+                <PageOverlay
+                  pageNumber={i + 1}
+                  totalPages={pageCount}
+                  settings={settings}
+                  scale={scale}
+                />
+              </div>
+            ))}
+
+            {/* Editor content overlaid on pages */}
+            <div
+              ref={editorWrapperRef}
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: `${scaledPageWidthMm}mm`,
+                zIndex: 2,
+                pointerEvents: 'auto',
+              }}
+            >
+              <div
+                style={{
+                  width: `${pageDimensions.width}mm`,
+                  transformOrigin: 'top left',
+                  transform: `scale(${scale})`,
+                }}
+              >
+                <EditorContent editor={editor} />
+              </div>
+            </div>
           </div>
         </div>
 
@@ -323,6 +423,5 @@ export function WriterEditor() {
       {/* App Settings Dialog */}
       <SettingsDialog open={showSettings} onClose={() => setShowSettings(false)} />
     </div>
-    </AIContextProvider>
   )
 }

@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Editor } from '@tiptap/react'
 import {
   Indent, Outdent, FileText, RectangleVertical, RectangleHorizontal,
-  Ruler, Settings, Columns2, Columns3,
+  Ruler, Settings, Columns2,
   PanelTop, PanelBottom, Hash, SeparatorHorizontal,
 } from 'lucide-react'
 import { ToolbarButton, ToolbarSelect, RibbonLargeButton } from '../../ToolbarButton'
@@ -21,7 +21,7 @@ interface TabSeitenlayoutProps {
 }
 
 export function TabSeitenlayout({ editor }: TabSeitenlayoutProps) {
-  const { settings, updateOrientation, updatePageSize, updateMargins, updateHeaderContent, updateFooterContent, togglePageNumbers, setPageNumberPosition } = useDocumentSettings()
+  const { settings, updateOrientation, updatePageSize, updateMargins, updateHeaderContent, updateFooterContent, togglePageNumbers } = useDocumentSettings()
   const [showPageSetup, setShowPageSetup] = useState(false)
   const [showHeaderEditor, setShowHeaderEditor] = useState(false)
   const [showFooterEditor, setShowFooterEditor] = useState(false)

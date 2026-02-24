@@ -15,7 +15,7 @@ function createWindow() {
     height: 900,
     minWidth: 900,
     minHeight: 600,
-    title: 'ImpulsOffice Writer',
+    title: 'ImpulsWriter',
     titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'default',
     trafficLightPosition: { x: 16, y: 8 },
     backgroundColor: '#f3f4f6',
@@ -106,7 +106,7 @@ function registerIpcHandlers() {
       title: 'Dokument speichern',
       defaultPath: options?.filename || 'dokument',
       filters: [
-        { name: 'ImpulsOffice Writer', extensions: ['impuls'] },
+        { name: 'ImpulsWriter', extensions: ['impuls'] },
         { name: 'HTML', extensions: ['html'] },
         { name: 'PDF', extensions: ['pdf'] },
         { name: 'Word', extensions: ['docx'] },
@@ -121,7 +121,7 @@ function registerIpcHandlers() {
     const result = await dialog.showOpenDialog(mainWindow, {
       title: 'Dokument öffnen',
       filters: [
-        { name: 'ImpulsOffice Writer', extensions: ['impuls', 'json'] },
+        { name: 'ImpulsWriter', extensions: ['impuls', 'json'] },
         { name: 'Alle Dateien', extensions: ['*'] },
       ],
       properties: ['openFile'],
@@ -134,7 +134,7 @@ function registerIpcHandlers() {
 
   ipcMain.on('set-title', (_, title) => {
     if (mainWindow) {
-      mainWindow.setTitle(title ? `${title} - ImpulsOffice Writer` : 'ImpulsOffice Writer')
+      mainWindow.setTitle(title ? `${title} - ImpulsWriter` : 'ImpulsWriter')
     }
   })
 

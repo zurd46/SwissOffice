@@ -15,15 +15,15 @@ function createMenu(mainWindow) {
     ...(isMac ? [{
       label: app.name,
       submenu: [
-        { role: 'about', label: 'Über ImpulsOffice Writer' },
+        { role: 'about', label: 'Über ImpulsWriter' },
         { type: 'separator' },
         { role: 'services' },
         { type: 'separator' },
-        { role: 'hide', label: 'ImpulsOffice Writer ausblenden' },
+        { role: 'hide', label: 'ImpulsWriter ausblenden' },
         { role: 'hideOthers', label: 'Andere ausblenden' },
         { role: 'unhide', label: 'Alle einblenden' },
         { type: 'separator' },
-        { role: 'quit', label: 'ImpulsOffice Writer beenden' },
+        { role: 'quit', label: 'ImpulsWriter beenden' },
       ],
     }] : []),
 
@@ -214,7 +214,7 @@ function createMenu(mainWindow) {
       label: 'Hilfe',
       submenu: [
         {
-          label: 'Über ImpulsOffice Writer',
+          label: 'Über ImpulsWriter',
           click: () => sendAction('about'),
         },
       ],
