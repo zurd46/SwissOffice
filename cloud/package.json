@@ -20,11 +20,16 @@
     "@hono/zod-validator": "^0.4",
     "drizzle-orm": "^0.36",
     "zod": "^3.23",
-    "jose": "^5"
+    "jose": "^5",
+    "imapflow": "^1",
+    "nodemailer": "^6",
+    "ical-generator": "^8",
+    "rrule": "^2"
   },
   "devDependencies": {
     "drizzle-kit": "^0.28",
     "typescript": "^5",
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "@types/nodemailer": "^6"
   }
 }

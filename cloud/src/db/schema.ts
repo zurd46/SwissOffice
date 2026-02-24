@@ -4,15 +4,37 @@ import { documents } from './tables/documents'
 import { documentVersions } from './tables/documentVersions'
 import { shares } from './tables/shares'
 import { refreshTokens } from './tables/refreshTokens'
+import { emailAccounts } from './tables/emailAccounts'
+import { emailFolders } from './tables/emailFolders'
+import { emails } from './tables/emails'
+import { emailAttachments } from './tables/emailAttachments'
+import { contacts } from './tables/contacts'
+import { contactGroups } from './tables/contactGroups'
+import { contactGroupMembers } from './tables/contactGroupMembers'
+import { calendars } from './tables/calendars'
+import { events } from './tables/events'
+import { eventAttendees } from './tables/eventAttendees'
+import { eventReminders } from './tables/eventReminders'
 
-export { users, documents, documentVersions, shares, refreshTokens }
+export {
+  users, documents, documentVersions, shares, refreshTokens,
+  emailAccounts, emailFolders, emails, emailAttachments,
+  contacts, contactGroups, contactGroupMembers,
+  calendars, events, eventAttendees, eventReminders,
+}
 
+// ── Users Relations ──
 export const usersRelations = relations(users, ({ many }) => ({
   documents: many(documents),
   shares: many(shares, { relationName: 'sharedWith' }),
   refreshTokens: many(refreshTokens),
+  emailAccounts: many(emailAccounts),
+  contacts: many(contacts),
+  contactGroups: many(contactGroups),
+  calendars: many(calendars),
 }))
 
+// ── Documents Relations ──
 export const documentsRelations = relations(documents, ({ one, many }) => ({
   owner: one(users, { fields: [documents.ownerId], references: [users.id] }),
   versions: many(documentVersions),
@@ -32,4 +54,60 @@ export const sharesRelations = relations(shares, ({ one }) => ({
 
 export const refreshTokensRelations = relations(refreshTokens, ({ one }) => ({
   user: one(users, { fields: [refreshTokens.userId], references: [users.id] }),
+}))
+
+// ── Email Relations ──
+export const emailAccountsRelations = relations(emailAccounts, ({ one, many }) => ({
+  user: one(users, { fields: [emailAccounts.userId], references: [users.id] }),
+  folders: many(emailFolders),
+}))
+
+export const emailFoldersRelations = relations(emailFolders, ({ one, many }) => ({
+  account: one(emailAccounts, { fields: [emailFolders.accountId], references: [emailAccounts.id] }),
+  emails: many(emails),
+}))
+
+export const emailsRelations = relations(emails, ({ one, many }) => ({
+  folder: one(emailFolders, { fields: [emails.folderId], references: [emailFolders.id] }),
+  attachments: many(emailAttachments),
+}))
+
+export const emailAttachmentsRelations = relations(emailAttachments, ({ one }) => ({
+  email: one(emails, { fields: [emailAttachments.emailId], references: [emails.id] }),
+}))
+
+// ── Contacts Relations ──
+export const contactsRelations = relations(contacts, ({ one, many }) => ({
+  user: one(users, { fields: [contacts.userId], references: [users.id] }),
+  groupMembers: many(contactGroupMembers),
+}))
+
+export const contactGroupsRelations = relations(contactGroups, ({ one, many }) => ({
+  user: one(users, { fields: [contactGroups.userId], references: [users.id] }),
+  members: many(contactGroupMembers),
+}))
+
+export const contactGroupMembersRelations = relations(contactGroupMembers, ({ one }) => ({
+  contact: one(contacts, { fields: [contactGroupMembers.contactId], references: [contacts.id] }),
+  group: one(contactGroups, { fields: [contactGroupMembers.groupId], references: [contactGroups.id] }),
+}))
+
+// ── Calendar Relations ──
+export const calendarsRelations = relations(calendars, ({ one, many }) => ({
+  user: one(users, { fields: [calendars.userId], references: [users.id] }),
+  events: many(events),
+}))
+
+export const eventsRelations = relations(events, ({ one, many }) => ({
+  calendar: one(calendars, { fields: [events.calendarId], references: [calendars.id] }),
+  attendees: many(eventAttendees),
+  reminders: many(eventReminders),
+}))
+
+export const eventAttendeesRelations = relations(eventAttendees, ({ one }) => ({
+  event: one(events, { fields: [eventAttendees.eventId], references: [events.id] }),
+}))
+
+export const eventRemindersRelations = relations(eventReminders, ({ one }) => ({
+  event: one(events, { fields: [eventReminders.eventId], references: [events.id] }),
 }))
