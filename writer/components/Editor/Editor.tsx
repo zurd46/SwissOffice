@@ -42,6 +42,7 @@ import { ColumnBreak } from './extensions/ColumnBreak'
 import { TabStop } from './extensions/TabStop'
 import { TextBox } from './extensions/TextBox'
 import { Shape } from './extensions/Shape'
+import { MergeField } from './extensions/MergeField'
 import { WatermarkOverlay } from './WatermarkOverlay'
 import { RulerBar } from './RulerBar'
 import type { Comment } from '../../lib/types/comments'
@@ -62,6 +63,11 @@ import { AIContextProvider } from '../../lib/ai/aiContext'
 import { DocumentProvider, useDocumentSettings } from '../../lib/documentContext'
 import { defaultContent } from '../../lib/defaultContent'
 import { saveDocument, saveAsHTML, loadDocument, newDocument, printDocument } from '../../lib/fileOperations'
+import { useAutoSave } from '../../lib/hooks/useAutoSave'
+import { createVersion } from '../../lib/versionHistory'
+import { TemplateChooserDialog } from '../Dialogs/TemplateChooserDialog'
+import { VersionHistoryDialog } from '../Dialogs/VersionHistoryDialog'
+import type { DocumentTemplate } from '../../lib/templates/defaultTemplates'
 import { exportPDF } from '../Export/exportPDF'
 import { exportDOCX } from '../Export/exportDOCX'
 import { PageOverlay } from './PageOverlay'
@@ -106,6 +112,8 @@ function WriterEditorInner() {
   const [citationStyle] = useState<'apa' | 'mla' | 'chicago'>('apa')
   const [watermarkText, setWatermarkText] = useState('')
   const [showRuler, setShowRuler] = useState(true)
+  const [showTemplateChooser, setShowTemplateChooser] = useState(false)
+  const [showVersionHistory, setShowVersionHistory] = useState(false)
   const isElectron = typeof window !== 'undefined' && !!window.electronAPI?.isElectron
 
   const { settings, setSettings } = useDocumentSettings()
@@ -179,6 +187,7 @@ function WriterEditorInner() {
       TabStop,
       TextBox,
       Shape,
+      MergeField,
     ],
     content: defaultContent,
     editorProps: {
@@ -187,6 +196,23 @@ function WriterEditorInner() {
       },
     },
   })
+
+  // Auto-save
+  const { lastSaved } = useAutoSave({ editor, documentName })
+
+  // Template handler
+  const handleSelectTemplate = useCallback((template: DocumentTemplate) => {
+    if (!editor) return
+    editor.commands.setContent(template.content as Parameters<typeof editor.commands.setContent>[0])
+    setDocumentName(template.name)
+    setShowTemplateChooser(false)
+  }, [editor])
+
+  // Version restore handler
+  const handleRestoreVersion = useCallback((content: unknown) => {
+    if (!editor) return
+    editor.commands.setContent(content as Parameters<typeof editor.commands.setContent>[0])
+  }, [editor])
 
   // Calculate page count based on content height
   const calculatePageCount = useCallback(() => {
@@ -367,6 +393,7 @@ function WriterEditorInner() {
           })
           break
         case 'save':
+          createVersion(editor.getJSON(), documentName)
           saveDocument(editor, documentName, settings)
           break
         case 'export-pdf':
@@ -599,13 +626,30 @@ function WriterEditorInner() {
       </div>
 
       {/* Status Bar */}
-      <StatusBar editor={editor} zoom={zoom} setZoom={setZoom} />
+      <StatusBar editor={editor} zoom={zoom} setZoom={setZoom} lastSaved={lastSaved} />
 
       {/* AI Settings Dialog */}
       <AISettingsDialog />
 
       {/* App Settings Dialog */}
       <SettingsDialog open={showSettings} onClose={() => setShowSettings(false)} />
+
+      {/* Template Chooser */}
+      {showTemplateChooser && (
+        <TemplateChooserDialog
+          onSelect={handleSelectTemplate}
+          onClose={() => setShowTemplateChooser(false)}
+        />
+      )}
+
+      {/* Version History */}
+      {showVersionHistory && (
+        <VersionHistoryDialog
+          documentName={documentName}
+          onRestore={handleRestoreVersion}
+          onClose={() => setShowVersionHistory(false)}
+        />
+      )}
     </div>
   )
 }

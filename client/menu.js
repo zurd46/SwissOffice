@@ -17,6 +17,12 @@ function createMenu(mainWindow) {
       submenu: [
         { role: 'about', label: 'Über ImpulsWriter' },
         { type: 'separator' },
+        {
+          label: 'Einstellungen...',
+          accelerator: 'Cmd+,',
+          click: () => sendAction('open-settings'),
+        },
+        { type: 'separator' },
         { role: 'services' },
         { type: 'separator' },
         { role: 'hide', label: 'ImpulsWriter ausblenden' },
@@ -37,6 +43,10 @@ function createMenu(mainWindow) {
           click: () => sendAction('new'),
         },
         {
+          label: 'Aus Vorlage...',
+          click: () => sendAction('new-from-template'),
+        },
+        {
           label: 'Öffnen...',
           accelerator: 'CmdOrCtrl+O',
           click: () => sendAction('open'),
@@ -51,6 +61,11 @@ function createMenu(mainWindow) {
           label: 'Speichern unter...',
           accelerator: 'CmdOrCtrl+Shift+S',
           click: () => sendAction('save-as'),
+        },
+        { type: 'separator' },
+        {
+          label: 'Versionsprotokoll...',
+          click: () => sendAction('version-history'),
         },
         { type: 'separator' },
         {
@@ -149,12 +164,38 @@ function createMenu(mainWindow) {
         },
         { type: 'separator' },
         {
+          label: 'Textfeld',
+          click: () => sendAction('insert-textbox'),
+        },
+        {
+          label: 'Form',
+          click: () => sendAction('insert-shape'),
+        },
+        { type: 'separator' },
+        {
+          label: 'Fussnote',
+          click: () => sendAction('insert-footnote'),
+        },
+        {
+          label: 'Zitat',
+          click: () => sendAction('insert-citation'),
+        },
+        {
+          label: 'Bibliografie',
+          click: () => sendAction('insert-bibliography'),
+        },
+        { type: 'separator' },
+        {
           label: 'Horizontale Linie',
           click: () => sendAction('insert-hr'),
         },
         {
           label: 'Seitenumbruch',
           click: () => sendAction('insert-page-break'),
+        },
+        {
+          label: 'Abschnittswechsel',
+          click: () => sendAction('insert-section-break'),
         },
       ],
     },
@@ -167,6 +208,14 @@ function createMenu(mainWindow) {
           label: 'Seitenleiste ein/aus',
           accelerator: 'CmdOrCtrl+\\',
           click: () => sendAction('toggle-sidebar'),
+        },
+        {
+          label: 'AI-Chat ein/aus',
+          click: () => sendAction('toggle-ai-chat'),
+        },
+        {
+          label: 'Lineal ein/aus',
+          click: () => sendAction('toggle-ruler'),
         },
         { type: 'separator' },
         {

@@ -8,6 +8,7 @@ import { TabStart } from './tabs/TabStart'
 import { TabEinfuegen } from './tabs/TabEinfuegen'
 import { TabSeitenlayout } from './tabs/TabSeitenlayout'
 import { TabUeberpruefen } from './tabs/TabUeberpruefen'
+import { TabSendungen } from './tabs/TabSendungen'
 import { TabAnsicht } from './tabs/TabAnsicht'
 import { TabKI } from './tabs/TabKI'
 
@@ -97,6 +98,9 @@ export function RibbonToolbar({
             spellCheckEnabled={spellCheckEnabled}
             onToggleSpellCheck={onToggleSpellCheck ?? (() => {})}
           />
+        )}
+        {activeTab === 'sendungen' && (
+          <TabSendungen editor={editor} />
         )}
         {activeTab === 'ansicht' && (
           <TabAnsicht

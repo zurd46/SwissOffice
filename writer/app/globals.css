@@ -509,6 +509,18 @@ body {
   padding-top: 1em;
 }
 
+/* Merge Fields */
+.ProseMirror .merge-field {
+  background-color: #e0f2fe;
+  color: #0369a1;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 0.9em;
+  border: 1px solid #7dd3fc;
+  font-family: system-ui;
+  white-space: nowrap;
+}
+
 /* AI Spinner Animation */
 @keyframes spin {
   from { transform: rotate(0deg); }

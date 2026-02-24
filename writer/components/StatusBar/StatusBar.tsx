@@ -7,9 +7,10 @@ interface StatusBarProps {
   editor: Editor
   zoom: number
   setZoom: (zoom: number) => void
+  lastSaved?: number | null
 }
 
-export function StatusBar({ editor, zoom, setZoom }: StatusBarProps) {
+export function StatusBar({ editor, zoom, setZoom, lastSaved }: StatusBarProps) {
   const characterCount = editor.storage.characterCount
   const words = characterCount?.words?.() ?? 0
   const characters = characterCount?.characters?.() ?? 0
@@ -17,18 +18,35 @@ export function StatusBar({ editor, zoom, setZoom }: StatusBarProps) {
   // Estimate pages (A4 ~250 words per page)
   const pages = Math.max(1, Math.ceil(words / 250))
 
+  const savedText = lastSaved
+    ? `Gespeichert ${new Date(lastSaved).toLocaleTimeString('de-CH', { hour: '2-digit', minute: '2-digit' })}`
+    : ''
+
   return (
-    <div className="h-7 bg-blue-600 text-white flex items-center justify-between px-4 text-xs select-none">
-      <div className="flex items-center gap-4">
+    <div style={{
+      height: 28,
+      backgroundColor: '#0078d4',
+      color: 'white',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      padding: '0 16px',
+      fontSize: 11,
+      userSelect: 'none',
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
         <span>Seite {pages} von {pages}</span>
-        <span>{words} Wörter</span>
+        <span>{words} Woerter</span>
         <span>{characters} Zeichen</span>
+        {savedText && (
+          <span style={{ opacity: 0.7 }}>{savedText}</span>
+        )}
       </div>
 
-      <div className="flex items-center gap-2">
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <button
           onClick={() => setZoom(Math.max(25, zoom - 10))}
-          className="hover:bg-blue-500 p-0.5 rounded"
+          style={{ border: 'none', background: 'none', color: 'white', cursor: 'pointer', padding: 2, borderRadius: 2 }}
           title="Verkleinern"
         >
           <ZoomOut size={14} />
@@ -39,14 +57,15 @@ export function StatusBar({ editor, zoom, setZoom }: StatusBarProps) {
           max="200"
           value={zoom}
           onChange={(e) => setZoom(parseInt(e.target.value))}
-          className="w-24 h-1 accent-white"
+          className="ribbon-zoom-slider"
+          style={{ width: 96 }}
           title={`${zoom}%`}
         />
-        <span className="w-10 text-center">{zoom}%</span>
+        <span style={{ width: 36, textAlign: 'center' }}>{zoom}%</span>
         <button
           onClick={() => setZoom(Math.min(200, zoom + 10))}
-          className="hover:bg-blue-500 p-0.5 rounded"
-          title="Vergrössern"
+          style={{ border: 'none', background: 'none', color: 'white', cursor: 'pointer', padding: 2, borderRadius: 2 }}
+          title="Vergroessern"
         >
           <ZoomIn size={14} />
         </button>
