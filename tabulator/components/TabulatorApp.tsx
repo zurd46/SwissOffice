@@ -20,6 +20,7 @@ import { saveDocument, loadDocument, exportCSV, importCSV, printDocument } from 
 import { loadCloudSpreadsheet } from '@/lib/cloud/cloudSpreadsheetService'
 import { useAuth } from '@shared/contexts/AuthContext'
 import { useCloud } from '@shared/contexts/CloudContext'
+import { Cloud } from 'lucide-react'
 
 // Electron API Typen
 declare global {
@@ -196,6 +197,59 @@ function TabulatorAppInner() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
+      {/* Cloud-Toolbar (nur wenn eingeloggt + online) */}
+      {isAuthenticated && cloudStatus.isCloudReachable && (
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '6px',
+          padding: '4px 12px',
+          backgroundColor: '#f0fdf4',
+          borderBottom: '1px solid #bbf7d0',
+          fontSize: '13px',
+        }}>
+          <Cloud size={14} color="#16a34a" />
+          <button
+            onClick={() => setShowCloudSave(true)}
+            style={{
+              border: 'none',
+              background: 'none',
+              cursor: 'pointer',
+              fontSize: '13px',
+              color: '#16a34a',
+              fontWeight: 500,
+              padding: '2px 8px',
+              borderRadius: '4px',
+            }}
+            onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#dcfce7' }}
+            onMouseOut={(e) => { e.currentTarget.style.backgroundColor = 'transparent' }}
+          >
+            In Cloud speichern
+          </button>
+          <span style={{ color: '#d1d5db' }}>|</span>
+          <button
+            onClick={() => setShowCloudOpen(true)}
+            style={{
+              border: 'none',
+              background: 'none',
+              cursor: 'pointer',
+              fontSize: '13px',
+              color: '#16a34a',
+              fontWeight: 500,
+              padding: '2px 8px',
+              borderRadius: '4px',
+            }}
+            onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#dcfce7' }}
+            onMouseOut={(e) => { e.currentTarget.style.backgroundColor = 'transparent' }}
+          >
+            Aus Cloud öffnen
+          </button>
+          {cloudDocumentId && (
+            <span style={{ marginLeft: 'auto', fontSize: '12px', color: '#86efac' }}>Cloud-Dokument verbunden</span>
+          )}
+        </div>
+      )}
+
       {/* Ribbon-Toolbar */}
       <RibbonToolbar
         isElectron={isElectron}
@@ -228,6 +282,25 @@ function TabulatorAppInner() {
       {/* Sortieren */}
       {showSortDialog && (
         <SortDialog onClose={() => setShowSortDialog(false)} />
+      )}
+
+      {/* Cloud Save Dialog */}
+      {showCloudSave && (
+        <CloudSaveDialog
+          documentTitle={state.documentName}
+          workbook={state.workbook}
+          existingCloudId={cloudDocumentId}
+          onSaved={handleCloudSaved}
+          onClose={() => setShowCloudSave(false)}
+        />
+      )}
+
+      {/* Cloud Open Dialog */}
+      {showCloudOpen && (
+        <CloudOpenDialog
+          onOpen={handleCloudOpen}
+          onClose={() => setShowCloudOpen(false)}
+        />
       )}
     </div>
   )
