@@ -11,7 +11,7 @@ import {
   Image, Table, Minus, FileDown as PageBreak, Link,
   Bold, Italic, Underline, Strikethrough, RemoveFormatting,
   TableProperties, Columns2, Rows3, Trash2, Merge, Split,
-  PanelLeft,
+  PanelLeft, Settings,
 } from 'lucide-react'
 
 interface MenuBarProps {
@@ -20,6 +20,7 @@ interface MenuBarProps {
   setDocumentName: (name: string) => void
   onToggleFindReplace: () => void
   onToggleSidebar: () => void
+  onOpenSettings: () => void
 }
 
 type MenuItem = {
@@ -35,7 +36,7 @@ type Menu = {
   items: MenuItem[]
 }
 
-export function MenuBar({ editor, documentName, setDocumentName, onToggleFindReplace, onToggleSidebar }: MenuBarProps) {
+export function MenuBar({ editor, documentName, setDocumentName, onToggleFindReplace, onToggleSidebar, onOpenSettings }: MenuBarProps) {
   const [activeMenu, setActiveMenu] = useState<string | null>(null)
   const menuRef = useRef<HTMLDivElement>(null)
 
@@ -139,6 +140,12 @@ export function MenuBar({ editor, documentName, setDocumentName, onToggleFindRep
         { label: 'Tabelle löschen', action: () => editor.chain().focus().deleteTable().run(), icon: <Trash2 size={15} /> },
         { label: 'Zellen verbinden', action: () => editor.chain().focus().mergeCells().run(), icon: <Merge size={15} /> },
         { label: 'Zellen teilen', action: () => editor.chain().focus().splitCell().run(), icon: <Split size={15} /> },
+      ],
+    },
+    {
+      label: 'Extras',
+      items: [
+        { label: 'Einstellungen...', action: onOpenSettings, icon: <Settings size={15} /> },
       ],
     },
     {

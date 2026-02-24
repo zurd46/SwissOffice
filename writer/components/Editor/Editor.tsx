@@ -109,6 +109,7 @@ export function WriterEditor() {
       FontSize,
       LineHeight,
       PageBreak,
+      PasteHandler,
     ],
     content: defaultContent,
     editorProps: {

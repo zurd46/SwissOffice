@@ -17,8 +17,19 @@ export async function exportPDF(editor: Editor, filename: string = 'dokument') {
   document.body.appendChild(clone)
 
   try {
+    // Find page break positions in the cloned DOM
+    const pageBreaks = clone.querySelectorAll('[data-page-break]')
+    const breakPositions: number[] = []
+
+    pageBreaks.forEach(el => {
+      const htmlEl = el as HTMLElement
+      breakPositions.push(htmlEl.offsetTop)
+      // Hide the visual page break indicator in PDF
+      htmlEl.style.display = 'none'
+    })
+
     const canvas = await html2canvas(clone, {
-      scale: 2,
+      scale: 3,
       useCORS: true,
       logging: false,
       width: 794, // A4 width in px at 96dpi
@@ -31,17 +42,41 @@ export async function exportPDF(editor: Editor, filename: string = 'dokument') {
     const imgWidth = pdfWidth
     const imgHeight = (canvas.height * pdfWidth) / canvas.width
 
-    let heightLeft = imgHeight
-    let position = 0
+    // Calculate scale factor from DOM pixels to PDF mm
+    const domToCanvasScale = canvas.width / clone.offsetWidth
+    const canvasToPdfScale = pdfWidth / canvas.width
 
-    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
-    heightLeft -= pdfHeight
+    if (breakPositions.length > 0) {
+      // Use explicit page breaks for splitting
+      const pdfBreakPositions = breakPositions.map(
+        pos => pos * domToCanvasScale * canvasToPdfScale
+      )
 
-    while (heightLeft > 0) {
-      position = heightLeft - imgHeight
-      pdf.addPage()
+      let currentY = 0
+      const allBreaks = [...pdfBreakPositions, imgHeight]
+
+      allBreaks.forEach((breakPos, index) => {
+        if (index > 0) pdf.addPage()
+
+        // Clip the canvas region for this page
+        const offset = -currentY
+        pdf.addImage(imgData, 'PNG', 0, offset, imgWidth, imgHeight)
+        currentY = breakPos
+      })
+    } else {
+      // No explicit page breaks — split at fixed A4 page height
+      let heightLeft = imgHeight
+      let position = 0
+
       pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
       heightLeft -= pdfHeight
+
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight
+        pdf.addPage()
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
+        heightLeft -= pdfHeight
+      }
     }
 
     pdf.save(`${filename}.pdf`)
