@@ -192,10 +192,22 @@ export function TabStart({ editor, onToggleFindReplace }: TabStartProps) {
               <ListChecks size={14} />
             </ToolbarButton>
             <div style={dividerStyle} />
-            <ToolbarButton onClick={() => editor.chain().focus().liftListItem('listItem').run()} title="Einzug verkleinern" disabled={!editor.can().liftListItem('listItem')}>
+            <ToolbarButton onClick={() => {
+              if (editor.can().liftListItem('listItem')) {
+                editor.chain().focus().liftListItem('listItem').run()
+              } else {
+                editor.chain().focus().decreaseIndent().run()
+              }
+            }} title="Einzug verkleinern">
               <Outdent size={14} />
             </ToolbarButton>
-            <ToolbarButton onClick={() => editor.chain().focus().sinkListItem('listItem').run()} title="Einzug vergrössern" disabled={!editor.can().sinkListItem('listItem')}>
+            <ToolbarButton onClick={() => {
+              if (editor.can().sinkListItem('listItem')) {
+                editor.chain().focus().sinkListItem('listItem').run()
+              } else {
+                editor.chain().focus().increaseIndent().run()
+              }
+            }} title="Einzug vergrössern">
               <Indent size={14} />
             </ToolbarButton>
             <div style={dividerStyle} />

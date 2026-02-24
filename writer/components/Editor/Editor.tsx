@@ -26,6 +26,7 @@ import { LineHeight } from './extensions/LineHeight'
 import { PageBreak } from './extensions/PageBreak'
 import { PasteHandler } from './extensions/PasteHandler'
 import { ParagraphSpacing } from './extensions/ParagraphSpacing'
+import { Indent } from './extensions/Indent'
 import { RibbonToolbar } from '../Toolbar/Ribbon/RibbonToolbar'
 import { MenuBar } from '../Toolbar/MenuBar'
 import { StatusBar } from '../StatusBar/StatusBar'
@@ -114,6 +115,7 @@ export function WriterEditor() {
       PageBreak,
       PasteHandler,
       ParagraphSpacing,
+      Indent,
     ],
     content: defaultContent,
     editorProps: {

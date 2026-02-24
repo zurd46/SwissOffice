@@ -1,7 +1,7 @@
 'use client'
 
 import { X, Globe, Type, Save, SpellCheck } from 'lucide-react'
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback } from 'react'
 import {
   type AppSettings,
   AVAILABLE_LANGUAGES,
@@ -56,17 +56,15 @@ const toggleRowStyle: React.CSSProperties = {
   borderBottom: '1px solid #f0f0f0',
 }
 
+// Wrapper that only mounts the inner dialog when open, ensuring fresh state each time
 export function SettingsDialog({ open, onClose }: SettingsDialogProps) {
+  if (!open) return null
+  return <SettingsDialogInner onClose={onClose} />
+}
+
+function SettingsDialogInner({ onClose }: { onClose: () => void }) {
   const [settings, setSettings] = useState<AppSettings>(loadAppSettings)
   const [saved, setSaved] = useState(false)
-  const prevOpenRef = useRef(false)
-
-  // Reload settings from localStorage when dialog opens
-  if (open && !prevOpenRef.current) {
-    setSettings(loadAppSettings())
-    setSaved(false)
-  }
-  prevOpenRef.current = open
 
   const updateField = useCallback(<K extends keyof AppSettings>(key: K, value: AppSettings[K]) => {
     setSettings(prev => ({ ...prev, [key]: value }))
@@ -78,8 +76,6 @@ export function SettingsDialog({ open, onClose }: SettingsDialogProps) {
     setSaved(true)
     setTimeout(() => onClose(), 400)
   }, [settings, onClose])
-
-  if (!open) return null
 
   return (
     <div
