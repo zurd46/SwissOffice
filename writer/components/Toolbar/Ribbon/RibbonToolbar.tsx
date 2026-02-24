@@ -15,6 +15,8 @@ interface RibbonToolbarProps {
   onToggleFindReplace: () => void
   onToggleSidebar: () => void
   showSidebar: boolean
+  onToggleAIChat: () => void
+  showAIChat: boolean
   zoom: number
   setZoom: (zoom: number) => void
   isElectron?: boolean
@@ -25,6 +27,8 @@ export function RibbonToolbar({
   onToggleFindReplace,
   onToggleSidebar,
   showSidebar,
+  onToggleAIChat,
+  showAIChat,
   zoom,
   setZoom,
   isElectron,
@@ -50,6 +54,13 @@ export function RibbonToolbar({
             showSidebar={showSidebar}
             zoom={zoom}
             setZoom={setZoom}
+          />
+        )}
+        {activeTab === 'ki' && (
+          <TabKI
+            editor={editor}
+            onToggleAIChat={onToggleAIChat}
+            showAIChat={showAIChat}
           />
         )}
       </RibbonPanel>
