@@ -88,8 +88,8 @@ export function TabStart({ editor, onToggleFindReplace }: TabStartProps) {
     <>
       {/* Zwischenablage */}
       <RibbonGroup label="Zwischenablage">
-        <div className="flex flex-col gap-[1px]">
-          <div className="flex items-center">
+        <div className="flex flex-col gap-[3px]">
+          <div className="flex items-center gap-[1px]">
             <ToolbarButton onClick={() => editor.chain().focus().undo().run()} title="Rückgängig (Ctrl+Z)" disabled={!editor.can().undo()}>
               <Undo2 size={14} />
             </ToolbarButton>
@@ -97,7 +97,7 @@ export function TabStart({ editor, onToggleFindReplace }: TabStartProps) {
               <Redo2 size={14} />
             </ToolbarButton>
           </div>
-          <div className="flex items-center">
+          <div className="flex items-center gap-[1px]">
             <ToolbarButton onClick={handleCut} title="Ausschneiden (Ctrl+X)">
               <Scissors size={14} />
             </ToolbarButton>
@@ -113,8 +113,8 @@ export function TabStart({ editor, onToggleFindReplace }: TabStartProps) {
 
       {/* Schriftart */}
       <RibbonGroup label="Schriftart">
-        <div className="flex flex-col gap-[2px]">
-          <div className="flex items-center gap-[2px]">
+        <div className="flex flex-col gap-[3px]">
+          <div className="flex items-center gap-[3px]">
             <ToolbarSelect
               value={getCurrentFontFamily()}
               onChange={(v) => editor.chain().focus().setFontFamily(v).run()}
@@ -136,7 +136,7 @@ export function TabStart({ editor, onToggleFindReplace }: TabStartProps) {
               <AArrowDown size={14} />
             </ToolbarButton>
           </div>
-          <div className="flex items-center">
+          <div className="flex items-center gap-[1px]">
             <ToolbarButton onClick={() => editor.chain().focus().toggleBold().run()} isActive={editor.isActive('bold')} title="Fett (Ctrl+B)">
               <Bold size={14} />
             </ToolbarButton>
@@ -155,7 +155,7 @@ export function TabStart({ editor, onToggleFindReplace }: TabStartProps) {
             <ToolbarButton onClick={() => editor.chain().focus().toggleSuperscript().run()} isActive={editor.isActive('superscript')} title="Hochgestellt">
               <Superscript size={14} />
             </ToolbarButton>
-            <div className="w-px h-4 bg-[#e1dfdd] mx-[1px]" />
+            <div className="w-px h-4 bg-[#e1dfdd] mx-[3px]" />
             <ToolbarColorButton
               value={textColor}
               onChange={(color) => { setTextColor(color); editor.chain().focus().setColor(color).run() }}
@@ -168,7 +168,7 @@ export function TabStart({ editor, onToggleFindReplace }: TabStartProps) {
               title="Hervorhebungsfarbe"
               icon="highlight"
             />
-            <div className="w-px h-4 bg-[#e1dfdd] mx-[1px]" />
+            <div className="w-px h-4 bg-[#e1dfdd] mx-[3px]" />
             <ToolbarButton onClick={() => editor.chain().focus().unsetAllMarks().run()} title="Formatierung entfernen">
               <RemoveFormatting size={14} />
             </ToolbarButton>
@@ -178,8 +178,8 @@ export function TabStart({ editor, onToggleFindReplace }: TabStartProps) {
 
       {/* Absatz */}
       <RibbonGroup label="Absatz">
-        <div className="flex flex-col gap-[2px]">
-          <div className="flex items-center gap-[2px]">
+        <div className="flex flex-col gap-[3px]">
+          <div className="flex items-center gap-[3px]">
             <ToolbarButton onClick={() => editor.chain().focus().toggleBulletList().run()} isActive={editor.isActive('bulletList')} title="Aufzählung">
               <List size={14} />
             </ToolbarButton>
@@ -189,14 +189,14 @@ export function TabStart({ editor, onToggleFindReplace }: TabStartProps) {
             <ToolbarButton onClick={() => editor.chain().focus().toggleTaskList().run()} isActive={editor.isActive('taskList')} title="Aufgabenliste">
               <ListChecks size={14} />
             </ToolbarButton>
-            <div className="w-px h-4 bg-[#e1dfdd] mx-[1px]" />
+            <div className="w-px h-4 bg-[#e1dfdd] mx-[3px]" />
             <ToolbarButton onClick={() => editor.chain().focus().liftListItem('listItem').run()} title="Einzug verkleinern" disabled={!editor.can().liftListItem('listItem')}>
               <Outdent size={14} />
             </ToolbarButton>
             <ToolbarButton onClick={() => editor.chain().focus().sinkListItem('listItem').run()} title="Einzug vergrössern" disabled={!editor.can().sinkListItem('listItem')}>
               <Indent size={14} />
             </ToolbarButton>
-            <div className="w-px h-4 bg-[#e1dfdd] mx-[1px]" />
+            <div className="w-px h-4 bg-[#e1dfdd] mx-[3px]" />
             <ToolbarSelect
               value="1.5"
               onChange={(v) => editor.chain().focus().setLineHeight(v).run()}
@@ -205,7 +205,7 @@ export function TabStart({ editor, onToggleFindReplace }: TabStartProps) {
               className="w-[44px]"
             />
           </div>
-          <div className="flex items-center">
+          <div className="flex items-center gap-[1px]">
             <ToolbarButton onClick={() => editor.chain().focus().setTextAlign('left').run()} isActive={editor.isActive({ textAlign: 'left' })} title="Linksbündig">
               <AlignLeft size={14} />
             </ToolbarButton>
@@ -218,7 +218,7 @@ export function TabStart({ editor, onToggleFindReplace }: TabStartProps) {
             <ToolbarButton onClick={() => editor.chain().focus().setTextAlign('justify').run()} isActive={editor.isActive({ textAlign: 'justify' })} title="Blocksatz">
               <AlignJustify size={14} />
             </ToolbarButton>
-            <div className="w-px h-4 bg-[#e1dfdd] mx-[1px]" />
+            <div className="w-px h-4 bg-[#e1dfdd] mx-[3px]" />
             <ToolbarButton onClick={() => editor.chain().focus().toggleBlockquote().run()} isActive={editor.isActive('blockquote')} title="Blockzitat">
               <Quote size={14} />
             </ToolbarButton>
@@ -228,7 +228,7 @@ export function TabStart({ editor, onToggleFindReplace }: TabStartProps) {
 
       {/* Formatvorlagen */}
       <RibbonGroupLast label="Formatvorlagen">
-        <div className="flex flex-col gap-[2px]">
+        <div className="flex flex-col gap-[3px]">
           <ToolbarSelect
             value={getCurrentHeading()}
             onChange={handleHeadingChange}
