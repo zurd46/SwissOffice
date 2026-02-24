@@ -72,7 +72,7 @@ export function AIContextProvider({ children }: AIProviderWrapperProps) {
   const getProvider = useCallback((): AIProvider => {
     if (!settings.apiKey) {
       throw new Error(
-        'API-Schlüssel nicht konfiguriert. Bitte öffne die KI-Einstellungen.',
+        'API-Schlüssel nicht konfiguriert. Bitte öffne die AI-Einstellungen.',
       )
     }
     providerRef.current = createAIProvider(settings.provider, {

@@ -171,7 +171,7 @@ export function TabStart({ editor, onToggleFindReplace }: TabStartProps) {
               icon="highlight"
             />
             <div style={dividerStyle} />
-            <ToolbarButton onClick={() => editor.chain().focus().unsetAllMarks().run()} title="Formatierung entfernen">
+            <ToolbarButton onClick={() => editor.chain().focus().clearNodes().unsetAllMarks().unsetFontSize().unsetColor().unsetHighlight().unsetFontFamily().unsetLineHeight().setTextAlign('left').run()} title="Formatierung entfernen">
               <RemoveFormatting size={14} />
             </ToolbarButton>
           </div>

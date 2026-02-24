@@ -210,7 +210,7 @@ export function TabKI({ editor, onToggleAIChat, showAIChat }: TabKIProps) {
         </div>
       </RibbonGroup>
 
-      <RibbonGroupLast label="KI-Chat">
+      <RibbonGroupLast label="AI-Chat">
         <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <RibbonLargeButton
             onClick={onToggleAIChat}

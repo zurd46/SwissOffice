@@ -26,7 +26,7 @@ export const SYSTEM_PROMPTS = {
 
   chat: (documentContent?: string) => {
     const base =
-      `Du bist ein hilfreicher KI-Assistent in einer Textverarbeitung (ImpulsOffice Writer). ` +
+      `Du bist ein hilfreicher AI-Assistent in einer Textverarbeitung (ImpulsOffice Writer). ` +
       `Du hilfst beim Schreiben, Bearbeiten und Erstellen von Dokumenten. ` +
       `Antworte immer auf Deutsch, es sei denn der Benutzer fragt explizit nach einer anderen Sprache. ` +
       `Wenn du Dokumentinhalte generierst, formatiere sie klar und professionell.`

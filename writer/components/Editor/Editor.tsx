@@ -53,6 +53,7 @@ declare global {
 export function WriterEditor() {
   const [showFindReplace, setShowFindReplace] = useState(false)
   const [showSidebar, setShowSidebar] = useState(false)
+  const [showAIChat, setShowAIChat] = useState(false)
   const [zoom, setZoom] = useState(100)
   const [documentName, setDocumentName] = useState('Unbenannt')
   const isElectron = typeof window !== 'undefined' && !!window.electronAPI?.isElectron
@@ -115,6 +116,10 @@ export function WriterEditor() {
 
   const toggleSidebar = useCallback(() => {
     setShowSidebar(prev => !prev)
+  }, [])
+
+  const toggleAIChat = useCallback(() => {
+    setShowAIChat(prev => !prev)
   }, [])
 
   // Electron native menu handler
@@ -199,6 +204,9 @@ export function WriterEditor() {
         case 'toggle-sidebar':
           setShowSidebar(prev => !prev)
           break
+        case 'toggle-ai-chat':
+          setShowAIChat(prev => !prev)
+          break
         case 'zoom-in':
           setZoom(prev => Math.min(200, prev + 10))
           break
@@ -230,6 +238,7 @@ export function WriterEditor() {
   }
 
   return (
+    <AIContextProvider>
     <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: '#f5f5f5', overflow: 'hidden' }}>
       {/* Menu Bar - hidden in Electron (native menu takes over) */}
       {!isElectron && (
@@ -248,6 +257,8 @@ export function WriterEditor() {
         onToggleFindReplace={toggleFindReplace}
         onToggleSidebar={toggleSidebar}
         showSidebar={showSidebar}
+        onToggleAIChat={toggleAIChat}
+        showAIChat={showAIChat}
         zoom={zoom}
         setZoom={setZoom}
         isElectron={isElectron}
@@ -279,10 +290,17 @@ export function WriterEditor() {
             <EditorContent editor={editor} />
           </div>
         </div>
+
+        {/* AI Chat Sidebar */}
+        {showAIChat && <AIChatSidebar editor={editor} onClose={() => setShowAIChat(false)} />}
       </div>
 
       {/* Status Bar */}
       <StatusBar editor={editor} zoom={zoom} setZoom={setZoom} />
+
+      {/* AI Settings Dialog */}
+      <AISettingsDialog />
     </div>
+    </AIContextProvider>
   )
 }

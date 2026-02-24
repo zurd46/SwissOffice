@@ -74,7 +74,7 @@ export function AISettingsDialog() {
           }}
         >
           <span style={{ fontSize: 15, fontWeight: 600, color: '#323130' }}>
-            KI-Einstellungen
+            AI-Einstellungen
           </span>
           <button
             onClick={() => setShowSettingsDialog(false)}

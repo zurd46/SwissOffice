@@ -84,7 +84,7 @@ export function AIChatSidebar({ editor, onClose }: AIChatSidebarProps) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <Sparkles size={16} style={{ color: '#0078d4' }} />
           <span style={{ fontSize: 13, fontWeight: 600, color: '#323130' }}>
-            KI-Chat
+            AI-Chat
           </span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
@@ -150,7 +150,7 @@ export function AIChatSidebar({ editor, onClose }: AIChatSidebarProps) {
           >
             <Sparkles size={32} style={{ marginBottom: 12, opacity: 0.5 }} />
             <p style={{ fontSize: 13, margin: 0, fontStyle: 'italic' }}>
-              Stelle eine Frage oder bitte die KI, Inhalte für dein Dokument zu
+              Stelle eine Frage oder bitte die AI, Inhalte für dein Dokument zu
               erstellen.
             </p>
           </div>
