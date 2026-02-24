@@ -200,7 +200,7 @@ export function TabStart({ editor, onToggleFindReplace }: TabStartProps) {
             </ToolbarButton>
             <div style={dividerStyle} />
             <ToolbarSelect
-              value="1.5"
+              value={editor.getAttributes('paragraph').lineHeight || '1.5'}
               onChange={(v) => editor.chain().focus().setLineHeight(v).run()}
               options={LINE_HEIGHTS}
               title="Zeilenabstand"

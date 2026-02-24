@@ -63,6 +63,8 @@ export function WriterEditor() {
     extensions: [
       StarterKit.configure({
         heading: { levels: [1, 2, 3, 4, 5, 6] },
+        bulletList: { keepMarks: true, keepAttributes: true },
+        orderedList: { keepMarks: true, keepAttributes: true },
       }),
       Underline,
       TextAlign.configure({
@@ -97,7 +99,12 @@ export function WriterEditor() {
         placeholder: 'Beginnen Sie mit der Eingabe...',
       }),
       CharacterCount,
-      Typography,
+      Typography.configure({
+        openDoubleQuote: '\u201E',
+        closeDoubleQuote: '\u201C',
+        openSingleQuote: '\u201A',
+        closeSingleQuote: '\u2018',
+      }),
       FontSize,
       LineHeight,
       PageBreak,
@@ -169,7 +176,7 @@ export function WriterEditor() {
           editor.chain().focus().toggleUnderline().run()
           break
         case 'clear-format':
-          editor.chain().focus().clearNodes().unsetAllMarks().run()
+          editor.chain().focus().clearNodes().unsetAllMarks().unsetFontSize().unsetColor().unsetHighlight().unsetFontFamily().unsetLineHeight().setTextAlign('left').run()
           break
         case 'insert-image': {
           const input = document.createElement('input')

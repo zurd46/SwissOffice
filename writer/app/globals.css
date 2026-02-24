@@ -79,14 +79,24 @@ body {
   margin-bottom: 0.5em;
 }
 
+.ProseMirror ul ul { list-style-type: circle; }
+.ProseMirror ul ul ul { list-style-type: square; }
+
 .ProseMirror ol {
   list-style-type: decimal;
   padding-left: 1.5em;
   margin-bottom: 0.5em;
 }
 
+.ProseMirror ol ol { list-style-type: lower-alpha; }
+.ProseMirror ol ol ol { list-style-type: lower-roman; }
+
 .ProseMirror li {
   margin-bottom: 0.15em;
+}
+
+.ProseMirror li > p {
+  margin-bottom: 0;
 }
 
 /* Task List */

@@ -82,15 +82,15 @@ export function FindReplace({ editor, onClose }: FindReplaceProps) {
     const matches = findMatches()
     if (matches.length === 0) return
 
-    // Replace from end to start to preserve positions
+    // Single transaction so "Alle ersetzen" is one undo step
+    const { tr } = editor.state
     const sortedMatches = [...matches].sort((a, b) => b.from - a.from)
-    const chain = editor.chain().focus()
 
     sortedMatches.forEach(match => {
-      chain.setTextSelection({ from: match.from, to: match.to }).insertContent(replaceTerm)
+      tr.replaceWith(match.from, match.to, editor.state.schema.text(replaceTerm))
     })
 
-    chain.run()
+    editor.view.dispatch(tr)
     setMatchCount(0)
     setCurrentMatch(0)
   }, [editor, findMatches, replaceTerm])

@@ -11,15 +11,14 @@ export function AISettingsDialog() {
 
   const [apiKey, setApiKey] = useState(settings.apiKey)
   const [model, setModel] = useState(settings.model)
-  const [baseUrl, setBaseUrl] = useState(settings.baseUrl)
   const [testStatus, setTestStatus] = useState<
     'idle' | 'loading' | 'success' | 'error'
   >('idle')
 
   const handleSave = useCallback(() => {
-    updateSettings({ apiKey, model, baseUrl })
+    updateSettings({ apiKey, model })
     setShowSettingsDialog(false)
-  }, [apiKey, model, baseUrl, updateSettings, setShowSettingsDialog])
+  }, [apiKey, model, updateSettings, setShowSettingsDialog])
 
   const handleTest = useCallback(async () => {
     if (!apiKey) return
@@ -28,14 +27,13 @@ export function AISettingsDialog() {
       const provider = createAIProvider('openai', {
         apiKey,
         model,
-        baseUrl,
       })
       const success = await provider.testConnection()
       setTestStatus(success ? 'success' : 'error')
     } catch {
       setTestStatus('error')
     }
-  }, [apiKey, model, baseUrl])
+  }, [apiKey, model])
 
   if (!showSettingsDialog) return null
 
@@ -132,7 +130,7 @@ export function AISettingsDialog() {
           </div>
 
           {/* Model */}
-          <div style={{ marginBottom: 16 }}>
+          <div style={{ marginBottom: 20 }}>
             <label
               style={{
                 display: 'block',
@@ -160,42 +158,6 @@ export function AISettingsDialog() {
                 boxSizing: 'border-box',
               }}
             />
-          </div>
-
-          {/* Base URL */}
-          <div style={{ marginBottom: 20 }}>
-            <label
-              style={{
-                display: 'block',
-                fontSize: 12,
-                fontWeight: 600,
-                color: '#323130',
-                marginBottom: 4,
-              }}
-            >
-              API-URL
-            </label>
-            <input
-              type="text"
-              value={baseUrl}
-              onChange={(e) => setBaseUrl(e.target.value)}
-              placeholder="https://api.openai.com/v1"
-              style={{
-                width: '100%',
-                height: 32,
-                padding: '0 10px',
-                border: '1px solid #c8c6c4',
-                borderRadius: 4,
-                fontSize: 13,
-                outline: 'none',
-                boxSizing: 'border-box',
-              }}
-            />
-            <span
-              style={{ fontSize: 11, color: '#a19f9d', marginTop: 2, display: 'block' }}
-            >
-              Funktioniert auch mit lokalen LLMs (LM Studio, Ollama)
-            </span>
           </div>
 
           {/* Test Connection */}
