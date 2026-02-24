@@ -477,11 +477,44 @@ function WriterEditorInner() {
         case 'open-settings':
           setShowSettings(true)
           break
+        case 'new-from-template':
+          setShowTemplateChooser(true)
+          break
+        case 'version-history':
+          setShowVersionHistory(true)
+          break
+        case 'save-as':
+          saveDocument(editor, documentName, settings)
+          break
+        case 'insert-textbox':
+          editor.chain().focus().insertContent({ type: 'textBox', content: [{ type: 'paragraph' }] }).run()
+          break
+        case 'insert-shape':
+          editor.chain().focus().insertContent({ type: 'shape', attrs: { shapeType: 'rectangle', width: 200, height: 100, fillColor: '#e0e0e0' } }).run()
+          break
+        case 'insert-footnote':
+          handleInsertFootnote()
+          break
+        case 'insert-citation':
+          handleInsertCitation()
+          break
+        case 'insert-bibliography':
+          handleInsertBibliography()
+          break
+        case 'insert-section-break':
+          editor.chain().focus().insertContent({ type: 'sectionBreak' }).run()
+          break
+        case 'toggle-ruler':
+          setShowRuler(prev => !prev)
+          break
+        case 'about':
+          alert('ImpulsWriter\nVersion 1.0\n\nProfessionelle Textverarbeitung')
+          break
       }
     })
 
     return cleanup
-  }, [editor, documentName, settings, setSettings])
+  }, [editor, documentName, settings, setSettings, handleInsertFootnote, handleInsertCitation, handleInsertBibliography])
 
   // Sync document title with Electron window
   useEffect(() => {
