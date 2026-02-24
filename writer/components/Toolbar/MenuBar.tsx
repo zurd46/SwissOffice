@@ -151,33 +151,33 @@ export function MenuBar({ editor, documentName, setDocumentName, onToggleFindRep
   ]
 
   return (
-    <div ref={menuRef} className="bg-[#f8f8f8] border-b border-[#e1dfdd] flex items-center h-[40px] select-none">
+    <div ref={menuRef} className="bg-[#f9f9f9] border-b border-[#e5e5e5] flex items-center h-[38px] select-none">
       {/* Logo + Document Name */}
-      <div className="flex items-center gap-3 pl-4 pr-5 h-full">
-        <div className="w-6 h-6 bg-[#185abd] rounded flex items-center justify-center shadow-sm">
+      <div className="flex items-center gap-[10px] pl-[14px] pr-[16px] h-full">
+        <div className="w-[24px] h-[24px] bg-[#185abd] rounded-[5px] flex items-center justify-center shadow-[0_1px_3px_rgba(0,0,0,0.12)]">
           <span className="text-white font-bold text-[13px] leading-none">W</span>
         </div>
         <input
           type="text"
           value={documentName}
           onChange={(e) => setDocumentName(e.target.value)}
-          className="text-[13px] font-semibold text-[#323130] bg-transparent border-none outline-none hover:bg-white focus:bg-white px-2 py-1 rounded w-[150px] transition-colors"
+          className="text-[13px] font-medium text-[#242424] bg-transparent border-none outline-none hover:bg-white focus:bg-white focus:shadow-[0_0_0_1px_rgba(0,120,212,0.4)] px-[8px] py-[3px] rounded-[4px] w-[150px] transition-all"
         />
       </div>
 
       {/* Vertical separator */}
-      <div className="w-px h-5 bg-[#d2d0ce]" />
+      <div className="w-px h-[18px] bg-[#d9d9d9]" />
 
       {/* Menu Items */}
-      <nav className="flex items-center h-full ml-3">
+      <nav className="flex items-center h-full ml-[6px]">
         {menus.map(menu => (
           <div key={menu.label} className="relative h-full flex items-center">
             <button
               className={`
-                mx-[2px] px-4 py-[6px] text-[13px] rounded transition-colors duration-100
+                mx-[1px] px-[14px] py-[5px] text-[13px] rounded-[5px] transition-colors duration-100
                 ${activeMenu === menu.label
-                  ? 'bg-white text-[#201f1e] shadow-sm'
-                  : 'text-[#444] hover:bg-white/70 hover:text-[#201f1e]'
+                  ? 'bg-white text-[#242424] shadow-[0_1px_3px_rgba(0,0,0,0.08)]'
+                  : 'text-[#505050] hover:bg-white/60 hover:text-[#242424]'
                 }
               `}
               onClick={() => setActiveMenu(activeMenu === menu.label ? null : menu.label)}
@@ -187,25 +187,28 @@ export function MenuBar({ editor, documentName, setDocumentName, onToggleFindRep
             </button>
 
             {activeMenu === menu.label && (
-              <div className="absolute left-0 top-full mt-px bg-white border border-[#e1dfdd] rounded-lg shadow-[0_8px_30px_rgba(0,0,0,0.12)] py-1.5 z-50 min-w-[260px]">
+              <div className="absolute left-0 top-full mt-[2px] bg-white border border-[#d6d6d6] rounded-[8px] shadow-[0_6px_24px_rgba(0,0,0,0.14),0_0_0_1px_rgba(0,0,0,0.04)] py-[6px] z-50 min-w-[260px]">
                 {menu.items.map((item, i) => (
                   item.divider ? (
-                    <div key={i} className="border-t border-[#f0f0f0] my-1.5 mx-3" />
+                    <div key={i} className="h-px bg-[#e8e6e4] my-[5px] mx-[10px]" />
                   ) : (
                     <button
                       key={i}
-                      className="w-full text-left px-3 py-[7px] text-[13px] text-[#323130] hover:bg-[#f5f5f5] flex items-center transition-colors duration-75 cursor-pointer rounded-md mx-1.5 pr-4"
-                      style={{ width: 'calc(100% - 12px)' }}
+                      className="group flex items-center w-[calc(100%-10px)] mx-[5px] px-[10px] py-[6px] text-[13px] text-[#242424] hover:bg-[#eff6fc] rounded-[5px] transition-colors duration-75 cursor-pointer"
                       onClick={() => {
                         item.action?.()
                         setActiveMenu(null)
                       }}
                     >
-                      <span className="w-6 h-5 flex items-center justify-center mr-3 text-[#605e5c] shrink-0">
+                      <span className="w-[22px] h-[22px] flex items-center justify-center mr-[10px] text-[#616161] group-hover:text-[#0f6cbd] shrink-0 transition-colors">
                         {item.icon}
                       </span>
-                      <span className="flex-1">{item.label}</span>
-                      {item.shortcut && <span className="text-[11px] text-[#a19f9d] ml-6 shrink-0">{item.shortcut}</span>}
+                      <span className="flex-1 text-left">{item.label}</span>
+                      {item.shortcut && (
+                        <span className="text-[11px] text-[#adadad] ml-[20px] shrink-0 font-light tracking-wide">
+                          {item.shortcut}
+                        </span>
+                      )}
                     </button>
                   )
                 ))}
