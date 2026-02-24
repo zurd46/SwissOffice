@@ -3,6 +3,7 @@
 import { Editor } from '@tiptap/react'
 import {
   FileDown, FileImage, Link, Minus, Table, ImagePlus,
+  Footprints, BookOpen, ListOrdered,
 } from 'lucide-react'
 import { RibbonLargeButton } from '../../ToolbarButton'
 import { RibbonGroup, RibbonGroupLast } from '../RibbonGroup'
@@ -11,9 +12,12 @@ import { useState, useCallback } from 'react'
 
 interface TabEinfuegenProps {
   editor: Editor
+  onInsertFootnote?: () => void
+  onInsertCitation?: () => void
+  onInsertBibliography?: () => void
 }
 
-export function TabEinfuegen({ editor }: TabEinfuegenProps) {
+export function TabEinfuegen({ editor, onInsertFootnote, onInsertCitation, onInsertBibliography }: TabEinfuegenProps) {
   const [showTablePicker, setShowTablePicker] = useState(false)
 
   const insertImageFromFile = useCallback(() => {
@@ -99,6 +103,26 @@ export function TabEinfuegen({ editor }: TabEinfuegenProps) {
           label="Hyperlink"
           isActive={editor.isActive('link')}
         />
+      </RibbonGroup>
+
+      <RibbonGroup label="Verweise">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <RibbonLargeButton
+            onClick={onInsertFootnote ?? (() => {})}
+            icon={<Footprints size={20} style={{ color: '#605e5c' }} />}
+            label="Fussnote"
+          />
+          <RibbonLargeButton
+            onClick={onInsertCitation ?? (() => {})}
+            icon={<BookOpen size={20} style={{ color: '#605e5c' }} />}
+            label="Zitat"
+          />
+          <RibbonLargeButton
+            onClick={onInsertBibliography ?? (() => {})}
+            icon={<ListOrdered size={20} style={{ color: '#605e5c' }} />}
+            label="Bibliografie"
+          />
+        </div>
       </RibbonGroup>
 
       <RibbonGroupLast label="Elemente">

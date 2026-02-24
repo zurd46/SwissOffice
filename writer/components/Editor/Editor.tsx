@@ -33,8 +33,16 @@ import { SectionBreak } from './extensions/SectionBreak'
 import { Comment as CommentMark } from './extensions/Comment'
 import { TrackInsert } from './extensions/TrackInsert'
 import { TrackDelete } from './extensions/TrackDelete'
+import { FootnoteRef } from './extensions/FootnoteRef'
+import { Citation } from './extensions/Citation'
+import { Bibliography } from './extensions/Bibliography'
+import { AdvancedList } from './extensions/AdvancedList'
 import type { Comment } from '../../lib/types/comments'
 import { generateCommentId } from '../../lib/types/comments'
+import type { Footnote } from '../../lib/types/footnotes'
+import { generateFootnoteId } from '../../lib/types/footnotes'
+import type { BibEntry } from '../../lib/types/bibliography'
+import { generateBibId, formatCitation } from '../../lib/types/bibliography'
 import { RibbonToolbar } from '../Toolbar/Ribbon/RibbonToolbar'
 import { MenuBar } from '../Toolbar/MenuBar'
 import { StatusBar } from '../StatusBar/StatusBar'
@@ -86,6 +94,9 @@ function WriterEditorInner() {
   const [comments, setComments] = useState<Comment[]>([])
   const [trackingEnabled, setTrackingEnabled] = useState(false)
   const [spellCheckEnabled, setSpellCheckEnabled] = useState(false)
+  const [footnotes, setFootnotes] = useState<Footnote[]>([])
+  const [bibliography, setBibliography] = useState<BibEntry[]>([])
+  const [citationStyle] = useState<'apa' | 'mla' | 'chicago'>('apa')
   const isElectron = typeof window !== 'undefined' && !!window.electronAPI?.isElectron
 
   const { settings, setSettings } = useDocumentSettings()
@@ -150,6 +161,10 @@ function WriterEditorInner() {
       CommentMark,
       TrackInsert,
       TrackDelete,
+      FootnoteRef,
+      Citation,
+      Bibliography,
+      AdvancedList,
     ],
     content: defaultContent,
     editorProps: {
@@ -281,6 +296,44 @@ function WriterEditorInner() {
   const handleToggleSpellCheck = useCallback(() => {
     setSpellCheckEnabled(prev => !prev)
   }, [])
+
+  // Footnote handler
+  const handleInsertFootnote = useCallback(() => {
+    if (!editor) return
+    const id = generateFootnoteId()
+    const number = footnotes.length + 1
+    const content = prompt('Fussnotentext eingeben:')
+    if (content) {
+      setFootnotes(prev => [...prev, { id, number, content }])
+      editor.chain().focus().insertFootnote(id, number).run()
+    }
+  }, [editor, footnotes.length])
+
+  // Citation handler
+  const handleInsertCitation = useCallback(() => {
+    if (!editor) return
+    const title = prompt('Titel der Quelle:')
+    if (!title) return
+    const author = prompt('Autor(en):') || 'Unbekannt'
+    const year = prompt('Jahr:') || new Date().getFullYear().toString()
+
+    const entry: BibEntry = {
+      id: generateBibId(),
+      type: 'book',
+      authors: [author],
+      title,
+      year,
+    }
+    setBibliography(prev => [...prev, entry])
+    const displayText = formatCitation(entry, citationStyle)
+    editor.chain().focus().insertCitation(entry.id, displayText).run()
+  }, [editor, citationStyle])
+
+  // Bibliography handler
+  const handleInsertBibliography = useCallback(() => {
+    if (!editor) return
+    editor.chain().focus().insertBibliography().run()
+  }, [editor])
 
   // Electron native menu handler
   useEffect(() => {
@@ -442,6 +495,9 @@ function WriterEditorInner() {
         onRejectAll={handleRejectAll}
         spellCheckEnabled={spellCheckEnabled}
         onToggleSpellCheck={handleToggleSpellCheck}
+        onInsertFootnote={handleInsertFootnote}
+        onInsertCitation={handleInsertCitation}
+        onInsertBibliography={handleInsertBibliography}
       />
 
       {/* Find & Replace */}

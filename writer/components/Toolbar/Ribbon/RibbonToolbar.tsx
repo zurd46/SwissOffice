@@ -28,6 +28,9 @@ interface RibbonToolbarProps {
   onRejectAll?: () => void
   spellCheckEnabled?: boolean
   onToggleSpellCheck?: () => void
+  onInsertFootnote?: () => void
+  onInsertCitation?: () => void
+  onInsertBibliography?: () => void
 }
 
 export function RibbonToolbar({
@@ -47,6 +50,9 @@ export function RibbonToolbar({
   onRejectAll,
   spellCheckEnabled = false,
   onToggleSpellCheck,
+  onInsertFootnote,
+  onInsertCitation,
+  onInsertBibliography,
 }: RibbonToolbarProps) {
   const [activeTab, setActiveTab] = useState('start')
 
@@ -58,7 +64,12 @@ export function RibbonToolbar({
           <TabStart editor={editor} onToggleFindReplace={onToggleFindReplace} />
         )}
         {activeTab === 'einfuegen' && (
-          <TabEinfuegen editor={editor} />
+          <TabEinfuegen
+            editor={editor}
+            onInsertFootnote={onInsertFootnote}
+            onInsertCitation={onInsertCitation}
+            onInsertBibliography={onInsertBibliography}
+          />
         )}
         {activeTab === 'seitenlayout' && (
           <TabSeitenlayout editor={editor} />
