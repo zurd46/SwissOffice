@@ -14,6 +14,7 @@ export function createEmptySheet(name: string): SheetData {
     rowHeights: {},
     frozenRows: 0,
     frozenCols: 0,
+    mergedCells: [],
   }
 }
 

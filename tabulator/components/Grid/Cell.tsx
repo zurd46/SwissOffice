@@ -17,49 +17,77 @@ interface CellProps {
 }
 
 /** Formatiert einen Zellwert für die Anzeige */
-function formatCellValue(data: CellData | undefined): string {
-  if (!data || data.value === null || data.value === undefined) return ''
+function formatCellValue(data: CellData | undefined): { text: string; isNegative: boolean } {
+  if (!data || data.value === null || data.value === undefined) return { text: '', isNegative: false }
 
   const value = data.value
 
   if (isCellError(value)) {
-    return value.type
+    return { text: value.type, isNegative: false }
   }
 
   if (typeof value === 'boolean') {
-    return value ? 'WAHR' : 'FALSCH'
+    return { text: value ? 'WAHR' : 'FALSCH', isNegative: false }
   }
 
   if (typeof value === 'number') {
+    const isNeg = value < 0
     const format = data.style?.numberFormat || 'general'
+    const pattern = data.style?.numberFormatPattern
+
+    // Benutzerdefiniertes Format-Pattern
+    if (pattern) {
+      // Einfache Pattern-Unterstützung: #,##0.00 → Tausendertrennzeichen + 2 Dez.
+      const decimals = (pattern.split('.')[1] || '').replace(/[^0#]/g, '').length
+      return {
+        text: value.toLocaleString('de-CH', {
+          minimumFractionDigits: decimals,
+          maximumFractionDigits: decimals,
+        }),
+        isNegative: isNeg,
+      }
+    }
+
     switch (format) {
       case 'number':
-        return value.toLocaleString('de-CH', {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        })
+        return {
+          text: value.toLocaleString('de-CH', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }),
+          isNegative: isNeg,
+        }
       case 'currency':
-        return value.toLocaleString('de-CH', {
-          style: 'currency',
-          currency: 'CHF',
-        })
+        return {
+          text: value.toLocaleString('de-CH', {
+            style: 'currency',
+            currency: 'CHF',
+          }),
+          isNegative: isNeg,
+        }
       case 'percentage':
-        return (value * 100).toLocaleString('de-CH', {
-          minimumFractionDigits: 0,
-          maximumFractionDigits: 2,
-        }) + '%'
+        return {
+          text: (value * 100).toLocaleString('de-CH', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2,
+          }) + '%',
+          isNegative: isNeg,
+        }
       case 'date': {
         const d = new Date(Math.round((value - 25569) * 86400 * 1000))
-        return d.toLocaleDateString('de-CH')
+        return { text: d.toLocaleDateString('de-CH'), isNegative: false }
       }
       default:
         // Allgemein: Ganzzahlen ohne Dezimalstellen, Dezimalzahlen mit bis zu 10
-        if (Number.isInteger(value)) return value.toString()
-        return value.toLocaleString('de-CH', { maximumFractionDigits: 10 })
+        if (Number.isInteger(value)) return { text: value.toString(), isNegative: isNeg }
+        return {
+          text: value.toLocaleString('de-CH', { maximumFractionDigits: 10 }),
+          isNegative: isNeg,
+        }
     }
   }
 
-  return String(value)
+  return { text: String(value), isNegative: false }
 }
 
 /** Baut CSS-Styles aus CellStyle */
@@ -116,7 +144,7 @@ function buildCellStyles(style: CellStyle | undefined): React.CSSProperties {
 }
 
 export const Cell = memo(function Cell({ data, width, height, isActive, isSelected }: CellProps) {
-  const displayValue = formatCellValue(data)
+  const { text: displayValue, isNegative } = formatCellValue(data)
   const isError = data?.value && isCellError(data.value)
   const cellStyles = buildCellStyles(data?.style)
 
@@ -127,18 +155,39 @@ export const Cell = memo(function Cell({ data, width, height, isActive, isSelect
     }
   }
 
+  // Negative Zahlen in Rot (wenn keine explizite Textfarbe gesetzt)
+  const negativeColor = isNegative && !data?.style?.textColor ? '#cc0000' : undefined
+
+  const hasComment = !!data?.comment
+
   return (
     <div
       className="spreadsheet-cell"
       style={{
         width,
         height,
+        position: 'relative',
         ...cellStyles,
-        ...(isError ? { color: '#c00' } : {}),
+        ...(isError ? { color: '#c00' } : negativeColor ? { color: negativeColor } : {}),
         ...(isSelected && !isActive ? { backgroundColor: cellStyles.backgroundColor ? undefined : 'rgba(0, 120, 212, 0.08)' } : {}),
       }}
+      title={hasComment ? `${data.comment!.author ? data.comment!.author + ': ' : ''}${data.comment!.text}` : undefined}
     >
       {displayValue}
+      {/* Kommentar-Indikator (rotes Dreieck) */}
+      {hasComment && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            right: 0,
+            width: 0,
+            height: 0,
+            borderLeft: '6px solid transparent',
+            borderTop: '6px solid #ff6d00',
+          }}
+        />
+      )}
     </div>
   )
 })

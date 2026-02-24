@@ -19,12 +19,12 @@ export function ToolbarButton({ onClick, isActive, disabled, title, children, cl
       disabled={disabled}
       title={title}
       className={`
-        w-[26px] h-[26px] flex items-center justify-center rounded-sm transition-all duration-100
+        w-[26px] h-[26px] flex items-center justify-center rounded transition-all duration-100
         ${isActive
-          ? 'bg-[#c7e0f4] text-[#1a5276] shadow-[inset_0_0_0_1px_rgba(26,82,118,0.25)]'
-          : 'text-[#323130] hover:bg-[#e1dfdd]'
+          ? 'bg-[#d2e3fc] text-[#1a73e8] shadow-[inset_0_0_0_1px_rgba(26,115,232,0.2)]'
+          : 'text-[#202124] hover:bg-[#e8eaed]'
         }
-        ${disabled ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer active:bg-[#c8c6c4]'}
+        ${disabled ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer active:bg-[#dadce0]'}
         ${className}
       `}
     >
@@ -48,9 +48,9 @@ export function ToolbarSelect({ value, onChange, options, title, className = '' 
       onChange={(e) => onChange(e.target.value)}
       title={title}
       className={`
-        h-[24px] px-[6px] text-[11px] border border-[#c8c6c4] rounded-sm bg-white
-        hover:border-[#0078d4] focus:outline-none focus:border-[#0078d4] focus:shadow-[0_0_0_1px_rgba(0,120,212,0.3)]
-        text-[#323130] cursor-pointer transition-all duration-100
+        h-[24px] px-[6px] text-[11px] border border-[#dadce0] rounded bg-white
+        hover:border-[#1a73e8] focus:outline-none focus:border-[#1a73e8] focus:shadow-[0_0_0_1px_rgba(26,115,232,0.3)]
+        text-[#202124] cursor-pointer transition-all duration-100
         ${className}
       `}
     >
@@ -62,7 +62,7 @@ export function ToolbarSelect({ value, onChange, options, title, className = '' 
 }
 
 export function ToolbarDivider() {
-  return <div className="w-px h-6 bg-[#d2d0ce] mx-1" />
+  return <div className="w-px h-6 bg-[#dadce0] mx-1" />
 }
 
 interface ToolbarColorButtonProps {
@@ -78,9 +78,9 @@ export function ToolbarColorButton({ value, onChange, title, icon }: ToolbarColo
     <button
       onClick={() => inputRef.current?.click()}
       title={title}
-      className="w-[26px] h-[26px] flex flex-col items-center justify-center rounded-sm hover:bg-[#e1dfdd] cursor-pointer transition-all duration-100 relative"
+      className="w-[26px] h-[26px] flex flex-col items-center justify-center rounded hover:bg-[#e1dfdd] cursor-pointer transition-all duration-100 relative"
     >
-      {icon === 'text' ? <Type size={14} className="text-[#323130]" /> : <Highlighter size={14} className="text-[#323130]" />}
+      {icon === 'text' ? <Type size={14} className="text-[#202124]" /> : <Highlighter size={14} className="text-[#202124]" />}
       <div className="w-4 h-[3px] rounded-full mt-px" style={{ backgroundColor: value }} />
       <input
         ref={inputRef}
@@ -109,13 +109,13 @@ export function RibbonLargeButton({ onClick, icon, label, disabled, isActive }: 
       disabled={disabled}
       title={label}
       className={`
-        flex flex-col items-center justify-center gap-[2px] px-[10px] py-[4px] rounded-sm transition-all duration-100
+        flex flex-col items-center justify-center gap-[2px] px-[10px] py-[4px] rounded transition-all duration-100
         text-[10px] leading-tight min-w-[48px]
         ${isActive
           ? 'bg-[#c7e0f4] text-[#1a5276]'
-          : 'text-[#323130] hover:bg-[#e1dfdd]'
+          : 'text-[#202124] hover:bg-[#e8eaed]'
         }
-        ${disabled ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer active:bg-[#c8c6c4]'}
+        ${disabled ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer active:bg-[#dadce0]'}
       `}
     >
       <div className="h-6 flex items-center justify-center">{icon}</div>

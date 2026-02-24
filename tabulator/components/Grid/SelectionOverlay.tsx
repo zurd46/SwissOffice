@@ -80,7 +80,7 @@ export const SelectionOverlay = memo(function SelectionOverlay({
               top: pos.y,
               width: w,
               height: h,
-              border: '2px solid #0078d4',
+              border: '2px solid #1a73e8',
               pointerEvents: 'none',
               zIndex: 6,
             }}

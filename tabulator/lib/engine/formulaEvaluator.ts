@@ -5,7 +5,7 @@
 import type { CellValue, CellAddress, CellRange } from '@/lib/types/spreadsheet'
 import type { FormulaNode } from './formulaParser'
 import { parseFormula } from './formulaParser'
-import { getFormulaFunction } from './formulaFunctions'
+import { getFormulaFunction, type RangeArg } from './formulaFunctions'
 import { isCellError } from '@/lib/types/spreadsheet'
 // cellAddressUtils used via getCellValue/getCellRange callbacks
 
@@ -60,11 +60,15 @@ function evaluateNode(
         return { type: '#NAME?', message: `Unbekannte Funktion: ${node.name}` }
       }
 
-      // Argumente auflösen — Bereiche werden abgeflacht
+      // Argumente auflösen — Bereiche werden abgeflacht, aber Range-Metadaten werden gespeichert
       const resolvedArgs: CellValue[] = []
+      const rangeArgs: RangeArg[] = []
       for (const arg of node.args) {
         if (arg.type === 'rangeRef') {
           const values = getCellRange(arg.range)
+          const cols = Math.abs(arg.range.end.col - arg.range.start.col) + 1
+          const rows = Math.abs(arg.range.end.row - arg.range.start.row) + 1
+          rangeArgs.push({ argIndex: resolvedArgs.length, cols, rows, values })
           resolvedArgs.push(...values)
         } else {
           const val = evaluateNode(arg, getCellValue, getCellRange)
@@ -73,7 +77,7 @@ function evaluateNode(
       }
 
       try {
-        return func(resolvedArgs, getCellRange)
+        return func(resolvedArgs, getCellRange, rangeArgs)
       } catch {
         return { type: '#VALUE!', message: `Fehler in ${node.name}` }
       }

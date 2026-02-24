@@ -51,8 +51,9 @@ export function StatusBar({ zoom, setZoom }: StatusBarProps) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        backgroundColor: '#217346',
-        color: 'white',
+        backgroundColor: '#f8f9fa',
+        color: '#5f6368',
+        borderTop: '1px solid #dadce0',
         fontSize: 11,
         padding: '0 12px',
         userSelect: 'none',
@@ -64,19 +65,19 @@ export function StatusBar({ zoom, setZoom }: StatusBarProps) {
         <span>Bereit</span>
         {stats.count > 0 && (
           <>
-            <span style={{ opacity: 0.6 }}>|</span>
+            <span style={{ color: '#dadce0' }}>|</span>
             <span>Anzahl: {stats.count}</span>
           </>
         )}
         {stats.sum !== null && (
           <>
-            <span style={{ opacity: 0.6 }}>|</span>
+            <span style={{ color: '#dadce0' }}>|</span>
             <span>Summe: {stats.sum.toLocaleString('de-CH', { maximumFractionDigits: 2 })}</span>
           </>
         )}
         {stats.avg !== null && (
           <>
-            <span style={{ opacity: 0.6 }}>|</span>
+            <span style={{ color: '#dadce0' }}>|</span>
             <span>Durchschnitt: {stats.avg.toLocaleString('de-CH', { maximumFractionDigits: 2 })}</span>
           </>
         )}
@@ -86,7 +87,7 @@ export function StatusBar({ zoom, setZoom }: StatusBarProps) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <button
           onClick={() => setZoom(Math.max(25, zoom - 10))}
-          style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+          style={{ background: 'none', border: 'none', color: '#5f6368', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
         >
           <Minus size={12} />
         </button>
@@ -101,7 +102,7 @@ export function StatusBar({ zoom, setZoom }: StatusBarProps) {
         />
         <button
           onClick={() => setZoom(Math.min(200, zoom + 10))}
-          style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+          style={{ background: 'none', border: 'none', color: '#5f6368', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
         >
           <Plus size={12} />
         </button>

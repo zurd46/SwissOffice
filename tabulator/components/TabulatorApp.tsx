@@ -11,7 +11,10 @@ import { FormulaBar } from '@/components/FormulaBar/FormulaBar'
 import { Grid } from '@/components/Grid/Grid'
 import { SheetTabs } from '@/components/SheetTabs/SheetTabs'
 import { StatusBar } from '@/components/StatusBar/StatusBar'
-import { saveDocument, loadDocument, exportCSV, printDocument } from '@/lib/fileOperations'
+import { FindReplaceDialog } from '@/components/Dialogs/FindReplaceDialog'
+import { FormatCellsDialog } from '@/components/Dialogs/FormatCellsDialog'
+import { SortDialog } from '@/components/Dialogs/SortDialog'
+import { saveDocument, loadDocument, exportCSV, importCSV, printDocument } from '@/lib/fileOperations'
 
 // Electron API Typen
 declare global {
@@ -39,7 +42,9 @@ export function TabulatorApp() {
 function TabulatorAppInner() {
   const { state, dispatch } = useSpreadsheet()
   const [zoom, setZoom] = useState(100)
-  const [_showFindReplace, setShowFindReplace] = useState(false)
+  const [showFindReplace, setShowFindReplace] = useState(false)
+  const [showFormatCells, setShowFormatCells] = useState(false)
+  const [showSortDialog, setShowSortDialog] = useState(false)
 
   const isElectron = typeof window !== 'undefined' && !!window.electronAPI?.isElectron
 
@@ -83,6 +88,17 @@ function TabulatorAppInner() {
     exportCSV(state.workbook, state.workbook.activeSheetIndex, state.documentName)
   }, [state.workbook, state.documentName])
 
+  // CSV Import
+  const handleImportCSV = useCallback(() => {
+    importCSV((result) => {
+      dispatch({
+        type: 'LOAD_WORKBOOK',
+        workbook: result.workbook,
+        name: result.documentName,
+      })
+    })
+  }, [dispatch])
+
   // Drucken
   const handlePrint = useCallback(() => {
     printDocument(state.workbook, state.workbook.activeSheetIndex)
@@ -106,6 +122,9 @@ function TabulatorAppInner() {
       } else if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
         e.preventDefault()
         handlePrint()
+      } else if ((e.ctrlKey || e.metaKey) && e.key === '1') {
+        e.preventDefault()
+        setShowFormatCells(prev => !prev)
       }
     }
 
@@ -122,13 +141,15 @@ function TabulatorAppInner() {
         case 'open': handleOpen(); break
         case 'save': handleSave(); break
         case 'export-csv': handleExportCSV(); break
+        case 'import-csv': handleImportCSV(); break
         case 'print': handlePrint(); break
+        case 'format-cells': setShowFormatCells(true); break
         case 'undo': dispatch({ type: 'UNDO' }); break
         case 'redo': dispatch({ type: 'REDO' }); break
       }
     })
     return cleanup
-  }, [handleNew, handleOpen, handleSave, handleExportCSV, handlePrint, dispatch])
+  }, [handleNew, handleOpen, handleSave, handleExportCSV, handleImportCSV, handlePrint, dispatch])
 
   // beforeunload Warnung
   useEffect(() => {
@@ -154,13 +175,28 @@ function TabulatorAppInner() {
       <FormulaBar />
 
       {/* Spreadsheet-Grid */}
-      <Grid />
+      <Grid onFormatCells={() => setShowFormatCells(true)} />
 
       {/* Sheet-Tabs */}
       <SheetTabs />
 
       {/* Statusleiste */}
       <StatusBar zoom={zoom} setZoom={setZoom} />
+
+      {/* Suchen & Ersetzen */}
+      {showFindReplace && (
+        <FindReplaceDialog onClose={() => setShowFindReplace(false)} />
+      )}
+
+      {/* Zellen formatieren */}
+      {showFormatCells && (
+        <FormatCellsDialog onClose={() => setShowFormatCells(false)} />
+      )}
+
+      {/* Sortieren */}
+      {showSortDialog && (
+        <SortDialog onClose={() => setShowSortDialog(false)} />
+      )}
     </div>
   )
 }

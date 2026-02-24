@@ -55,7 +55,7 @@ export function FormulaBar() {
         display: 'flex',
         alignItems: 'center',
         height: 28,
-        borderBottom: '1px solid #d6d6d6',
+        borderBottom: '1px solid #dadce0',
         background: '#fff',
         flexShrink: 0,
       }}
@@ -68,10 +68,10 @@ export function FormulaBar() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          borderRight: '1px solid #d6d6d6',
+          borderRight: '1px solid #dadce0',
           fontSize: 12,
           fontWeight: 600,
-          color: '#323130',
+          color: '#202124',
           padding: '0 4px',
         }}
       >
@@ -86,9 +86,9 @@ export function FormulaBar() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          borderRight: '1px solid #d6d6d6',
+          borderRight: '1px solid #dadce0',
           cursor: 'pointer',
-          color: '#616161',
+          color: '#5f6368',
         }}
         title="Funktion einfügen"
       >

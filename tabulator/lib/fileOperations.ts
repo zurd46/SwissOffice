@@ -103,6 +103,122 @@ export function exportCSV(
   saveAs(blob, `${filename}.csv`)
 }
 
+/** CSV-Import */
+export function importCSV(
+  onLoaded: (result: { workbook: WorkbookData; documentName: string }) => void,
+): void {
+  const input = document.createElement('input')
+  input.type = 'file'
+  input.accept = '.csv,.tsv,.txt'
+  input.onchange = async (e) => {
+    const file = (e.target as HTMLInputElement).files?.[0]
+    if (!file) return
+    const text = await file.text()
+    const docName = file.name.replace(/\.(csv|tsv|txt)$/, '')
+
+    try {
+      const rows = parseCSV(text)
+      const cells: Record<string, import('@/lib/types/spreadsheet').CellData> = {}
+
+      for (let r = 0; r < rows.length; r++) {
+        for (let c = 0; c < rows[r].length; c++) {
+          const raw = rows[r][c].trim()
+          if (raw === '') continue
+          const key = cellAddressToString({ col: c, row: r })
+
+          // Typ-Erkennung
+          const num = Number(raw)
+          if (raw !== '' && !isNaN(num)) {
+            cells[key] = { value: num }
+          } else if (raw.toUpperCase() === 'WAHR' || raw.toUpperCase() === 'TRUE') {
+            cells[key] = { value: true }
+          } else if (raw.toUpperCase() === 'FALSCH' || raw.toUpperCase() === 'FALSE') {
+            cells[key] = { value: false }
+          } else {
+            cells[key] = { value: raw }
+          }
+        }
+      }
+
+      const sheet: import('@/lib/types/spreadsheet').SheetData = {
+        name: docName,
+        cells,
+        columnWidths: {},
+        rowHeights: {},
+        frozenRows: 0,
+        frozenCols: 0,
+        mergedCells: [],
+      }
+
+      onLoaded({
+        workbook: {
+          sheets: [sheet],
+          activeSheetIndex: 0,
+          defaultColumnWidth: 100,
+          defaultRowHeight: 24,
+        },
+        documentName: docName,
+      })
+    } catch {
+      alert('Fehler beim Importieren der CSV-Datei.')
+    }
+  }
+  input.click()
+}
+
+/** CSV-Parser (RFC 4180) */
+function parseCSV(text: string): string[][] {
+  const rows: string[][] = []
+  let row: string[] = []
+  let cell = ''
+  let inQuotes = false
+  const delimiter = text.includes('\t') ? '\t' : ','
+
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i]
+    const next = text[i + 1]
+
+    if (inQuotes) {
+      if (ch === '"' && next === '"') {
+        cell += '"'
+        i++ // Überspringe nächstes Anführungszeichen
+      } else if (ch === '"') {
+        inQuotes = false
+      } else {
+        cell += ch
+      }
+    } else {
+      if (ch === '"') {
+        inQuotes = true
+      } else if (ch === delimiter) {
+        row.push(cell)
+        cell = ''
+      } else if (ch === '\r' && next === '\n') {
+        row.push(cell)
+        cell = ''
+        rows.push(row)
+        row = []
+        i++ // Überspringe \n
+      } else if (ch === '\n') {
+        row.push(cell)
+        cell = ''
+        rows.push(row)
+        row = []
+      } else {
+        cell += ch
+      }
+    }
+  }
+
+  // Letzte Zelle/Zeile
+  if (cell !== '' || row.length > 0) {
+    row.push(cell)
+    rows.push(row)
+  }
+
+  return rows
+}
+
 /** Drucken */
 export function printDocument(workbook: WorkbookData, sheetIndex: number): void {
   const sheet = workbook.sheets[sheetIndex]

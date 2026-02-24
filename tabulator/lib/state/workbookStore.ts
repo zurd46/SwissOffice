@@ -11,6 +11,7 @@ import { createEmptySheet, createDefaultWorkbook } from '@/lib/defaultContent'
 import { createDefaultSelection } from './selectionManager'
 import type { HistoryState, CellPatch } from './historyManager'
 import { createHistory, pushHistory, undo as undoHistory, redo as redoHistory } from './historyManager'
+import { recalculate, recalcAll, clearDependencyGraph } from '@/lib/engine/recalcEngine'
 
 // ---- State ----
 
@@ -71,6 +72,14 @@ export type WorkbookAction =
   | { type: 'SET_CLIPBOARD'; clipboard: WorkbookState['clipboard'] }
   | { type: 'UNDO' }
   | { type: 'REDO' }
+  | { type: 'MERGE_CELLS'; range: CellRange }
+  | { type: 'UNMERGE_CELLS'; range: CellRange }
+  | { type: 'SET_COMMENT'; address: string; comment: { text: string; author?: string } }
+  | { type: 'DELETE_COMMENT'; address: string }
+  | { type: 'TOGGLE_FILTER'; range: CellRange }
+  | { type: 'SET_FILTER'; column: number; selectedValues: Set<string> }
+  | { type: 'CLEAR_FILTERS' }
+  | { type: 'AUTO_FILL'; cells: Record<string, import('@/lib/types/spreadsheet').CellData> }
 
 // ---- Helpers ----
 
@@ -88,12 +97,12 @@ function updateActiveSheet(state: WorkbookState, updater: (sheet: SheetData) => 
   }
 }
 
-function parseInputValue(raw: string): { value: string | number | boolean; formula?: string } {
+function parseInputValue(raw: string): { value: string | number | boolean | null; formula?: string } {
   const trimmed = raw.trim()
 
-  // Formel
+  // Formel — Wert wird durch Recalc-Engine berechnet
   if (trimmed.startsWith('=')) {
-    return { value: trimmed, formula: trimmed }
+    return { value: null, formula: trimmed }
   }
 
   // Boolean
@@ -114,7 +123,39 @@ function parseInputValue(raw: string): { value: string | number | boolean; formu
   return { value: trimmed }
 }
 
-// (createPatches entfernt — inline in Reducer verwendet)
+/** Wendet Recalc-Ergebnisse auf den State an */
+function applyRecalcResults(state: WorkbookState, changedAddresses: string[]): WorkbookState {
+  const sheet = getActiveSheet(state)
+  const results = recalculate(sheet, changedAddresses)
+  if (Object.keys(results).length === 0) return state
+
+  return updateActiveSheet(state, (s) => {
+    const newCells = { ...s.cells }
+    for (const [addr, value] of Object.entries(results)) {
+      if (newCells[addr]) {
+        newCells[addr] = { ...newCells[addr], value }
+      }
+    }
+    return { ...s, cells: newCells }
+  })
+}
+
+/** Vollständige Neuberechnung aller Formeln */
+function applyRecalcAll(state: WorkbookState): WorkbookState {
+  const sheet = getActiveSheet(state)
+  const results = recalcAll(sheet)
+  if (Object.keys(results).length === 0) return state
+
+  return updateActiveSheet(state, (s) => {
+    const newCells = { ...s.cells }
+    for (const [addr, value] of Object.entries(results)) {
+      if (newCells[addr]) {
+        newCells[addr] = { ...newCells[addr], value }
+      }
+    }
+    return { ...s, cells: newCells }
+  })
+}
 
 // ---- Reducer ----
 
@@ -143,10 +184,13 @@ export function workbookReducer(state: WorkbookState, action: WorkbookAction): W
         newValue: oldData,
       }]
 
-      const newState = updateActiveSheet(state, (s) => ({
+      let newState = updateActiveSheet(state, (s) => ({
         ...s,
         cells: { ...s.cells, [action.address]: newData },
       }))
+
+      // Formel-Neuberechnung
+      newState = applyRecalcResults(newState, [action.address])
 
       return {
         ...newState,
@@ -194,7 +238,9 @@ export function workbookReducer(state: WorkbookState, action: WorkbookAction): W
         }
       }
 
-      const newState = updateActiveSheet(state, (s) => ({ ...s, cells: newCells }))
+      let newState = updateActiveSheet(state, (s) => ({ ...s, cells: newCells }))
+      // Neuberechnung der abhängigen Zellen
+      newState = applyRecalcResults(newState, action.addresses)
       return {
         ...newState,
         history: pushHistory(state.history, {
@@ -542,7 +588,8 @@ export function workbookReducer(state: WorkbookState, action: WorkbookAction): W
     }
 
     case 'LOAD_WORKBOOK': {
-      return {
+      clearDependencyGraph()
+      let newState: WorkbookState = {
         ...state,
         workbook: action.workbook,
         documentName: action.name,
@@ -552,9 +599,13 @@ export function workbookReducer(state: WorkbookState, action: WorkbookAction): W
         isModified: false,
         history: createHistory(),
       }
+      // Alle Formeln im aktiven Sheet berechnen
+      newState = applyRecalcAll(newState)
+      return newState
     }
 
     case 'NEW_WORKBOOK': {
+      clearDependencyGraph()
       return {
         ...createInitialState(),
         documentName: 'Unbenannt',
@@ -570,13 +621,16 @@ export function workbookReducer(state: WorkbookState, action: WorkbookAction): W
     }
 
     case 'PASTE_CELLS': {
-      return updateActiveSheet(state, (s) => {
+      let newState = updateActiveSheet(state, (s) => {
         const newCells = { ...s.cells }
         for (const [addr, data] of Object.entries(action.cells)) {
           newCells[addr] = data
         }
         return { ...s, cells: newCells }
       })
+      // Neuberechnung der eingefügten und abhängigen Zellen
+      newState = applyRecalcResults(newState, Object.keys(action.cells))
+      return newState
     }
 
     case 'SET_CLIPBOARD': {
@@ -587,6 +641,7 @@ export function workbookReducer(state: WorkbookState, action: WorkbookAction): W
       const { history: newHistory, entry } = undoHistory(state.history)
       if (!entry) return state
       let newState = { ...state, history: newHistory }
+      const changedAddresses: string[] = []
       for (const patch of entry.inversePatches) {
         const sheets = [...newState.workbook.sheets]
         const sheet = { ...sheets[patch.sheetIndex] }
@@ -599,7 +654,10 @@ export function workbookReducer(state: WorkbookState, action: WorkbookAction): W
         sheet.cells = cells
         sheets[patch.sheetIndex] = sheet
         newState = { ...newState, workbook: { ...newState.workbook, sheets } }
+        changedAddresses.push(patch.address)
       }
+      // Neuberechnung
+      newState = applyRecalcResults(newState, changedAddresses)
       return newState
     }
 
@@ -607,6 +665,7 @@ export function workbookReducer(state: WorkbookState, action: WorkbookAction): W
       const { history: newHistory, entry } = redoHistory(state.history)
       if (!entry) return state
       let newState = { ...state, history: newHistory }
+      const changedAddresses: string[] = []
       for (const patch of entry.patches) {
         const sheets = [...newState.workbook.sheets]
         const sheet = { ...sheets[patch.sheetIndex] }
@@ -619,7 +678,158 @@ export function workbookReducer(state: WorkbookState, action: WorkbookAction): W
         sheet.cells = cells
         sheets[patch.sheetIndex] = sheet
         newState = { ...newState, workbook: { ...newState.workbook, sheets } }
+        changedAddresses.push(patch.address)
       }
+      // Neuberechnung
+      newState = applyRecalcResults(newState, changedAddresses)
+      return newState
+    }
+
+    case 'MERGE_CELLS': {
+      const range = normalizeRange(action.range)
+      return updateActiveSheet(state, (s) => {
+        const newCells = { ...s.cells }
+        const topLeftKey = cellAddressToString(range.start)
+
+        // Sammle Inhalte aller Zellen im Bereich
+        const parts: string[] = []
+        for (const addr of iterateRange(range)) {
+          const key = cellAddressToString(addr)
+          const cell = newCells[key]
+          if (cell && cell.value != null && String(cell.value) !== '') {
+            parts.push(String(cell.value))
+          }
+        }
+
+        // Setze kombinierten Inhalt in die obere linke Zelle
+        const topLeftCell = newCells[topLeftKey] || { value: null }
+        newCells[topLeftKey] = {
+          ...topLeftCell,
+          value: parts.length > 0 ? parts.join(' ') : null,
+          formula: topLeftCell.formula,
+        }
+
+        // Leere alle anderen Zellen im Bereich (behalte Styles)
+        for (const addr of iterateRange(range)) {
+          const key = cellAddressToString(addr)
+          if (key === topLeftKey) continue
+          const cell = newCells[key]
+          if (cell) {
+            newCells[key] = { value: null, style: cell.style }
+          }
+        }
+
+        const mergedCells = [...(s.mergedCells || [])]
+        mergedCells.push({ start: range.start, end: range.end })
+
+        return { ...s, cells: newCells, mergedCells }
+      })
+    }
+
+    case 'UNMERGE_CELLS': {
+      const range = normalizeRange(action.range)
+      return updateActiveSheet(state, (s) => {
+        const mergedCells = (s.mergedCells || []).filter(
+          (m) =>
+            m.start.col !== range.start.col ||
+            m.start.row !== range.start.row ||
+            m.end.col !== range.end.col ||
+            m.end.row !== range.end.row
+        )
+        return { ...s, mergedCells }
+      })
+    }
+
+    case 'SET_COMMENT': {
+      return updateActiveSheet(state, (s) => {
+        const newCells = { ...s.cells }
+        const existing = newCells[action.address] || { value: null }
+        newCells[action.address] = {
+          ...existing,
+          comment: {
+            text: action.comment.text,
+            author: action.comment.author,
+            date: new Date().toISOString(),
+          },
+        }
+        return { ...s, cells: newCells }
+      })
+    }
+
+    case 'DELETE_COMMENT': {
+      return updateActiveSheet(state, (s) => {
+        const newCells = { ...s.cells }
+        if (newCells[action.address]) {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { comment: _, ...rest } = newCells[action.address]
+          newCells[action.address] = rest as import('@/lib/types/spreadsheet').CellData
+        }
+        return { ...s, cells: newCells }
+      })
+    }
+
+    case 'TOGGLE_FILTER': {
+      return updateActiveSheet(state, (s) => {
+        if (s.filterState) {
+          // Filter entfernen
+          return { ...s, filterState: undefined, hiddenRows: undefined }
+        }
+        // Filter aktivieren
+        const range = normalizeRange(action.range)
+        return {
+          ...s,
+          filterState: { range, columns: {} },
+          hiddenRows: new Set<number>(),
+        }
+      })
+    }
+
+    case 'SET_FILTER': {
+      return updateActiveSheet(state, (s) => {
+        if (!s.filterState) return s
+        const newFilterState = {
+          ...s.filterState,
+          columns: {
+            ...s.filterState.columns,
+            [action.column]: { selectedValues: action.selectedValues },
+          },
+        }
+        // Berechne versteckte Zeilen
+        const hiddenRows = new Set<number>()
+        const range = s.filterState.range
+        for (let row = range.start.row + 1; row <= range.end.row; row++) {
+          for (const [colStr, filter] of Object.entries(newFilterState.columns)) {
+            const col = parseInt(colStr, 10)
+            const key = cellAddressToString({ col, row })
+            const val = s.cells[key]?.value
+            const strVal = val != null ? String(val) : ''
+            if (!filter.selectedValues.has(strVal)) {
+              hiddenRows.add(row)
+              break
+            }
+          }
+        }
+        return { ...s, filterState: newFilterState, hiddenRows }
+      })
+    }
+
+    case 'CLEAR_FILTERS': {
+      return updateActiveSheet(state, (s) => ({
+        ...s,
+        filterState: undefined,
+        hiddenRows: undefined,
+      }))
+    }
+
+    case 'AUTO_FILL': {
+      let newState = updateActiveSheet(state, (s) => {
+        const newCells = { ...s.cells }
+        for (const [addr, data] of Object.entries(action.cells)) {
+          newCells[addr] = data
+        }
+        return { ...s, cells: newCells }
+      })
+      newState = applyRecalcResults(newState, Object.keys(action.cells))
       return newState
     }
 

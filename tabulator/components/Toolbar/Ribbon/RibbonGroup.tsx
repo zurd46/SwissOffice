@@ -15,11 +15,11 @@ export function RibbonGroup({ label, children }: RibbonGroupProps) {
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 3, paddingTop: 6, paddingBottom: 2 }}>
           {children}
         </div>
-        <span style={{ fontSize: 9, color: '#a19f9d', lineHeight: 1, paddingBottom: 5, marginTop: 'auto', textAlign: 'center', userSelect: 'none', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+        <span style={{ fontSize: 9, color: '#80868b', lineHeight: 1, paddingBottom: 5, marginTop: 'auto', textAlign: 'center', userSelect: 'none', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
           {label}
         </span>
       </div>
-      <div style={{ width: 1, backgroundColor: '#d2d0ce', alignSelf: 'stretch', margin: '8px 0' }} />
+      <div style={{ width: 1, backgroundColor: '#dadce0', alignSelf: 'stretch', margin: '8px 0' }} />
     </>
   )
 }
@@ -30,7 +30,7 @@ export function RibbonGroupLast({ label, children }: RibbonGroupProps) {
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 3, paddingTop: 6, paddingBottom: 2 }}>
         {children}
       </div>
-      <span style={{ fontSize: 9, color: '#a19f9d', lineHeight: 1, paddingBottom: 5, marginTop: 'auto', textAlign: 'center', userSelect: 'none', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+      <span style={{ fontSize: 9, color: '#80868b', lineHeight: 1, paddingBottom: 5, marginTop: 'auto', textAlign: 'center', userSelect: 'none', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
         {label}
       </span>
     </div>

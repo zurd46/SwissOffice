@@ -12,18 +12,24 @@ import { ColumnHeader } from './ColumnHeader'
 import { RowHeader } from './RowHeader'
 import { SelectionOverlay } from './SelectionOverlay'
 import { CellEditor } from './CellEditor'
+import { ContextMenu } from './ContextMenu'
 import { cellAddressToString } from '@/lib/engine/cellAddressUtils'
 import { isCellSelected, selectCell, extendSelection } from '@/lib/state/selectionManager'
 import {
   HEADER_WIDTH, HEADER_HEIGHT, MAX_COLUMNS, MAX_ROWS,
 } from '@/lib/types/spreadsheet'
 
-export function Grid() {
+interface GridProps {
+  onFormatCells?: () => void
+}
+
+export function Grid({ onFormatCells }: GridProps = {}) {
   const { state, dispatch } = useSpreadsheet()
   const sheet = useActiveSheet()
   const containerRef = useRef<HTMLDivElement>(null)
   const [containerSize, setContainerSize] = useState({ width: 800, height: 600 })
   const [scrollPos, setScrollPos] = useState({ top: 0, left: 0 })
+  const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null)
 
   // Container-Größe beobachten
   useEffect(() => {
@@ -439,6 +445,115 @@ export function Grid() {
     return rows
   }, [state.selection.ranges])
 
+  // Kontextmenü
+  const handleContextMenu = useCallback((e: React.MouseEvent) => {
+    e.preventDefault()
+    setContextMenu({ x: e.clientX, y: e.clientY })
+  }, [])
+
+  const contextMenuHandlers = useMemo(() => ({
+    onCut: () => {
+      const range = state.selection.ranges[state.selection.ranges.length - 1]
+      if (!range) return
+      const cells: Record<string, import('@/lib/types/spreadsheet').CellData> = {}
+      const minCol = Math.min(range.start.col, range.end.col)
+      const maxCol = Math.max(range.start.col, range.end.col)
+      const minRow = Math.min(range.start.row, range.end.row)
+      const maxRow = Math.max(range.start.row, range.end.row)
+      for (let r = minRow; r <= maxRow; r++) {
+        for (let c = minCol; c <= maxCol; c++) {
+          const key = cellAddressToString({ col: c, row: r })
+          const relKey = `${c - minCol},${r - minRow}`
+          if (sheet.cells[key]) cells[relKey] = { ...sheet.cells[key] }
+        }
+      }
+      dispatch({
+        type: 'SET_CLIPBOARD',
+        clipboard: {
+          cells,
+          range: { start: { col: minCol, row: minRow }, end: { col: maxCol, row: maxRow } },
+          isCut: true,
+        },
+      })
+      dispatch({ type: 'DELETE_CELL_VALUES', addresses: getSelectedAddresses() })
+    },
+    onCopy: () => {
+      const range = state.selection.ranges[state.selection.ranges.length - 1]
+      if (!range) return
+      const cells: Record<string, import('@/lib/types/spreadsheet').CellData> = {}
+      const minCol = Math.min(range.start.col, range.end.col)
+      const maxCol = Math.max(range.start.col, range.end.col)
+      const minRow = Math.min(range.start.row, range.end.row)
+      const maxRow = Math.max(range.start.row, range.end.row)
+      for (let r = minRow; r <= maxRow; r++) {
+        for (let c = minCol; c <= maxCol; c++) {
+          const key = cellAddressToString({ col: c, row: r })
+          const relKey = `${c - minCol},${r - minRow}`
+          if (sheet.cells[key]) cells[relKey] = { ...sheet.cells[key] }
+        }
+      }
+      dispatch({
+        type: 'SET_CLIPBOARD',
+        clipboard: {
+          cells,
+          range: { start: { col: minCol, row: minRow }, end: { col: maxCol, row: maxRow } },
+          isCut: false,
+        },
+      })
+    },
+    onPaste: () => {
+      if (!state.clipboard) return
+      const target = state.selection.activeCell
+      const width = state.clipboard.range.end.col - state.clipboard.range.start.col + 1
+      const height = state.clipboard.range.end.row - state.clipboard.range.start.row + 1
+      const pasteCells: Record<string, import('@/lib/types/spreadsheet').CellData> = {}
+      for (let r = 0; r < height; r++) {
+        for (let c = 0; c < width; c++) {
+          const relKey = `${c},${r}`
+          if (state.clipboard.cells[relKey]) {
+            const addr = cellAddressToString({ col: target.col + c, row: target.row + r })
+            pasteCells[addr] = { ...state.clipboard.cells[relKey] }
+          }
+        }
+      }
+      dispatch({ type: 'PASTE_CELLS', cells: pasteCells, targetStart: target })
+    },
+    onInsertRow: () => dispatch({ type: 'INSERT_ROWS', at: state.selection.activeCell.row, count: 1 }),
+    onInsertColumn: () => dispatch({ type: 'INSERT_COLUMNS', at: state.selection.activeCell.col, count: 1 }),
+    onDeleteRow: () => dispatch({ type: 'DELETE_ROWS', at: state.selection.activeCell.row, count: 1 }),
+    onDeleteColumn: () => dispatch({ type: 'DELETE_COLUMNS', at: state.selection.activeCell.col, count: 1 }),
+    onSortAsc: () => {
+      const range = state.selection.ranges[0]
+      if (range) dispatch({ type: 'SORT_RANGE', range, column: state.selection.activeCell.col, ascending: true })
+    },
+    onSortDesc: () => {
+      const range = state.selection.ranges[0]
+      if (range) dispatch({ type: 'SORT_RANGE', range, column: state.selection.activeCell.col, ascending: false })
+    },
+    onClearContents: () => dispatch({ type: 'DELETE_CELL_VALUES', addresses: getSelectedAddresses() }),
+  }), [state.selection, state.clipboard, sheet.cells, dispatch, getSelectedAddresses])
+
+  // Merge-Lookup: Für jede Zelle prüfen ob sie Teil eines Merges ist
+  const mergeMap = useMemo(() => {
+    const map = new Map<string, { isTopLeft: boolean; spanCols: number; spanRows: number; mergeKey: string }>()
+    const mergedCells = sheet.mergedCells || []
+    for (const merge of mergedCells) {
+      const tlKey = cellAddressToString(merge.start)
+      const spanCols = merge.end.col - merge.start.col + 1
+      const spanRows = merge.end.row - merge.start.row + 1
+      map.set(tlKey, { isTopLeft: true, spanCols, spanRows, mergeKey: tlKey })
+      for (let r = merge.start.row; r <= merge.end.row; r++) {
+        for (let c = merge.start.col; c <= merge.end.col; c++) {
+          const key = cellAddressToString({ col: c, row: r })
+          if (key !== tlKey) {
+            map.set(key, { isTopLeft: false, spanCols: 0, spanRows: 0, mergeKey: tlKey })
+          }
+        }
+      }
+    }
+    return map
+  }, [sheet.mergedCells])
+
   // Alle sichtbaren Zellen rendern
   const allVisibleCols = [...virtualGrid.frozenColItems, ...virtualGrid.visibleCols]
   const allVisibleRows = [...virtualGrid.frozenRowItems, ...virtualGrid.visibleRows]
@@ -513,6 +628,7 @@ export function Grid() {
         <div
           style={{ flex: 1, overflow: 'auto', position: 'relative' }}
           onScroll={handleScroll}
+          onContextMenu={handleContextMenu}
         >
           {/* Spacer für Scrollbar */}
           <div
@@ -526,10 +642,29 @@ export function Grid() {
             {allVisibleRows.map(rowItem => (
               allVisibleCols.map(colItem => {
                 const key = cellAddressToString({ col: colItem.index, row: rowItem.index })
+                const mergeInfo = mergeMap.get(key)
+
+                // Zelle ist Teil eines Merges, aber nicht die obere linke → überspringen
+                if (mergeInfo && !mergeInfo.isTopLeft) return null
+
                 const cellData = sheet.cells[key]
                 const isActive = state.selection.activeCell.col === colItem.index &&
                                  state.selection.activeCell.row === rowItem.index
                 const isSelected = isCellSelected(state.selection, { col: colItem.index, row: rowItem.index })
+
+                // Merged cell: Breite/Höhe über mehrere Spalten/Zeilen berechnen
+                let cellWidth = colItem.size
+                let cellHeight = rowItem.size
+                if (mergeInfo && mergeInfo.isTopLeft) {
+                  cellWidth = 0
+                  for (let c = 0; c < mergeInfo.spanCols; c++) {
+                    cellWidth += getColumnWidth(colItem.index + c)
+                  }
+                  cellHeight = 0
+                  for (let r = 0; r < mergeInfo.spanRows; r++) {
+                    cellHeight += getRowHeight(rowItem.index + r)
+                  }
+                }
 
                 return (
                   <div
@@ -538,16 +673,17 @@ export function Grid() {
                       position: 'absolute',
                       left: colItem.offset,
                       top: rowItem.offset,
-                      width: colItem.size,
-                      height: rowItem.size,
+                      width: cellWidth,
+                      height: cellHeight,
+                      zIndex: mergeInfo ? 1 : 0,
                     }}
                     onMouseDown={(e) => handleCellMouseDown(colItem.index, rowItem.index, e)}
                     onDoubleClick={() => handleCellDoubleClick(colItem.index, rowItem.index)}
                   >
                     <Cell
                       data={cellData}
-                      width={colItem.size}
-                      height={rowItem.size}
+                      width={cellWidth}
+                      height={cellHeight}
                       isActive={isActive}
                       isSelected={isSelected}
                     />
@@ -592,6 +728,22 @@ export function Grid() {
           })()}
         </div>
       </div>
+
+      {/* Kontextmenü */}
+      {contextMenu && (
+        <ContextMenu
+          x={contextMenu.x}
+          y={contextMenu.y}
+          onClose={() => setContextMenu(null)}
+          {...contextMenuHandlers}
+          onFormatCells={onFormatCells}
+          onAddComment={() => {
+            const addr = cellAddressToString(state.selection.activeCell)
+            const text = prompt('Kommentar eingeben:')
+            if (text) dispatch({ type: 'SET_COMMENT', address: addr, comment: { text } })
+          }}
+        />
+      )}
     </div>
   )
 }

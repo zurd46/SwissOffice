@@ -10,6 +10,7 @@ import {
   Clipboard, ClipboardPaste, Scissors,
   Undo2, Redo2, Search, WrapText,
   ArrowUpNarrowWide, ArrowDownNarrowWide,
+  Merge, SplitSquareHorizontal,
 } from 'lucide-react'
 import { RibbonGroup, RibbonGroupLast } from '../RibbonGroup'
 import { ToolbarButton, ToolbarSelect, ToolbarColorButton, ToolbarDivider } from '../../ToolbarButton'
@@ -146,6 +147,19 @@ export function TabStart({ onToggleFindReplace }: TabStartProps) {
         <ToolbarDivider />
         <ToolbarButton title="Textumbruch" onClick={() => setStyle({ wrapText: !activeStyle.wrapText })} isActive={activeStyle.wrapText}>
           <WrapText size={14} />
+        </ToolbarButton>
+        <ToolbarDivider />
+        <ToolbarButton title="Zellen verbinden" onClick={() => {
+          const range = state.selection.ranges[state.selection.ranges.length - 1]
+          if (range) dispatch({ type: 'MERGE_CELLS', range })
+        }}>
+          <Merge size={14} />
+        </ToolbarButton>
+        <ToolbarButton title="Verbindung aufheben" onClick={() => {
+          const range = state.selection.ranges[state.selection.ranges.length - 1]
+          if (range) dispatch({ type: 'UNMERGE_CELLS', range })
+        }}>
+          <SplitSquareHorizontal size={14} />
         </ToolbarButton>
       </RibbonGroup>
 

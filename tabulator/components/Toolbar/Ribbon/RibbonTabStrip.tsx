@@ -24,7 +24,7 @@ export function RibbonTabStrip({ activeTab, onTabChange, isElectron }: RibbonTab
         alignItems: 'flex-end',
         paddingLeft: isElectron ? 80 : 16,
         gap: 2,
-        backgroundColor: '#f3f3f3',
+        backgroundColor: '#f9fbfd',
         ...(isElectron ? { WebkitAppRegion: 'drag' } as React.CSSProperties : {}),
       }}
     >
@@ -45,18 +45,18 @@ export function RibbonTabStrip({ activeTab, onTabChange, isElectron }: RibbonTab
             ...(activeTab === tab.id
               ? {
                   backgroundColor: 'white',
-                  color: '#0078d4',
+                  color: '#1a73e8',
                   fontWeight: 600,
-                  borderTop: '2px solid #217346',
-                  borderLeft: '1px solid #d2d0ce',
-                  borderRight: '1px solid #d2d0ce',
-                  borderBottom: 'none',
+                  borderTop: 'none',
+                  borderLeft: '1px solid #dadce0',
+                  borderRight: '1px solid #dadce0',
+                  borderBottom: '3px solid #1a73e8',
                   marginBottom: -1,
                   zIndex: 10,
                 }
               : {
                   backgroundColor: 'transparent',
-                  color: '#616161',
+                  color: '#5f6368',
                   fontWeight: 400,
                   border: '1px solid transparent',
                 }

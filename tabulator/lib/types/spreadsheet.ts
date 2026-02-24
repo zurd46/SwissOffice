@@ -65,11 +65,25 @@ export interface CellStyle {
   wrapText?: boolean
 }
 
+/** Zell-Kommentar */
+export interface CellComment {
+  text: string
+  author?: string
+  date?: string
+}
+
 /** Zell-Daten */
 export interface CellData {
   value: CellValue
   formula?: string
   style?: CellStyle
+  comment?: CellComment
+}
+
+/** Filter-State */
+export interface FilterState {
+  range: CellRange
+  columns: Record<number, { selectedValues: Set<string> }>
 }
 
 /** Tabellenblatt */
@@ -80,8 +94,11 @@ export interface SheetData {
   rowHeights: Record<number, number>
   frozenRows: number
   frozenCols: number
-  filterColumn?: number
-  filterValues?: string[]
+  mergedCells?: { start: CellAddress; end: CellAddress }[]
+  filterState?: FilterState
+  hiddenRows?: Set<number>
+  conditionalFormats?: import('@/lib/engine/conditionalFormatting').ConditionalFormatRule[]
+  validations?: Record<string, import('@/lib/engine/dataValidation').ValidationRule>
 }
 
 /** Workbook (gesamtes Dokument) */
