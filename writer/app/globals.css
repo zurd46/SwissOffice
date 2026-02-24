@@ -261,6 +261,25 @@ body {
   font-family: system-ui;
 }
 
+/* Widows & Orphans Control */
+.ProseMirror p {
+  orphans: 2;
+  widows: 2;
+}
+
+.ProseMirror h1, .ProseMirror h2, .ProseMirror h3,
+.ProseMirror h4, .ProseMirror h5, .ProseMirror h6 {
+  break-after: avoid;
+}
+
+.ProseMirror img {
+  break-inside: avoid;
+}
+
+.ProseMirror blockquote {
+  break-inside: avoid;
+}
+
 /* Selection */
 .ProseMirror ::selection {
   background-color: #bfdbfe;
@@ -280,8 +299,38 @@ body {
     left: 0;
     top: 0;
     width: 100%;
-    padding: 20mm;
+    padding: 25mm;
     font-size: 12pt;
+  }
+  .ProseMirror p {
+    orphans: 2;
+    widows: 2;
+  }
+  .ProseMirror h1, .ProseMirror h2, .ProseMirror h3,
+  .ProseMirror h4, .ProseMirror h5, .ProseMirror h6 {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+  .ProseMirror img {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .ProseMirror table {
+    page-break-inside: auto;
+  }
+  .ProseMirror tr {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .ProseMirror thead {
+    display: table-header-group;
+  }
+  .ProseMirror blockquote {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .ProseMirror li {
+    break-inside: avoid;
   }
 }
 
