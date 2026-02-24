@@ -1,0 +1,78 @@
+{
+  "name": "impulsoffice-writer",
+  "version": "1.0.0",
+  "description": "ImpulsOffice Writer - Professionelle Textverarbeitung",
+  "main": "main.js",
+  "author": "ImpulsOffice",
+  "license": "MIT",
+  "scripts": {
+    "dev": "node dev.js",
+    "next:build": "cd ../writer && npm run build",
+    "next:start": "cd ../writer && npm run start",
+    "build": "npm run next:build && electron-builder",
+    "pack": "electron-builder --dir",
+    "dist": "npm run next:build && electron-builder --mac --win",
+    "start": "electron ."
+  },
+  "build": {
+    "appId": "com.impulsoffice.writer",
+    "productName": "ImpulsOffice Writer",
+    "directories": {
+      "output": "dist",
+      "buildResources": "resources"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "menu.js",
+      "resources/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "../writer/.next/standalone",
+        "to": "app",
+        "filter": ["**/*"]
+      },
+      {
+        "from": "../writer/.next/static",
+        "to": "app/.next/static",
+        "filter": ["**/*"]
+      },
+      {
+        "from": "../writer/public",
+        "to": "app/public",
+        "filter": ["**/*"]
+      }
+    ],
+    "mac": {
+      "category": "public.app-category.productivity",
+      "icon": "resources/icon.icns",
+      "target": ["dmg", "zip"],
+      "hardenedRuntime": true,
+      "darkModeSupport": true
+    },
+    "win": {
+      "icon": "resources/icon.ico",
+      "target": ["nsis", "portable"]
+    },
+    "linux": {
+      "icon": "resources/icon.png",
+      "target": ["AppImage", "deb"],
+      "category": "Office"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowToChangeInstallationDirectory": true
+    }
+  },
+  "dependencies": {
+    "electron-serve": "^2.1.1"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "cross-env": "^7.0.3",
+    "electron": "^33.3.1",
+    "electron-builder": "^25.1.8"
+  }
+}
