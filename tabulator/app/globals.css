@@ -1,0 +1,262 @@
+@import "tailwindcss";
+
+/* =============================================
+   ImpulsTabulator — Global Styles
+   ============================================= */
+
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 13px;
+  color: #323130;
+  background: #f3f3f3;
+  user-select: none;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 5px;
+  border: 2px solid #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+::-webkit-scrollbar-corner {
+  background: #f1f1f1;
+}
+
+/* Grid Cell Styles */
+.spreadsheet-cell {
+  border-right: 1px solid #d6d6d6;
+  border-bottom: 1px solid #d6d6d6;
+  padding: 0 4px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 12px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+}
+
+.spreadsheet-cell.wrap-text {
+  white-space: normal;
+  word-wrap: break-word;
+}
+
+/* Cell Editor */
+.cell-editor {
+  border: 2px solid #0078d4;
+  outline: none;
+  padding: 0 3px;
+  font-size: 12px;
+  font-family: inherit;
+  background: white;
+  z-index: 10;
+  box-shadow: 0 0 0 1px rgba(0, 120, 212, 0.3);
+}
+
+/* Selection */
+.selection-overlay {
+  border: 2px solid #0078d4;
+  background: rgba(0, 120, 212, 0.08);
+  pointer-events: none;
+  z-index: 5;
+}
+
+.selection-range {
+  background: rgba(0, 120, 212, 0.1);
+  pointer-events: none;
+}
+
+/* Fill Handle */
+.fill-handle {
+  width: 7px;
+  height: 7px;
+  background: #0078d4;
+  border: 1px solid white;
+  cursor: crosshair;
+  z-index: 15;
+}
+
+/* Column/Row Headers */
+.header-cell {
+  background: #f8f8f8;
+  border-right: 1px solid #d6d6d6;
+  border-bottom: 1px solid #d6d6d6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: #616161;
+  font-weight: 500;
+  user-select: none;
+  cursor: default;
+}
+
+.header-cell.selected {
+  background: #d4e6f1;
+  color: #0078d4;
+  font-weight: 600;
+}
+
+.header-cell:hover {
+  background: #e8e8e8;
+}
+
+/* Resize Handle */
+.resize-handle-col {
+  cursor: col-resize;
+  width: 4px;
+  height: 100%;
+  position: absolute;
+  right: -2px;
+  top: 0;
+  z-index: 20;
+}
+
+.resize-handle-col:hover,
+.resize-handle-col.active {
+  background: #0078d4;
+}
+
+.resize-handle-row {
+  cursor: row-resize;
+  height: 4px;
+  width: 100%;
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  z-index: 20;
+}
+
+.resize-handle-row:hover,
+.resize-handle-row.active {
+  background: #0078d4;
+}
+
+/* Freeze Pane Indicator */
+.freeze-line-horizontal {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #888;
+  z-index: 25;
+  pointer-events: none;
+}
+
+.freeze-line-vertical {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #888;
+  z-index: 25;
+  pointer-events: none;
+}
+
+/* Formula Bar */
+.formula-bar-input {
+  border: none;
+  outline: none;
+  font-family: 'Calibri', 'Segoe UI', sans-serif;
+  font-size: 12px;
+  padding: 0 6px;
+  width: 100%;
+  height: 100%;
+}
+
+.formula-bar-input:focus {
+  background: #fff;
+}
+
+/* Sheet Tabs */
+.sheet-tab {
+  padding: 4px 16px;
+  font-size: 11px;
+  border: 1px solid transparent;
+  border-bottom: none;
+  cursor: pointer;
+  background: transparent;
+  color: #616161;
+  white-space: nowrap;
+  position: relative;
+}
+
+.sheet-tab:hover {
+  background: #e8e8e8;
+}
+
+.sheet-tab.active {
+  background: white;
+  border-color: #d6d6d6;
+  color: #323130;
+  font-weight: 600;
+}
+
+/* Ribbon Zoom Slider */
+.ribbon-zoom-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.3);
+  outline: none;
+}
+
+.ribbon-zoom-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: white;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Dialog Overlay */
+.dialog-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.dialog-content {
+  background: white;
+  border-radius: 4px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  padding: 20px;
+  min-width: 300px;
+}
+
+/* Gridlines toggle */
+.grid-no-lines .spreadsheet-cell {
+  border-color: transparent;
+}
