@@ -4,8 +4,8 @@ import { useState } from 'react'
 import { Editor } from '@tiptap/react'
 import {
   Indent, Outdent, FileText, RectangleVertical, RectangleHorizontal,
-  Ruler, Settings, Columns2,
-  PanelTop, PanelBottom, Hash, SeparatorHorizontal,
+  Ruler, Settings, Columns2, Columns3,
+  PanelTop, PanelBottom, Hash, SeparatorHorizontal, Droplets,
 } from 'lucide-react'
 import { ToolbarButton, ToolbarSelect, RibbonLargeButton } from '../../ToolbarButton'
 import { RibbonGroup, RibbonGroupLast } from '../RibbonGroup'
@@ -18,9 +18,11 @@ import { HeaderFooterEditor } from '../../../Editor/HeaderFooterEditor'
 
 interface TabSeitenlayoutProps {
   editor: Editor
+  watermarkText?: string
+  onSetWatermark?: (text: string) => void
 }
 
-export function TabSeitenlayout({ editor }: TabSeitenlayoutProps) {
+export function TabSeitenlayout({ editor, watermarkText = '', onSetWatermark }: TabSeitenlayoutProps) {
   const { settings, updateOrientation, updatePageSize, updateMargins, updateHeaderContent, updateFooterContent, togglePageNumbers } = useDocumentSettings()
   const [showPageSetup, setShowPageSetup] = useState(false)
   const [showHeaderEditor, setShowHeaderEditor] = useState(false)

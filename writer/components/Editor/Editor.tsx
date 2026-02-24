@@ -37,6 +37,13 @@ import { FootnoteRef } from './extensions/FootnoteRef'
 import { Citation } from './extensions/Citation'
 import { Bibliography } from './extensions/Bibliography'
 import { AdvancedList } from './extensions/AdvancedList'
+import { ColumnLayout } from './extensions/ColumnLayout'
+import { ColumnBreak } from './extensions/ColumnBreak'
+import { TabStop } from './extensions/TabStop'
+import { TextBox } from './extensions/TextBox'
+import { Shape } from './extensions/Shape'
+import { WatermarkOverlay } from './WatermarkOverlay'
+import { RulerBar } from './RulerBar'
 import type { Comment } from '../../lib/types/comments'
 import { generateCommentId } from '../../lib/types/comments'
 import type { Footnote } from '../../lib/types/footnotes'
@@ -97,6 +104,8 @@ function WriterEditorInner() {
   const [footnotes, setFootnotes] = useState<Footnote[]>([])
   const [bibliography, setBibliography] = useState<BibEntry[]>([])
   const [citationStyle] = useState<'apa' | 'mla' | 'chicago'>('apa')
+  const [watermarkText, setWatermarkText] = useState('')
+  const [showRuler, setShowRuler] = useState(true)
   const isElectron = typeof window !== 'undefined' && !!window.electronAPI?.isElectron
 
   const { settings, setSettings } = useDocumentSettings()
@@ -165,6 +174,11 @@ function WriterEditorInner() {
       Citation,
       Bibliography,
       AdvancedList,
+      ColumnLayout,
+      ColumnBreak,
+      TabStop,
+      TextBox,
+      Shape,
     ],
     content: defaultContent,
     editorProps: {
@@ -500,6 +514,9 @@ function WriterEditorInner() {
         onInsertBibliography={handleInsertBibliography}
       />
 
+      {/* Ruler */}
+      {showRuler && <RulerBar zoom={zoom} />}
+
       {/* Find & Replace */}
       {showFindReplace && (
         <FindReplace editor={editor} onClose={() => setShowFindReplace(false)} />
@@ -542,6 +559,9 @@ function WriterEditorInner() {
                   settings={settings}
                   scale={scale}
                 />
+                {watermarkText && (
+                  <WatermarkOverlay text={watermarkText} scale={scale} />
+                )}
               </div>
             ))}
 
