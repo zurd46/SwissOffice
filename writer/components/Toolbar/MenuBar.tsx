@@ -151,35 +151,39 @@ export function MenuBar({ editor, documentName, setDocumentName, onToggleFindRep
   ]
 
   return (
-    <div ref={menuRef} className="bg-[#f9f9f9] border-b border-[#e5e5e5] flex items-center h-[38px] select-none">
+    <div ref={menuRef} style={{ display: 'flex', alignItems: 'center', height: 38, backgroundColor: '#f9f9f9', borderBottom: '1px solid #e5e5e5', userSelect: 'none' }}>
       {/* Logo + Document Name */}
-      <div className="flex items-center gap-[10px] pl-[14px] pr-[16px] h-full">
-        <div className="w-[24px] h-[24px] bg-[#185abd] rounded-[5px] flex items-center justify-center shadow-[0_1px_3px_rgba(0,0,0,0.12)]">
-          <span className="text-white font-bold text-[13px] leading-none">W</span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, paddingLeft: 14, paddingRight: 20, height: '100%' }}>
+        <div style={{ width: 24, height: 24, backgroundColor: '#185abd', borderRadius: 5, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 1px 3px rgba(0,0,0,0.12)' }}>
+          <span style={{ color: 'white', fontWeight: 700, fontSize: 13, lineHeight: 1 }}>W</span>
         </div>
         <input
           type="text"
           value={documentName}
           onChange={(e) => setDocumentName(e.target.value)}
-          className="text-[13px] font-medium text-[#242424] bg-transparent border-none outline-none hover:bg-white focus:bg-white focus:shadow-[0_0_0_1px_rgba(0,120,212,0.4)] px-[8px] py-[3px] rounded-[4px] w-[150px] transition-all"
+          style={{ fontSize: 13, fontWeight: 500, color: '#242424', backgroundColor: 'transparent', border: 'none', outline: 'none', padding: '3px 8px', borderRadius: 4, width: 150 }}
         />
       </div>
 
       {/* Vertical separator */}
-      <div className="w-px h-[18px] bg-[#d9d9d9]" />
+      <div style={{ width: 1, height: 18, backgroundColor: '#d9d9d9' }} />
 
       {/* Menu Items */}
-      <nav className="flex items-center h-full ml-[6px]">
+      <nav style={{ display: 'flex', alignItems: 'center', height: '100%', marginLeft: 8, gap: 2 }}>
         {menus.map(menu => (
-          <div key={menu.label} className="relative h-full flex items-center">
+          <div key={menu.label} style={{ position: 'relative', height: '100%', display: 'flex', alignItems: 'center' }}>
             <button
-              className={`
-                mx-[1px] px-[14px] py-[5px] text-[13px] rounded-[5px] transition-colors duration-100
-                ${activeMenu === menu.label
-                  ? 'bg-white text-[#242424] shadow-[0_1px_3px_rgba(0,0,0,0.08)]'
-                  : 'text-[#505050] hover:bg-white/60 hover:text-[#242424]'
-                }
-              `}
+              style={{
+                padding: '5px 14px',
+                fontSize: 13,
+                borderRadius: 5,
+                border: 'none',
+                cursor: 'pointer',
+                transition: 'all 0.1s',
+                backgroundColor: activeMenu === menu.label ? 'white' : 'transparent',
+                color: activeMenu === menu.label ? '#242424' : '#505050',
+                boxShadow: activeMenu === menu.label ? '0 1px 4px rgba(0,0,0,0.1)' : 'none',
+              }}
               onClick={() => setActiveMenu(activeMenu === menu.label ? null : menu.label)}
               onMouseEnter={() => activeMenu && setActiveMenu(menu.label)}
             >
@@ -187,25 +191,54 @@ export function MenuBar({ editor, documentName, setDocumentName, onToggleFindRep
             </button>
 
             {activeMenu === menu.label && (
-              <div className="absolute left-0 top-full mt-[2px] bg-white border border-[#d6d6d6] rounded-[8px] shadow-[0_6px_24px_rgba(0,0,0,0.14),0_0_0_1px_rgba(0,0,0,0.04)] py-[6px] z-50 min-w-[260px]">
+              <div style={{
+                position: 'absolute',
+                left: 0,
+                top: '100%',
+                marginTop: 2,
+                backgroundColor: 'white',
+                border: '1px solid #d6d6d6',
+                borderRadius: 8,
+                boxShadow: '0 6px 24px rgba(0,0,0,0.14), 0 0 0 1px rgba(0,0,0,0.04)',
+                padding: '6px 0',
+                zIndex: 50,
+                minWidth: 260,
+              }}>
                 {menu.items.map((item, i) => (
                   item.divider ? (
-                    <div key={i} className="h-px bg-[#e8e6e4] my-[5px] mx-[10px]" />
+                    <div key={i} style={{ height: 1, backgroundColor: '#e8e6e4', margin: '6px 12px' }} />
                   ) : (
                     <button
                       key={i}
-                      className="group flex items-center w-[calc(100%-10px)] mx-[5px] px-[10px] py-[6px] text-[13px] text-[#242424] hover:bg-[#eff6fc] rounded-[5px] transition-colors duration-75 cursor-pointer"
+                      className="menu-dropdown-item"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        width: 'calc(100% - 12px)',
+                        margin: '0 6px',
+                        padding: '7px 12px',
+                        fontSize: 13,
+                        color: '#242424',
+                        backgroundColor: 'transparent',
+                        border: 'none',
+                        borderRadius: 5,
+                        cursor: 'pointer',
+                        transition: 'background-color 0.075s',
+                        textAlign: 'left',
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#eff6fc' }}
+                      onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent' }}
                       onClick={() => {
                         item.action?.()
                         setActiveMenu(null)
                       }}
                     >
-                      <span className="w-[22px] h-[22px] flex items-center justify-center mr-[10px] text-[#616161] group-hover:text-[#0f6cbd] shrink-0 transition-colors">
+                      <span style={{ width: 22, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: 10, color: '#616161', flexShrink: 0 }}>
                         {item.icon}
                       </span>
-                      <span className="flex-1 text-left">{item.label}</span>
+                      <span style={{ flex: 1 }}>{item.label}</span>
                       {item.shortcut && (
-                        <span className="text-[11px] text-[#adadad] ml-[20px] shrink-0 font-light tracking-wide">
+                        <span style={{ fontSize: 11, color: '#adadad', marginLeft: 20, flexShrink: 0, fontWeight: 300, letterSpacing: '0.03em' }}>
                           {item.shortcut}
                         </span>
                       )}

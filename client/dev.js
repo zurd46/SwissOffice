@@ -61,13 +61,15 @@ async function main() {
 
   console.log('🖥️  Launching Electron...')
 
+  // Use the actual Electron binary directly, not the .bin wrapper (which sets ELECTRON_RUN_AS_NODE)
+  const electronBin = path.join(__dirname, 'node_modules', 'electron', 'dist', 'Electron.app', 'Contents', 'MacOS', 'Electron')
   const electronProcess = spawn(
-    path.join(__dirname, 'node_modules', '.bin', 'electron'),
+    electronBin,
     ['.'],
     {
       cwd: __dirname,
       stdio: 'inherit',
-      env: { ...process.env, NODE_ENV: 'development' },
+      env: { ...process.env, NODE_ENV: 'development', ELECTRON_RUN_AS_NODE: '' },
     }
   )
 
