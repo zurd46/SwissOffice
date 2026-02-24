@@ -2,7 +2,7 @@
 
 <h1>ImpulsOffice</h1>
 
-<p><strong>Open-Source Office-Suite — modern, schnell, plattformuebergreifend.</strong></p>
+<p><strong>Open-Source Office-Suite — modern, schnell, plattformübergreifend.</strong></p>
 
 <p>
 Eine professionelle Desktop-Office-Suite als leichtgewichtige Alternative zu Microsoft Office.<br/>
@@ -34,7 +34,7 @@ Textverarbeitung, Tabellenkalkulation, Kommunikation und Cloud-Backend — alles
 
 ---
 
-## Uebersicht
+## Übersicht
 
 ImpulsOffice ist eine modulare Office-Suite mit dem Ziel, eine moderne, performante und erweiterbare Alternative zu klassischen Office-Anwendungen bereitzustellen. Das Projekt ist als Monorepo organisiert — jedes Modul lebt in einem eigenen Verzeichnis.
 
@@ -55,35 +55,35 @@ ImpulsOffice ist eine modulare Office-Suite mit dem Ziel, eine moderne, performa
 
 ### Writer — Textverarbeitung
 
-Desktop-Textverarbeitung (Word-Alternative) mit Office-aehnlicher Ribbon-UI, gebaut mit Next.js und Tiptap.
+Desktop-Textverarbeitung (Word-Alternative) mit Office-ähnlicher Ribbon-UI, gebaut mit Next.js und Tiptap.
 
 - 23 Custom Extensions + 15+ Built-in Extensions (Tiptap 3)
-- Ribbon-Toolbar mit 7 Tabs (Start, Einfuegen, Seitenlayout, Ueberpruefen, Sendungen, Ansicht, KI)
-- Schriftart, -groesse, -farbe, Hervorhebung, Hoch-/Tiefgestellt
-- Ueberschriften H1–H6, Absatzausrichtung, Zeilenabstand, Einzuege
-- Tabellen, Bilder, Links, Seitenumbrueche, Listen, Checklisten
+- Ribbon-Toolbar mit 7 Tabs (Start, Einfügen, Seitenlayout, Überprüfen, Sendungen, Ansicht, KI)
+- Schriftart, -größe, -farbe, Hervorhebung, Hoch-/Tiefgestellt
+- Überschriften H1–H6, Absatzausrichtung, Zeilenabstand, Einzüge
+- Tabellen, Bilder, Links, Seitenumbrüche, Listen, Checklisten
 - A4-WYSIWYG-Ansicht mit Zoom (25–200 %)
 - `.impuls`-Format (JSON), Export als **PDF**, **DOCX**, **HTML**
-- Suchen & Ersetzen, Undo/Redo, Woerter-/Seitenzaehlung
+- Suchen & Ersetzen, Undo/Redo, Wörter-/Seitenzählung
 - Formatvorlagen (6 Themes) und Dokumentvorlagen
-- Kopf-/Fusszeilen mit Seitenzahlen
-- Kommentar-System und Aenderungsverfolgung
-- Rechtschreibpruefung (Browser-basiert, mehrsprachig)
+- Kopf-/Fußzeilen mit Seitenzahlen
+- Kommentar-System und Änderungsverfolgung
+- Rechtschreibprüfung (Browser-basiert, mehrsprachig)
 
 ### Tabulator — Tabellenkalkulation
 
-Tabellenkalkulation (Excel-Alternative) mit Grid-basiertem Editor und vollstaendiger Formel-Engine, gebaut mit Next.js.
+Tabellenkalkulation (Excel-Alternative) mit Grid-basiertem Editor und vollständiger Formel-Engine, gebaut mit Next.js.
 
-- Grid-Editor mit Zellenbearbeitung, Tastaturnavigation und Kontextmenue
+- Grid-Editor mit Zellenbearbeitung, Tastaturnavigation und Kontextmenü
 - Formel-Engine mit 40+ Funktionen (Mathe, Logik, Text, Statistik)
-- Abhaengigkeitsgraph fuer effiziente Neuberechnung
-- Formelleiste (FormulaBar) mit Funktionseinfuegung
-- Mehrere Arbeitsblaetter (SheetTabs) mit Umbenennen/Duplizieren
-- Ribbon-Toolbar mit 5 Tabs (Start, Formeln, Daten, Einfuegen, Seitenlayout)
+- Abhängigkeitsgraph für effiziente Neuberechnung
+- Formelleiste (FormulaBar) mit Funktionseinfügung
+- Mehrere Arbeitsblätter (SheetTabs) mit Umbenennen/Duplizieren
+- Ribbon-Toolbar mit 5 Tabs (Start, Formeln, Daten, Einfügen, Seitenlayout)
 - Bedingte Formatierung (13+ Regeltypen)
 - Datenvalidierung und Auto-Fill
 - CSV Import/Export (RFC 4180), natives `.impuls-tabelle`-Format
-- Zellformatierung (Schrift, Farben, Rahmen, Zahlenformate, Zusammenfuegen)
+- Zellformatierung (Schrift, Farben, Rahmen, Zahlenformate, Zusammenführen)
 - Suchen & Ersetzen, Undo/Redo, Sortierung, Filter
 - Statusleiste mit Summe/Durchschnitt/Anzahl und Zoom
 
@@ -94,14 +94,14 @@ Kommunikationsplattform (Teams-Alternative), gebaut mit Next.js. Aktuell als UI-
 - **Chat** — Einzel-/Gruppenchats, Dateianhänge, Reaktionen, Antworten, Emoji-Picker
 - **Kalender** — Tag/Woche/Monat-Ansichten, Terminplanung, wiederkehrende Termine
 - **Anrufe** — Anrufverlauf, Grid-/Speaker-Ansicht, Mediensteuerung (UI-Mockup, kein WebRTC)
-- **Teams** — Teamstruktur mit Kanaelen (oeffentlich, privat, Ankuendigungen)
+- **Teams** — Teamstruktur mit Kanälen (öffentlich, privat, Ankündigungen)
 - **Dateien** — Dateiliste mit Filter, Grid-/Listenansicht, Drag & Drop
 - **Benachrichtigungen** — 9 Benachrichtigungstypen, Gelesen-Markierung
 - **Einstellungen** — Profil, Audio/Video, Benachrichtigungen, Darstellung, Datenschutz
 
 ### Cloud — Backend-API
 
-Zentrales Backend fuer die gesamte Suite, gebaut mit Hono und Bun.
+Zentrales Backend für die gesamte Suite, gebaut mit Hono und Bun.
 
 - **Auth** — JWT-basierte Authentifizierung (Access + Refresh Tokens, Argon2id)
 - **Dokumente** — CRUD mit Zugriffskontrolle (Owner/Read/Write)
@@ -151,7 +151,7 @@ ImpulsOffice/
 ├── client/                  # Electron Desktop-Wrapper
 │   ├── main.js              #   Main Process (BrowserWindow, IPC)
 │   ├── preload.js           #   Secure IPC Bridge (Context Isolation)
-│   ├── menu.js              #   Native Menues
+│   ├── menu.js              #   Native Menüs
 │   └── resources/           #   App-Icons (icns, ico, png)
 │
 ├── tabulator/               # Next.js — Tabellenkalkulation
@@ -160,14 +160,14 @@ ImpulsOffice/
 │       ├── Grid/            #   Grid-Editor
 │       ├── FormulaBar/      #   Formelleiste
 │       ├── Toolbar/         #   Formatierungs-Toolbar
-│       ├── SheetTabs/       #   Arbeitsblaetter
+│       ├── SheetTabs/       #   Arbeitsblätter
 │       ├── StatusBar/       #   Statusleiste
 │       └── Dialogs/         #   Dialoge
 │
 ├── meet/                    # Next.js — Kommunikation
 │   ├── app/                 #   Pages & Layout
 │   ├── components/
-│   │   ├── Chat/            #   Chat-Funktionalitaet
+│   │   ├── Chat/            #   Chat-Funktionalität
 │   │   ├── Calendar/        #   Kalender
 │   │   ├── Call/            #   Video-/Audioanrufe
 │   │   ├── Contacts/        #   Kontaktverwaltung
@@ -202,7 +202,7 @@ ImpulsOffice/
 ### Voraussetzungen
 
 - [Node.js](https://nodejs.org/) >= 18 (inkl. npm)
-- [Bun](https://bun.sh/) (fuer Cloud-Backend)
+- [Bun](https://bun.sh/) (für Cloud-Backend)
 - Git
 
 ### Installation
@@ -251,8 +251,8 @@ cd cloud && bun run dev           # → http://localhost:4000
 ```bash
 # Writer Desktop-App
 cd client
-npm run build       # Build fuer aktuelle Plattform
-npm run dist        # Installer fuer macOS + Windows
+npm run build       # Build für aktuelle Plattform
+npm run dist        # Installer für macOS + Windows
 
 # Tabulator
 cd tabulator && npm run build
@@ -308,27 +308,27 @@ cd cloud && bun run start
 | `bun run start` | Startet Production Server |
 | `bun run lint` | TypeScript Type-Check |
 | `bun run db:generate` | Drizzle Migrations generieren |
-| `bun run db:migrate` | Migrations ausfuehren |
+| `bun run db:migrate` | Migrations ausführen |
 | `bun run db:push` | Schema direkt pushen |
-| `bun run db:studio` | Drizzle Studio oeffnen |
+| `bun run db:studio` | Drizzle Studio öffnen |
 
 ---
 
-## Tastaturkuerzel (Writer)
+## Tastaturkürzel (Writer)
 
 | Aktion | Shortcut |
 |--------|----------|
 | Neues Dokument | `Ctrl/Cmd + N` |
-| Oeffnen | `Ctrl/Cmd + O` |
+| Öffnen | `Ctrl/Cmd + O` |
 | Speichern | `Ctrl/Cmd + S` |
 | Drucken | `Ctrl/Cmd + P` |
-| Rueckgaengig | `Ctrl/Cmd + Z` |
+| Rückgängig | `Ctrl/Cmd + Z` |
 | Wiederherstellen | `Ctrl/Cmd + Y` |
 | Suchen & Ersetzen | `Ctrl/Cmd + H` |
 
 ---
 
-## Unterstuetzte Dateiformate (Writer)
+## Unterstützte Dateiformate (Writer)
 
 | Format | Lesen | Schreiben | Beschreibung |
 |--------|:-----:|:---------:|--------------|
@@ -343,30 +343,30 @@ cd cloud && bun run start
 
 ### Writer
 - [x] Tiptap-Editor mit 38+ Extensions (23 Custom + 15+ Built-in)
-- [x] Ribbon-Toolbar mit 7 Tabs (Start, Einfuegen, Seitenlayout, Ueberpruefen, Sendungen, Ansicht, KI)
+- [x] Ribbon-Toolbar mit 7 Tabs (Start, Einfügen, Seitenlayout, Überprüfen, Sendungen, Ansicht, KI)
 - [x] PDF-, DOCX- & HTML-Export
-- [x] Electron Desktop-App mit nativen Menues
+- [x] Electron Desktop-App mit nativen Menüs
 - [x] Suchen & Ersetzen
 - [x] Inhaltsverzeichnis-Sidebar
 - [x] Formatvorlagen (6 Themes) & Dokumentvorlagen
-- [x] Kopf- & Fusszeilen mit Seitenzahlen
-- [x] Rechtschreibpruefung (Browser-basiert, mehrsprachig)
-- [x] Kommentar-System & Aenderungsverfolgung
+- [x] Kopf- & Fußzeilen mit Seitenzahlen
+- [x] Rechtschreibprüfung (Browser-basiert, mehrsprachig)
+- [x] Kommentar-System & Änderungsverfolgung
 - [ ] Dark Mode
 - [ ] IMPULS-Datei Import (Lesen)
-- [ ] Erweiterte Rechtschreibpruefung (eigenes Woerterbuch)
+- [ ] Erweiterte Rechtschreibprüfung (eigenes Wörterbuch)
 
 ### Tabulator
 - [x] Grid-Editor mit Zellenbearbeitung & Tastaturnavigation
-- [x] Formelleiste mit Funktionseinfuegung
-- [x] Mehrere Arbeitsblaetter (Umbenennen, Duplizieren, Loeschen)
+- [x] Formelleiste mit Funktionseinfügung
+- [x] Mehrere Arbeitsblätter (Umbenennen, Duplizieren, Löschen)
 - [x] Formel-Engine mit 40+ Funktionen (Mathe, Logik, Text, Statistik)
-- [x] Abhaengigkeitsgraph & intelligente Neuberechnung
+- [x] Abhängigkeitsgraph & intelligente Neuberechnung
 - [x] Ribbon-Toolbar mit 5 Tabs
 - [x] Bedingte Formatierung (13+ Regeltypen)
 - [x] Datenvalidierung & Auto-Fill
 - [x] CSV Import/Export (RFC 4180)
-- [x] Zellformatierung (Schrift, Farben, Rahmen, Zahlenformate, Zusammenfuegen)
+- [x] Zellformatierung (Schrift, Farben, Rahmen, Zahlenformate, Zusammenführen)
 - [x] Suchen & Ersetzen, Sortierung, Filter
 - [x] Undo/Redo
 - [ ] Diagramme
@@ -377,7 +377,7 @@ cd cloud && bun run start
 - [x] Chat UI (Einzel-/Gruppenchats, Reaktionen, Antworten, Emoji-Picker)
 - [x] Kalender UI (Tag/Woche/Monat, Terminplanung)
 - [x] Anruf UI (Verlauf, Grid-/Speaker-Ansicht, Mediensteuerung)
-- [x] Teams UI (Kanaele, Teamstruktur)
+- [x] Teams UI (Kanäle, Teamstruktur)
 - [x] Dateien UI (Dateiliste, Filter, Drag & Drop)
 - [x] Benachrichtigungen UI (9 Typen)
 - [x] Einstellungen (Profil, Darstellung, Datenschutz)
@@ -400,7 +400,7 @@ cd cloud && bun run start
 - [ ] Bidirektionale Microsoft-Synchronisation
 - [ ] Datei-Synchronisation
 
-### Suite-uebergreifend
+### Suite-übergreifend
 - [ ] E-Mail-Client
 - [ ] Meet-Backend-Integration
 - [ ] Auto-Save & Dokumentversionierung im Client
@@ -411,11 +411,11 @@ cd cloud && bun run start
 
 ## Mitwirken
 
-Beitraege sind willkommen!
+Beiträge sind willkommen!
 
 1. Repository **forken**
 2. Feature-Branch erstellen: `git checkout -b feature/mein-feature`
-3. Aenderungen committen: `git commit -m 'feat: mein neues Feature'`
+3. Änderungen committen: `git commit -m 'feat: mein neues Feature'`
 4. Branch pushen: `git push origin feature/mein-feature`
 5. **Pull Request** erstellen
 

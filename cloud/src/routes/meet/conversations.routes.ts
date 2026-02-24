@@ -2,32 +2,34 @@ import { Hono } from 'hono'
 import { db } from '../../db/client'
 import { conversations, conversationMembers, messages } from '../../db/schema'
 import { eq, desc } from 'drizzle-orm'
+import { authMiddleware } from '../../middleware/auth'
 
 export const conversationRoutes = new Hono()
 
+// Auth-Middleware für alle Meet-Routes
+conversationRoutes.use(authMiddleware)
+
 // Alle Conversations eines Users
 conversationRoutes.get('/', async (c) => {
-  const userId = c.req.header('x-user-id')
-  if (!userId) return c.json({ error: 'Nicht authentifiziert' }, 401)
+  const { userId } = c.get('user')
 
   const memberships = await db.select()
     .from(conversationMembers)
     .where(eq(conversationMembers.userId, userId))
 
   const convIds = memberships.map(m => m.conversationId)
-  if (convIds.length === 0) return c.json([])
+  if (convIds.length === 0) return c.json({ ok: true, data: [] })
 
   const result = await db.select()
     .from(conversations)
     .orderBy(desc(conversations.updatedAt))
 
-  return c.json(result.filter(conv => convIds.includes(conv.id)))
+  return c.json({ ok: true, data: result.filter(conv => convIds.includes(conv.id)) })
 })
 
 // Neue Conversation erstellen
 conversationRoutes.post('/', async (c) => {
-  const userId = c.req.header('x-user-id')
-  if (!userId) return c.json({ error: 'Nicht authentifiziert' }, 401)
+  const { userId } = c.get('user')
 
   const body = await c.req.json() as {
     type: 'direct' | 'group'
@@ -53,7 +55,7 @@ conversationRoutes.post('/', async (c) => {
     })
   }
 
-  return c.json({ id: convId }, 201)
+  return c.json({ ok: true, data: { id: convId } }, 201)
 })
 
 // Nachrichten einer Conversation
@@ -69,13 +71,12 @@ conversationRoutes.get('/:id/messages', async (c) => {
     .limit(limit)
     .offset(offset)
 
-  return c.json(result.reverse())
+  return c.json({ ok: true, data: result.reverse() })
 })
 
 // Nachricht senden
 conversationRoutes.post('/:id/messages', async (c) => {
-  const userId = c.req.header('x-user-id')
-  if (!userId) return c.json({ error: 'Nicht authentifiziert' }, 401)
+  const { userId } = c.get('user')
 
   const convId = c.req.param('id')
   const body = await c.req.json() as {
@@ -99,5 +100,5 @@ conversationRoutes.post('/:id/messages', async (c) => {
     .set({ updatedAt: new Date() })
     .where(eq(conversations.id, convId))
 
-  return c.json({ id: msgId }, 201)
+  return c.json({ ok: true, data: { id: msgId } }, 201)
 })

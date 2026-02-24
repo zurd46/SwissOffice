@@ -2,20 +2,23 @@ import { Hono } from 'hono'
 import { db } from '../../db/client'
 import { teams, teamMembers, channels, channelMembers } from '../../db/schema'
 import { eq } from 'drizzle-orm'
+import { authMiddleware } from '../../middleware/auth'
 
 export const teamRoutes = new Hono()
 
+// Auth-Middleware für alle Team-Routes
+teamRoutes.use(authMiddleware)
+
 // Alle Teams eines Users
 teamRoutes.get('/', async (c) => {
-  const userId = c.req.header('x-user-id')
-  if (!userId) return c.json({ error: 'Nicht authentifiziert' }, 401)
+  const { userId } = c.get('user')
 
   const memberships = await db.select()
     .from(teamMembers)
     .where(eq(teamMembers.userId, userId))
 
   const teamIds = memberships.map(m => m.teamId)
-  if (teamIds.length === 0) return c.json([])
+  if (teamIds.length === 0) return c.json({ ok: true, data: [] })
 
   const allTeams = await db.select().from(teams)
   const userTeams = allTeams.filter(t => teamIds.includes(t.id))
@@ -28,13 +31,12 @@ teamRoutes.get('/', async (c) => {
     return { ...team, channels: teamChannels }
   }))
 
-  return c.json(result)
+  return c.json({ ok: true, data: result })
 })
 
 // Team erstellen
 teamRoutes.post('/', async (c) => {
-  const userId = c.req.header('x-user-id')
-  if (!userId) return c.json({ error: 'Nicht authentifiziert' }, 401)
+  const { userId } = c.get('user')
 
   const body = await c.req.json() as {
     name: string
@@ -76,13 +78,12 @@ teamRoutes.post('/', async (c) => {
     userId,
   })
 
-  return c.json({ id: teamId }, 201)
+  return c.json({ ok: true, data: { id: teamId } }, 201)
 })
 
 // Channel erstellen
 teamRoutes.post('/:teamId/channels', async (c) => {
-  const userId = c.req.header('x-user-id')
-  if (!userId) return c.json({ error: 'Nicht authentifiziert' }, 401)
+  const { userId } = c.get('user')
 
   const teamId = c.req.param('teamId')
   const body = await c.req.json() as {
@@ -108,11 +109,12 @@ teamRoutes.post('/:teamId/channels', async (c) => {
     userId,
   })
 
-  return c.json({ id: channelId }, 201)
+  return c.json({ ok: true, data: { id: channelId } }, 201)
 })
 
 // Mitglied einladen
 teamRoutes.post('/:teamId/members', async (c) => {
+  const { userId } = c.get('user')
   const body = await c.req.json() as { userId: string; role?: string }
   const teamId = c.req.param('teamId')
 

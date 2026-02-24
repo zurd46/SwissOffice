@@ -1,64 +1,66 @@
 'use client'
 
-import { createContext, useContext, useState, useCallback, type ReactNode } from 'react'
+// Meet-spezifischer Auth-Context — nutzt den Shared AuthContext
+// und fügt Meet-spezifische Methoden hinzu (Presence, Custom Status)
+
+import { createContext, useContext, useCallback, useState, type ReactNode } from 'react'
+import { useAuth as useSharedAuth } from '@shared/contexts/AuthContext'
 import type { User, PresenceStatus } from '@/lib/types'
 
-interface AuthContextValue {
+interface MeetAuthContextValue {
   currentUser: User | null
   isAuthenticated: boolean
+  isLoading: boolean
   login: (email: string, password: string) => Promise<void>
-  logout: () => void
+  logout: () => Promise<void>
   updatePresence: (status: PresenceStatus) => void
   updateCustomStatus: (message: string) => void
 }
 
-const AuthContext = createContext<AuthContextValue | null>(null)
+const MeetAuthContext = createContext<MeetAuthContextValue | null>(null)
 
-// Demo-User für Entwicklung
-const demoUser: User = {
-  id: 'user-1',
-  email: 'daniel@impulsmeet.local',
-  displayName: 'Daniel Zurmühle',
-  presence: 'online',
-  createdAt: new Date().toISOString(),
-}
+export function MeetAuthProvider({ children }: { children: ReactNode }) {
+  const shared = useSharedAuth()
+  const [presence, setPresence] = useState<PresenceStatus>('online')
+  const [customStatus, setCustomStatus] = useState<string>('')
 
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const [currentUser, setCurrentUser] = useState<User | null>(demoUser)
-
-  const login = useCallback(async (_email: string, _password: string) => {
-    // TODO: Echte Auth-Logik über cloud/ Backend
-    setCurrentUser(demoUser)
-  }, [])
-
-  const logout = useCallback(() => {
-    setCurrentUser(null)
-  }, [])
+  // Shared User auf Meet User-Format mappen
+  const currentUser: User | null = shared.user
+    ? {
+        id: shared.user.id,
+        email: shared.user.email,
+        displayName: shared.user.displayName,
+        presence,
+        customStatus,
+        createdAt: shared.user.createdAt ?? new Date().toISOString(),
+      }
+    : null
 
   const updatePresence = useCallback((status: PresenceStatus) => {
-    setCurrentUser(prev => prev ? { ...prev, presence: status } : null)
+    setPresence(status)
   }, [])
 
   const updateCustomStatus = useCallback((message: string) => {
-    setCurrentUser(prev => prev ? { ...prev, customStatus: message } : null)
+    setCustomStatus(message)
   }, [])
 
   return (
-    <AuthContext.Provider value={{
+    <MeetAuthContext.Provider value={{
       currentUser,
-      isAuthenticated: !!currentUser,
-      login,
-      logout,
+      isAuthenticated: shared.isAuthenticated,
+      isLoading: shared.isLoading,
+      login: shared.login,
+      logout: shared.logout,
       updatePresence,
       updateCustomStatus,
     }}>
       {children}
-    </AuthContext.Provider>
+    </MeetAuthContext.Provider>
   )
 }
 
-export function useAuth(): AuthContextValue {
-  const context = useContext(AuthContext)
-  if (!context) throw new Error('useAuth muss innerhalb von AuthProvider verwendet werden')
+export function useAuth(): MeetAuthContextValue {
+  const context = useContext(MeetAuthContext)
+  if (!context) throw new Error('useAuth muss innerhalb von MeetAuthProvider verwendet werden')
   return context
 }

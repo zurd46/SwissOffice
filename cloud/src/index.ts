@@ -5,6 +5,7 @@ import { wsManager, type WSData } from './ws/WebSocketManager'
 import { registerChatHandlers } from './ws/handlers/chatHandler'
 import { registerPresenceHandlers } from './ws/handlers/presenceHandler'
 import { registerCallSignalingHandlers } from './ws/handlers/callSignalingHandler'
+import { jwtVerify } from 'jose'
 
 await runMigrations()
 
@@ -15,18 +16,33 @@ registerCallSignalingHandlers()
 
 console.log(`ImpulsCloud Server laeuft auf ${env.HOST}:${env.PORT}`)
 
+const jwtSecret = new TextEncoder().encode(env.JWT_SECRET)
+
 const server = Bun.serve<WSData>({
   port: env.PORT,
   hostname: env.HOST,
-  fetch(req, server) {
+  async fetch(req, server) {
     const url = new URL(req.url)
 
-    // WebSocket Upgrade für /ws
+    // WebSocket Upgrade für /ws — mit JWT-Verifikation (Sicherheit!)
     if (url.pathname === '/ws') {
-      const userId = url.searchParams.get('userId')
-      if (!userId) {
-        return new Response('userId erforderlich', { status: 400 })
+      const token = url.searchParams.get('token')
+      if (!token) {
+        return new Response('Token erforderlich', { status: 401 })
       }
+
+      // JWT verifizieren — nur authentifizierte User dürfen verbinden
+      let userId: string
+      try {
+        const { payload } = await jwtVerify(token, jwtSecret)
+        if (!payload.sub) {
+          return new Response('Ungueltiger Token', { status: 401 })
+        }
+        userId = payload.sub
+      } catch {
+        return new Response('Ungueltiger oder abgelaufener Token', { status: 401 })
+      }
+
       const success = server.upgrade(req, {
         data: {
           userId,
