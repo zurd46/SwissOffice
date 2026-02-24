@@ -8,7 +8,7 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: "ImpulsOffice Writer",
+  title: "ImpulsWriter",
   description: "Professionelle Textverarbeitung - Word Alternative",
 }
 

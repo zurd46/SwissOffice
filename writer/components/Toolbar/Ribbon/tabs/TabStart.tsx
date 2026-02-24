@@ -13,7 +13,8 @@ import {
 } from 'lucide-react'
 import { ToolbarButton, ToolbarSelect, ToolbarColorButton } from '../../ToolbarButton'
 import { RibbonGroup, RibbonGroupLast } from '../RibbonGroup'
-import { FONT_FAMILIES, FONT_SIZES, HEADING_OPTIONS, LINE_HEIGHTS } from '../constants'
+import { FONT_FAMILIES, FONT_SIZES, LINE_HEIGHTS } from '../constants'
+import { StyleGallery } from '../StyleGallery'
 import { useState, useCallback } from 'react'
 
 interface TabStartProps {
@@ -33,22 +34,6 @@ export function TabStart({ editor, onToggleFindReplace }: TabStartProps) {
   const getCurrentFontFamily = () => {
     const attrs = editor.getAttributes('textStyle')
     return attrs.fontFamily || 'Times New Roman'
-  }
-
-  const getCurrentHeading = () => {
-    for (let i = 1; i <= 6; i++) {
-      if (editor.isActive('heading', { level: i })) return String(i)
-    }
-    return '0'
-  }
-
-  const handleHeadingChange = (value: string) => {
-    const level = parseInt(value)
-    if (level === 0) {
-      editor.chain().focus().setParagraph().run()
-    } else {
-      editor.chain().focus().toggleHeading({ level: level as 1 | 2 | 3 | 4 | 5 | 6 }).run()
-    }
   }
 
   const increaseFontSize = useCallback(() => {

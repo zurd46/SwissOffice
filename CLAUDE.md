@@ -1,4 +1,4 @@
-# ImpulsOffice
+# ImpulsWriter
 
 Professionelle Desktop-Textverarbeitung (Word-Alternative) als Electron-App mit Next.js-Frontend und Tiptap-Editor.
 

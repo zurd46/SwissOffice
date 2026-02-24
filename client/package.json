@@ -1,9 +1,9 @@
 {
   "name": "impulswriter",
   "version": "1.0.0",
-  "description": "ImpulsOffice Writer - Professionelle Textverarbeitung",
+  "description": "ImpulsWriter - Professionelle Textverarbeitung",
   "main": "main.js",
-  "author": "ImpulsOffice",
+  "author": "ImpulsWriter",
   "license": "MIT",
   "scripts": {
     "dev": "node dev.js",
@@ -15,8 +15,8 @@
     "start": "electron ."
   },
   "build": {
-    "appId": "com.impulsoffice.writer",
-    "productName": "ImpulsOffice Writer",
+    "appId": "com.impulswriter.app",
+    "productName": "ImpulsWriter",
     "directories": {
       "output": "dist",
       "buildResources": "resources"

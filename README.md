@@ -1,6 +1,6 @@
 <div align="center">
 
-<h1>ImpulsOffice</h1>
+<h1>ImpulsWriter</h1>
 
 <p><strong>Open-Source Office-Suite — modern, schnell, plattformuebergreifend.</strong></p>
 
@@ -35,7 +35,7 @@ Gebaut mit Next.js, Electron und Tiptap. Verfuegbar fuer macOS, Windows und Linu
 
 ## Uebersicht
 
-ImpulsOffice ist eine modulare Office-Suite mit dem Ziel, eine moderne, performante und erweiterbare Alternative zu klassischen Office-Anwendungen bereitzustellen. Das Projekt ist als Monorepo organisiert — jedes Modul lebt in einem eigenen Verzeichnis.
+ImpulsWriter ist eine modulare Office-Suite mit dem Ziel, eine moderne, performante und erweiterbare Alternative zu klassischen Office-Anwendungen bereitzustellen. Das Projekt ist als Monorepo organisiert — jedes Modul lebt in einem eigenen Verzeichnis.
 
 | Modul | Verzeichnis | Status | Beschreibung |
 |-------|-------------|--------|--------------|
@@ -104,7 +104,7 @@ ImpulsOffice ist eine modulare Office-Suite mit dem Ziel, eine moderne, performa
 ## Projektstruktur
 
 ```
-ImpulsOffice/
+ImpulsWriter/
 │
 ├── writer/                  # Next.js App — Textverarbeitung (Frontend)
 │   ├── app/                 #   Pages & Layout (App Router)
@@ -147,8 +147,8 @@ ImpulsOffice/
 ### Installation
 
 ```bash
-git clone https://github.com/<dein-username>/ImpulsOffice.git
-cd ImpulsOffice
+git clone https://github.com/<dein-username>/ImpulsWriter.git
+cd ImpulsWriter
 
 # Writer-Dependencies
 cd writer && npm install

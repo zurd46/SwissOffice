@@ -1,4 +1,4 @@
-# ImpulsOffice Writer - Implementierungsplan
+# ImpulsWriter - Implementierungsplan
 
 ## Technologie-Stack
 - **Framework:** Next.js 14 (App Router)

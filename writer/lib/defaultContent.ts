@@ -7,14 +7,14 @@ export const defaultContent = {
     {
       type: 'heading',
       attrs: { level: 1 },
-      content: [{ type: 'text', text: 'Willkommen bei ImpulsOffice Writer' }],
+      content: [{ type: 'text', text: 'Willkommen bei ImpulsWriter' }],
     },
     {
       type: 'paragraph',
       content: [
         {
           type: 'text',
-          text: 'Beginnen Sie hier mit der Bearbeitung Ihres Dokuments. ImpulsOffice Writer bietet alle Funktionen, die Sie für professionelle Dokumente benötigen.',
+          text: 'Beginnen Sie hier mit der Bearbeitung Ihres Dokuments. ImpulsWriter bietet alle Funktionen, die Sie für professionelle Dokumente benötigen.',
         },
       ],
     },
