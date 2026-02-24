@@ -4,7 +4,9 @@ import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import Underline from '@tiptap/extension-underline'
 import TextAlign from '@tiptap/extension-text-align'
-import Image from '@tiptap/extension-image'
+import { ResizableImage } from './extensions/ResizableImage'
+import { ParagraphBorder } from './extensions/ParagraphBorder'
+import { TableCellBackground } from './extensions/TableCellBackground'
 import { Table } from '@tiptap/extension-table'
 import TableRow from '@tiptap/extension-table-row'
 import TableCell from '@tiptap/extension-table-cell'
@@ -93,7 +95,7 @@ function WriterEditorInner() {
       TextAlign.configure({
         types: ['heading', 'paragraph'],
       }),
-      Image.configure({
+      ResizableImage.configure({
         inline: false,
         allowBase64: true,
       }),

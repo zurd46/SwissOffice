@@ -226,39 +226,35 @@ export function TabStart({ editor, onToggleFindReplace }: TabStartProps) {
       </RibbonGroup>
 
       {/* Formatvorlagen */}
-      <RibbonGroupLast label="Formatvorlagen">
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-          <ToolbarSelect
-            value={getCurrentHeading()}
-            onChange={handleHeadingChange}
-            options={HEADING_OPTIONS}
-            title="Absatzformat"
-            className="w-[130px]"
-          />
-          <button
-            onClick={onToggleFindReplace}
-            title="Suchen & Ersetzen (Ctrl+H)"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 4,
-              height: 26,
-              padding: '0 6px',
-              borderRadius: 2,
-              fontSize: 11,
-              color: '#323130',
-              backgroundColor: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              transition: 'all 0.1s',
-            }}
-            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#e1dfdd' }}
-            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent' }}
-          >
-            <Search size={13} style={{ color: '#605e5c' }} />
-            <span>Suchen & Ersetzen</span>
-          </button>
-        </div>
+      <RibbonGroup label="Formatvorlagen">
+        <StyleGallery editor={editor} />
+      </RibbonGroup>
+
+      {/* Suchen */}
+      <RibbonGroupLast label="Bearbeiten">
+        <button
+          onClick={onToggleFindReplace}
+          title="Suchen & Ersetzen (Ctrl+H)"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 4,
+            height: 26,
+            padding: '0 6px',
+            borderRadius: 2,
+            fontSize: 11,
+            color: '#323130',
+            backgroundColor: 'transparent',
+            border: 'none',
+            cursor: 'pointer',
+            transition: 'all 0.1s',
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#e1dfdd' }}
+          onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent' }}
+        >
+          <Search size={13} style={{ color: '#605e5c' }} />
+          <span>Suchen & Ersetzen</span>
+        </button>
       </RibbonGroupLast>
     </>
   )
