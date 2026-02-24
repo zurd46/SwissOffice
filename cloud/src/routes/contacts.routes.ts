@@ -7,6 +7,7 @@ import {
 } from '../validators/contact.validators'
 import { authMiddleware } from '../middleware/auth'
 import * as contactService from '../services/contact.service'
+import { importMicrosoftContacts } from '../services/microsoftImport.service'
 
 export const contactRoutes = new Hono()
 
@@ -93,4 +94,13 @@ contactRoutes.delete('/groups/:gId/members/:cId', async (c) => {
   const user = c.get('user')
   contactService.removeGroupMember(c.req.param('gId'), user.userId, c.req.param('cId'))
   return c.json({ ok: true })
+})
+
+// ── Microsoft Import ──
+
+contactRoutes.post('/import/microsoft', async (c) => {
+  const user = c.get('user')
+  const { accountId } = await c.req.json()
+  const result = await importMicrosoftContacts(accountId, user.userId)
+  return c.json({ ok: true, data: result })
 })

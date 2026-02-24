@@ -6,6 +6,7 @@ import {
 } from '../validators/calendar.validators'
 import { authMiddleware } from '../middleware/auth'
 import * as calendarService from '../services/calendar.service'
+import { importMicrosoftCalendars } from '../services/microsoftImport.service'
 
 export const calendarRoutes = new Hono()
 
@@ -40,8 +41,10 @@ calendarRoutes.delete('/:id', async (c) => {
 })
 
 calendarRoutes.post('/import/microsoft', async (c) => {
-  // Placeholder — wird in Microsoft-Import Schritt implementiert
-  return c.json({ ok: false, error: { code: 'NOT_IMPLEMENTED', message: 'Microsoft-Import noch nicht implementiert' } }, 501)
+  const user = c.get('user')
+  const { accountId } = await c.req.json()
+  const result = await importMicrosoftCalendars(accountId, user.userId)
+  return c.json({ ok: true, data: result })
 })
 
 // ── Events ──
