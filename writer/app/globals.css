@@ -286,23 +286,48 @@ body {
   background-color: #bfdbfe;
 }
 
-/* Print Styles */
+/* Print Styles — @page size/margins are injected dynamically by printDocument() */
 @media print {
+  /* Reset html/body for print flow */
+  html, body {
+    overflow: visible !important;
+    height: auto !important;
+    width: auto !important;
+    background: white !important;
+  }
+
+  /* Hide all UI chrome */
   body * {
     visibility: hidden;
   }
+
+  /* Show only editor content */
   .ProseMirror,
   .ProseMirror * {
     visibility: visible;
   }
+
   .ProseMirror {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    padding: 25mm;
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    min-height: auto !important;
     font-size: 12pt;
+    line-height: 1.5;
+    background: white !important;
+    box-shadow: none !important;
+    border: none !important;
   }
+
+  /* Remove zoom transform from parent elements */
+  [style*="transform"] {
+    transform: none !important;
+  }
+
+  /* Page break control */
   .ProseMirror p {
     orphans: 2;
     widows: 2;
@@ -332,6 +357,12 @@ body {
   }
   .ProseMirror li {
     break-inside: avoid;
+  }
+
+  /* Hide page break visual markers */
+  .ProseMirror div[data-page-break]::after,
+  .ProseMirror div[data-section-break]::after {
+    display: none;
   }
 }
 

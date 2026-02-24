@@ -5,6 +5,7 @@ import { useState, useRef, useEffect } from 'react'
 import { saveDocument, saveAsHTML, loadDocument, newDocument, printDocument } from '../../lib/fileOperations'
 import { exportPDF } from '../Export/exportPDF'
 import { exportDOCX } from '../Export/exportDOCX'
+import { useDocumentSettings } from '../../lib/documentContext'
 import {
   File, FilePlus, FolderOpen, Save, FileText, FileDown, FileOutput, Printer,
   Undo2, Redo2, MousePointerClick, Search,
@@ -39,6 +40,7 @@ type Menu = {
 export function MenuBar({ editor, documentName, setDocumentName, onToggleFindReplace, onToggleSidebar, onOpenSettings }: MenuBarProps) {
   const [activeMenu, setActiveMenu] = useState<string | null>(null)
   const menuRef = useRef<HTMLDivElement>(null)
+  const { settings } = useDocumentSettings()
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -63,7 +65,7 @@ export function MenuBar({ editor, documentName, setDocumentName, onToggleFindRep
         { label: 'Als PDF exportieren', action: () => exportPDF(editor, documentName), icon: <FileDown size={15} /> },
         { label: 'Als DOCX exportieren', action: () => exportDOCX(editor, documentName), icon: <FileOutput size={15} /> },
         { label: '', divider: true },
-        { label: 'Drucken', action: () => printDocument(), shortcut: 'Ctrl+P', icon: <Printer size={15} /> },
+        { label: 'Drucken', action: () => printDocument(settings), shortcut: 'Ctrl+P', icon: <Printer size={15} /> },
       ],
     },
     {

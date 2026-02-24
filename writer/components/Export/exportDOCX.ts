@@ -14,8 +14,13 @@ import {
   ImageRun,
   LevelFormat,
   ShadingType,
+  Header,
+  Footer,
+  PageNumber,
+  PageBreak,
 } from 'docx'
 import { saveAs } from 'file-saver'
+import type { DocumentSettings } from '../../lib/types/document'
 
 type JSONContent = {
   type?: string
@@ -61,8 +66,11 @@ function getLineSpacing(lineHeight: string | undefined): number | undefined {
   if (!lineHeight) return undefined
   const num = parseFloat(lineHeight)
   if (isNaN(num)) return undefined
-  // DOCX line spacing: 240 twips = single spacing (1.0)
   return Math.round(num * 240)
+}
+
+function mmToTwips(mm: number): number {
+  return Math.round(mm * 56.693)
 }
 
 function processTextRuns(content: JSONContent[]): TextRun[] {
@@ -91,6 +99,41 @@ function processTextRuns(content: JSONContent[]): TextRun[] {
         } : undefined,
       })
     }
+
+    // Handle footnoteRef inline
+    if (node.type === 'footnoteRef') {
+      const num = node.attrs?.number || '?'
+      return new TextRun({
+        text: `[${num}]`,
+        superScript: true,
+        color: '0078D4',
+        size: 16,
+      })
+    }
+
+    // Handle citation inline
+    if (node.type === 'citation') {
+      const displayText = (node.attrs?.displayText as string) || '[Zitat]'
+      return new TextRun({
+        text: displayText,
+        color: '0078D4',
+      })
+    }
+
+    // Handle merge field inline
+    if (node.type === 'mergeField') {
+      const fieldName = (node.attrs?.fieldName as string) || 'Feld'
+      return new TextRun({
+        text: `\u00AB${fieldName}\u00BB`,
+        color: '0369A1',
+        shading: {
+          type: ShadingType.SOLID,
+          color: 'E0F2FE',
+          fill: 'E0F2FE',
+        },
+      })
+    }
+
     return new TextRun({ text: '' })
   })
 }
@@ -115,10 +158,12 @@ function processNode(node: JSONContent): (Paragraph | DocxTable)[] {
     case 'paragraph': {
       const alignment = node.attrs?.textAlign as string
       const spacing = getParagraphSpacing(node)
+      const indent = node.attrs?.indent as number | undefined
       results.push(new Paragraph({
         children: node.content ? processTextRuns(node.content) : [],
         alignment: alignment ? getAlignment(alignment) : undefined,
         spacing,
+        indent: indent ? { left: indent * 720 } : undefined,
       }))
       break
     }
@@ -193,17 +238,21 @@ function processNode(node: JSONContent): (Paragraph | DocxTable)[] {
     }
     case 'horizontalRule': {
       results.push(new Paragraph({
-        children: [new TextRun({ text: '___________________________________' })],
+        children: [],
+        border: {
+          bottom: { style: BorderStyle.SINGLE, size: 6, color: 'D1D5DB' },
+        },
+        spacing: { before: 200, after: 200 },
       }))
       break
     }
     case 'pageBreak': {
       results.push(new Paragraph({
-        children: [],
-        pageBreakBefore: true,
+        children: [new TextRun({ break: 1, children: [new PageBreak()] })],
       }))
       break
     }
+    case 'resizableImage':
     case 'image': {
       const src = node.attrs?.src as string
       if (src?.startsWith('data:image')) {
@@ -231,7 +280,7 @@ function processNode(node: JSONContent): (Paragraph | DocxTable)[] {
         }
       } else if (src) {
         results.push(new Paragraph({
-          children: [new TextRun({ text: `[Bild: ${src}]` })],
+          children: [new TextRun({ text: `[Bild: ${src}]`, italics: true, color: '999999' })],
         }))
       }
       break
@@ -250,6 +299,30 @@ function processNode(node: JSONContent): (Paragraph | DocxTable)[] {
             }))
           }
         })
+      })
+      break
+    }
+    case 'sectionBreak': {
+      results.push(new Paragraph({
+        children: [],
+        pageBreakBefore: true,
+      }))
+      break
+    }
+    case 'bibliography': {
+      results.push(new Paragraph({
+        children: [new TextRun({ text: 'Literaturverzeichnis', bold: true, size: 28 })],
+        spacing: { before: 400, after: 200 },
+        border: {
+          bottom: { style: BorderStyle.SINGLE, size: 6, color: 'D1D5DB' },
+        },
+      }))
+      break
+    }
+    case 'textBox': {
+      // Render text box content as indented paragraphs with border
+      node.content?.forEach(child => {
+        results.push(...processNode(child))
       })
       break
     }
@@ -289,7 +362,7 @@ function processList(node: JSONContent, results: (Paragraph | DocxTable)[], type
   })
 }
 
-export async function exportDOCX(editor: Editor, filename: string = 'dokument') {
+export async function exportDOCX(editor: Editor, filename: string = 'dokument', settings?: DocumentSettings) {
   const json = editor.getJSON()
   const children: (Paragraph | DocxTable)[] = []
 
@@ -299,6 +372,57 @@ export async function exportDOCX(editor: Editor, filename: string = 'dokument') 
 
   if (children.length === 0) {
     children.push(new Paragraph({}))
+  }
+
+  // Use document settings for margins and page size
+  const marginTop = settings ? mmToTwips(settings.margins.top) : 1418
+  const marginRight = settings ? mmToTwips(settings.margins.right) : 1418
+  const marginBottom = settings ? mmToTwips(settings.margins.bottom) : 1418
+  const marginLeft = settings ? mmToTwips(settings.margins.left) : 1418
+
+  const isLandscape = settings?.orientation === 'landscape'
+  const pageWidth = settings
+    ? mmToTwips(isLandscape ? settings.pageSize.height : settings.pageSize.width)
+    : mmToTwips(210)
+  const pageHeight = settings
+    ? mmToTwips(isLandscape ? settings.pageSize.width : settings.pageSize.height)
+    : mmToTwips(297)
+
+  // Build header/footer if enabled
+  const headers: Record<string, { default?: Header }> = {}
+  const footers: Record<string, { default?: Footer }> = {}
+
+  if (settings?.headerContent?.enabled && settings.headerContent.html) {
+    headers.default = new Header({
+      children: [new Paragraph({
+        children: [new TextRun({ text: settings.headerContent.html, size: 18, color: '666666' })],
+        alignment: AlignmentType.CENTER,
+      })],
+    })
+  }
+
+  if (settings?.footerContent?.enabled && settings.footerContent.html) {
+    footers.default = new Footer({
+      children: [new Paragraph({
+        children: [new TextRun({ text: settings.footerContent.html, size: 18, color: '666666' })],
+        alignment: AlignmentType.CENTER,
+      })],
+    })
+  } else if (settings?.showPageNumbers) {
+    footers.default = new Footer({
+      children: [new Paragraph({
+        children: [
+          new TextRun({ children: [PageNumber.CURRENT], size: 18, color: '666666' }),
+          new TextRun({ text: ' / ', size: 18, color: '666666' }),
+          new TextRun({ children: [PageNumber.TOTAL_PAGES], size: 18, color: '666666' }),
+        ],
+        alignment: settings.pageNumberPosition === 'left'
+          ? AlignmentType.LEFT
+          : settings.pageNumberPosition === 'right'
+            ? AlignmentType.RIGHT
+            : AlignmentType.CENTER,
+      })],
+    })
   }
 
   const doc = new Document({
@@ -317,14 +441,21 @@ export async function exportDOCX(editor: Editor, filename: string = 'dokument') 
     sections: [{
       properties: {
         page: {
+          size: {
+            width: pageWidth,
+            height: pageHeight,
+            orientation: isLandscape ? 'landscape' as unknown as undefined : undefined,
+          },
           margin: {
-            top: 1418,   // 25mm in twips
-            right: 1418,
-            bottom: 1418,
-            left: 1418,
+            top: marginTop,
+            right: marginRight,
+            bottom: marginBottom,
+            left: marginLeft,
           },
         },
       },
+      headers: headers.default ? { default: headers.default } : undefined,
+      footers: footers.default ? { default: footers.default } : undefined,
       children,
     }],
   })

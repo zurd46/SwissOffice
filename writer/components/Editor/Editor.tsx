@@ -406,7 +406,7 @@ function WriterEditorInner() {
           saveAsHTML(editor, documentName)
           break
         case 'print':
-          printDocument()
+          printDocument(settings)
           break
         case 'undo':
           editor.chain().focus().undo().run()

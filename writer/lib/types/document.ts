@@ -56,6 +56,9 @@ export interface ImpulsDocument {
   version: number
   settings: DocumentSettings
   content: Record<string, unknown>
+  footnotes?: Array<{ id: string; number: number; content: string }>
+  bibliography?: Array<Record<string, unknown>>
+  citationStyle?: 'apa' | 'mla' | 'chicago'
 }
 
 export function getEffectivePageDimensions(settings: DocumentSettings): { width: number; height: number } {

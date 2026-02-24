@@ -105,6 +105,28 @@ export function newDocument(editor: Editor) {
   })
 }
 
-export function printDocument() {
+export function printDocument(settings?: DocumentSettings) {
+  const s = settings ?? defaultDocumentSettings
+  const orientation = s.orientation ?? 'portrait'
+  const pageSize = s.pageSize ?? { width: 210, height: 297 }
+  const effectiveWidth = orientation === 'landscape' ? pageSize.height : pageSize.width
+  const effectiveHeight = orientation === 'landscape' ? pageSize.width : pageSize.height
+
+  // Inject dynamic @page rule matching document settings
+  const styleId = 'impuls-print-page-style'
+  let styleEl = document.getElementById(styleId) as HTMLStyleElement | null
+  if (!styleEl) {
+    styleEl = document.createElement('style')
+    styleEl.id = styleId
+    document.head.appendChild(styleEl)
+  }
+
+  styleEl.textContent = `
+    @page {
+      size: ${effectiveWidth}mm ${effectiveHeight}mm;
+      margin: ${s.margins.top}mm ${s.margins.right}mm ${s.margins.bottom}mm ${s.margins.left}mm;
+    }
+  `
+
   window.print()
 }
