@@ -220,14 +220,14 @@ export function WriterEditor() {
 
   if (!editor) {
     return (
-      <div className="h-screen flex items-center justify-center bg-gray-100">
-        <div className="text-gray-500">Editor wird geladen...</div>
+      <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f5f5f5' }}>
+        <div style={{ color: '#888' }}>Editor wird geladen...</div>
       </div>
     )
   }
 
   return (
-    <div className="h-screen flex flex-col bg-gray-100 overflow-hidden">
+    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: '#f5f5f5', overflow: 'hidden' }}>
       {/* Menu Bar - hidden in Electron (native menu takes over) */}
       {!isElectron && (
         <MenuBar
@@ -256,18 +256,20 @@ export function WriterEditor() {
       )}
 
       {/* Main Content Area */}
-      <div className="flex flex-1 overflow-hidden">
+      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
         {/* Sidebar */}
         {showSidebar && <Sidebar editor={editor} />}
 
         {/* Editor Area with A4 Page */}
-        <div className="flex-1 overflow-auto bg-gray-200 py-8 flex justify-center">
+        <div style={{ flex: 1, overflow: 'auto', backgroundColor: '#e5e5e5', padding: '32px 0', display: 'flex', justifyContent: 'center' }}>
           <div
-            className="bg-white shadow-lg border border-gray-300 relative"
             style={{
+              backgroundColor: 'white',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
+              border: '1px solid #d0d0d0',
+              position: 'relative',
               width: `${210 * (zoom / 100)}mm`,
               minHeight: `${297 * (zoom / 100)}mm`,
-              transform: `scale(1)`,
               transformOrigin: 'top center',
             }}
           >

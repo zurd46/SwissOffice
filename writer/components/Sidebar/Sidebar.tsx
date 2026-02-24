@@ -2,7 +2,7 @@
 
 import { Editor } from '@tiptap/react'
 import { useEffect, useState, useCallback } from 'react'
-import { FileText, X } from 'lucide-react'
+import { FileText } from 'lucide-react'
 
 interface HeadingItem {
   level: number
@@ -44,7 +44,6 @@ export function Sidebar({ editor }: SidebarProps) {
 
   const scrollToHeading = (pos: number) => {
     editor.chain().focus().setTextSelection(pos).run()
-    // Scroll the editor view to the heading
     const domAtPos = editor.view.domAtPos(pos)
     const node = domAtPos.node as HTMLElement
     if (node.scrollIntoView) {
@@ -53,37 +52,62 @@ export function Sidebar({ editor }: SidebarProps) {
   }
 
   return (
-    <div className="w-64 bg-white border-r border-gray-200 flex flex-col overflow-hidden">
-      <div className="px-4 py-3 border-b border-gray-200 flex items-center gap-2">
-        <FileText size={16} className="text-blue-600" />
-        <span className="text-sm font-semibold text-gray-700">Inhaltsverzeichnis</span>
+    <div style={{
+      width: 240,
+      minWidth: 240,
+      backgroundColor: 'white',
+      borderRight: '1px solid #e5e5e5',
+      display: 'flex',
+      flexDirection: 'column',
+      overflow: 'hidden',
+      boxShadow: '1px 0 3px rgba(0,0,0,0.04)',
+    }}>
+      {/* Header */}
+      <div style={{
+        padding: '12px 16px',
+        borderBottom: '1px solid #e5e5e5',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 8,
+        backgroundColor: '#fafafa',
+      }}>
+        <FileText size={16} style={{ color: '#0078d4' }} />
+        <span style={{ fontSize: 13, fontWeight: 600, color: '#323130' }}>Inhaltsverzeichnis</span>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-3">
+      {/* Content */}
+      <div style={{ flex: 1, overflowY: 'auto', padding: 12 }}>
         {headings.length === 0 ? (
-          <p className="text-xs text-gray-400 italic">
+          <p style={{ fontSize: 12, color: '#a0a0a0', fontStyle: 'italic', margin: 0 }}>
             Fügen Sie Überschriften hinzu, um ein Inhaltsverzeichnis zu erstellen.
           </p>
         ) : (
-          <nav className="space-y-1">
+          <nav style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             {headings.map((heading, index) => (
               <button
                 key={index}
                 onClick={() => scrollToHeading(heading.pos)}
-                className={`
-                  w-full text-left px-2 py-1 rounded text-sm hover:bg-blue-50 hover:text-blue-700
-                  transition-colors truncate block
-                `}
-                style={{ paddingLeft: `${(heading.level - 1) * 12 + 8}px` }}
+                style={{
+                  width: '100%',
+                  textAlign: 'left',
+                  padding: `5px 8px 5px ${(heading.level - 1) * 12 + 8}px`,
+                  borderRadius: 4,
+                  fontSize: 13,
+                  backgroundColor: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  transition: 'background-color 0.1s',
+                  color: heading.level === 1 ? '#242424' : heading.level === 2 ? '#444' : '#666',
+                  fontWeight: heading.level === 1 ? 600 : heading.level === 2 ? 500 : 400,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#eff6fc' }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent' }}
                 title={heading.text}
               >
-                <span className={`
-                  ${heading.level === 1 ? 'font-semibold text-gray-800' : ''}
-                  ${heading.level === 2 ? 'font-medium text-gray-700' : ''}
-                  ${heading.level >= 3 ? 'text-gray-600' : ''}
-                `}>
-                  {heading.text || 'Leere Überschrift'}
-                </span>
+                {heading.text || 'Leere Überschrift'}
               </button>
             ))}
           </nav>
