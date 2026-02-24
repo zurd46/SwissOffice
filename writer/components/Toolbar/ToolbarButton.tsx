@@ -73,3 +73,30 @@ export function ToolbarColorInput({ value, onChange, title }: ToolbarColorInputP
     />
   )
 }
+
+interface RibbonLargeButtonProps {
+  onClick: () => void
+  icon: ReactNode
+  label: string
+  disabled?: boolean
+  isActive?: boolean
+}
+
+export function RibbonLargeButton({ onClick, icon, label, disabled, isActive }: RibbonLargeButtonProps) {
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      title={label}
+      className={`
+        flex flex-col items-center gap-1 px-3 py-1.5 rounded hover:bg-blue-50 transition-colors duration-150
+        text-[11px] leading-tight min-w-[56px]
+        ${isActive ? 'bg-blue-100 text-blue-800' : 'text-gray-700'}
+        ${disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}
+      `}
+    >
+      {icon}
+      <span className="whitespace-nowrap">{label}</span>
+    </button>
+  )
+}
