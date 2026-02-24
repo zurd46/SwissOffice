@@ -15,47 +15,45 @@ interface TabSeitenlayoutProps {
 export function TabSeitenlayout({ editor }: TabSeitenlayoutProps) {
   return (
     <>
-      {/* Seite einrichten (Page Setup) */}
       <RibbonGroup label="Seite einrichten">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-[2px]">
           <RibbonLargeButton
             onClick={() => {}}
-            icon={<RectangleVertical size={22} className="text-[#0078d4]" />}
+            icon={<RectangleVertical size={20} className="text-[#0078d4]" />}
             label="Hochformat"
           />
           <RibbonLargeButton
             onClick={() => {}}
-            icon={<FileText size={22} className="text-[#0078d4]" />}
+            icon={<FileText size={20} className="text-[#0078d4]" />}
             label="A4"
           />
           <RibbonLargeButton
             onClick={() => {}}
-            icon={<Ruler size={22} className="text-[#605e5c]" />}
+            icon={<Ruler size={20} className="text-[#605e5c]" />}
             label="25mm Rand"
           />
         </div>
       </RibbonGroup>
 
-      {/* Absatz (Paragraph) */}
       <RibbonGroupLast label="Absatz">
-        <div className="flex flex-col gap-[6px] py-[2px]">
-          <div className="flex items-center gap-[6px]">
-            <span className="text-[11px] text-[#605e5c] w-[46px]">Einzug:</span>
+        <div className="flex flex-col gap-[3px]">
+          <div className="flex items-center gap-[4px]">
+            <span className="text-[11px] text-[#605e5c] w-[42px]">Einzug:</span>
             <ToolbarButton onClick={() => editor.chain().focus().liftListItem('listItem').run()} title="Einzug verkleinern" disabled={!editor.can().liftListItem('listItem')}>
-              <Outdent size={15} />
+              <Outdent size={14} />
             </ToolbarButton>
             <ToolbarButton onClick={() => editor.chain().focus().sinkListItem('listItem').run()} title="Einzug vergrössern" disabled={!editor.can().sinkListItem('listItem')}>
-              <Indent size={15} />
+              <Indent size={14} />
             </ToolbarButton>
           </div>
-          <div className="flex items-center gap-[6px]">
-            <span className="text-[11px] text-[#605e5c] w-[46px]">Abstand:</span>
+          <div className="flex items-center gap-[4px]">
+            <span className="text-[11px] text-[#605e5c] w-[42px]">Abstand:</span>
             <ToolbarSelect
               value="1.5"
               onChange={(v) => editor.chain().focus().setLineHeight(v).run()}
               options={LINE_HEIGHTS}
               title="Zeilenabstand"
-              className="w-[60px]"
+              className="w-[54px]"
             />
           </div>
         </div>

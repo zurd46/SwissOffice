@@ -86,172 +86,162 @@ export function TabStart({ editor, onToggleFindReplace }: TabStartProps) {
 
   return (
     <>
-      {/* Zwischenablage (Clipboard) */}
+      {/* Zwischenablage */}
       <RibbonGroup label="Zwischenablage">
-        <div className="flex flex-col gap-1 py-[2px]">
-          <div className="flex items-center gap-[2px]">
+        <div className="flex flex-col gap-[1px]">
+          <div className="flex items-center">
             <ToolbarButton onClick={() => editor.chain().focus().undo().run()} title="Rückgängig (Ctrl+Z)" disabled={!editor.can().undo()}>
-              <Undo2 size={15} />
+              <Undo2 size={14} />
             </ToolbarButton>
             <ToolbarButton onClick={() => editor.chain().focus().redo().run()} title="Wiederholen (Ctrl+Y)" disabled={!editor.can().redo()}>
-              <Redo2 size={15} />
+              <Redo2 size={14} />
             </ToolbarButton>
           </div>
-          <div className="flex items-center gap-[2px]">
+          <div className="flex items-center">
             <ToolbarButton onClick={handleCut} title="Ausschneiden (Ctrl+X)">
-              <Scissors size={15} />
+              <Scissors size={14} />
             </ToolbarButton>
             <ToolbarButton onClick={handleCopy} title="Kopieren (Ctrl+C)">
-              <Copy size={15} />
+              <Copy size={14} />
             </ToolbarButton>
             <ToolbarButton onClick={handlePaste} title="Einfügen (Ctrl+V)">
-              <ClipboardPaste size={15} />
+              <ClipboardPaste size={14} />
             </ToolbarButton>
           </div>
         </div>
       </RibbonGroup>
 
-      {/* Schriftart (Font) */}
+      {/* Schriftart */}
       <RibbonGroup label="Schriftart">
-        <div className="flex flex-col gap-[5px] py-[2px]">
-          {/* Row 1: Font selects + size controls */}
-          <div className="flex items-center gap-[3px]">
+        <div className="flex flex-col gap-[2px]">
+          <div className="flex items-center gap-[2px]">
             <ToolbarSelect
               value={getCurrentFontFamily()}
               onChange={(v) => editor.chain().focus().setFontFamily(v).run()}
               options={FONT_FAMILIES}
               title="Schriftart"
-              className="w-[130px]"
+              className="w-[120px]"
             />
             <ToolbarSelect
               value={getCurrentFontSize()}
               onChange={(v) => editor.chain().focus().setFontSize(v).run()}
               options={FONT_SIZES}
               title="Schriftgrösse"
-              className="w-[52px]"
+              className="w-[46px]"
             />
             <ToolbarButton onClick={increaseFontSize} title="Schrift vergrössern">
-              <AArrowUp size={15} />
+              <AArrowUp size={14} />
             </ToolbarButton>
             <ToolbarButton onClick={decreaseFontSize} title="Schrift verkleinern">
-              <AArrowDown size={15} />
+              <AArrowDown size={14} />
             </ToolbarButton>
           </div>
-          {/* Row 2: Formatting buttons */}
-          <div className="flex items-center gap-[2px]">
+          <div className="flex items-center">
             <ToolbarButton onClick={() => editor.chain().focus().toggleBold().run()} isActive={editor.isActive('bold')} title="Fett (Ctrl+B)">
-              <Bold size={15} />
+              <Bold size={14} />
             </ToolbarButton>
             <ToolbarButton onClick={() => editor.chain().focus().toggleItalic().run()} isActive={editor.isActive('italic')} title="Kursiv (Ctrl+I)">
-              <Italic size={15} />
+              <Italic size={14} />
             </ToolbarButton>
             <ToolbarButton onClick={() => editor.chain().focus().toggleUnderline().run()} isActive={editor.isActive('underline')} title="Unterstrichen (Ctrl+U)">
-              <Underline size={15} />
+              <Underline size={14} />
             </ToolbarButton>
             <ToolbarButton onClick={() => editor.chain().focus().toggleStrike().run()} isActive={editor.isActive('strike')} title="Durchgestrichen">
-              <Strikethrough size={15} />
+              <Strikethrough size={14} />
             </ToolbarButton>
             <ToolbarButton onClick={() => editor.chain().focus().toggleSubscript().run()} isActive={editor.isActive('subscript')} title="Tiefgestellt">
-              <Subscript size={15} />
+              <Subscript size={14} />
             </ToolbarButton>
             <ToolbarButton onClick={() => editor.chain().focus().toggleSuperscript().run()} isActive={editor.isActive('superscript')} title="Hochgestellt">
-              <Superscript size={15} />
+              <Superscript size={14} />
             </ToolbarButton>
-            <div className="w-px h-5 bg-[#e1dfdd] mx-[2px]" />
+            <div className="w-px h-4 bg-[#e1dfdd] mx-[1px]" />
             <ToolbarColorButton
               value={textColor}
-              onChange={(color) => {
-                setTextColor(color)
-                editor.chain().focus().setColor(color).run()
-              }}
+              onChange={(color) => { setTextColor(color); editor.chain().focus().setColor(color).run() }}
               title="Textfarbe"
               icon="text"
             />
             <ToolbarColorButton
               value={highlightColor}
-              onChange={(color) => {
-                setHighlightColor(color)
-                editor.chain().focus().toggleHighlight({ color }).run()
-              }}
+              onChange={(color) => { setHighlightColor(color); editor.chain().focus().toggleHighlight({ color }).run() }}
               title="Hervorhebungsfarbe"
               icon="highlight"
             />
-            <div className="w-px h-5 bg-[#e1dfdd] mx-[2px]" />
+            <div className="w-px h-4 bg-[#e1dfdd] mx-[1px]" />
             <ToolbarButton onClick={() => editor.chain().focus().unsetAllMarks().run()} title="Formatierung entfernen">
-              <RemoveFormatting size={15} />
+              <RemoveFormatting size={14} />
             </ToolbarButton>
           </div>
         </div>
       </RibbonGroup>
 
-      {/* Absatz (Paragraph) */}
+      {/* Absatz */}
       <RibbonGroup label="Absatz">
-        <div className="flex flex-col gap-[5px] py-[2px]">
-          {/* Row 1: Lists + indent + line height */}
+        <div className="flex flex-col gap-[2px]">
           <div className="flex items-center gap-[2px]">
             <ToolbarButton onClick={() => editor.chain().focus().toggleBulletList().run()} isActive={editor.isActive('bulletList')} title="Aufzählung">
-              <List size={15} />
+              <List size={14} />
             </ToolbarButton>
             <ToolbarButton onClick={() => editor.chain().focus().toggleOrderedList().run()} isActive={editor.isActive('orderedList')} title="Nummerierung">
-              <ListOrdered size={15} />
+              <ListOrdered size={14} />
             </ToolbarButton>
             <ToolbarButton onClick={() => editor.chain().focus().toggleTaskList().run()} isActive={editor.isActive('taskList')} title="Aufgabenliste">
-              <ListChecks size={15} />
+              <ListChecks size={14} />
             </ToolbarButton>
-            <div className="w-px h-5 bg-[#e1dfdd] mx-[2px]" />
+            <div className="w-px h-4 bg-[#e1dfdd] mx-[1px]" />
             <ToolbarButton onClick={() => editor.chain().focus().liftListItem('listItem').run()} title="Einzug verkleinern" disabled={!editor.can().liftListItem('listItem')}>
-              <Outdent size={15} />
+              <Outdent size={14} />
             </ToolbarButton>
             <ToolbarButton onClick={() => editor.chain().focus().sinkListItem('listItem').run()} title="Einzug vergrössern" disabled={!editor.can().sinkListItem('listItem')}>
-              <Indent size={15} />
+              <Indent size={14} />
             </ToolbarButton>
-            <div className="w-px h-5 bg-[#e1dfdd] mx-[2px]" />
+            <div className="w-px h-4 bg-[#e1dfdd] mx-[1px]" />
             <ToolbarSelect
               value="1.5"
               onChange={(v) => editor.chain().focus().setLineHeight(v).run()}
               options={LINE_HEIGHTS}
               title="Zeilenabstand"
-              className="w-[50px]"
+              className="w-[44px]"
             />
           </div>
-          {/* Row 2: Alignment + blockquote */}
-          <div className="flex items-center gap-[2px]">
+          <div className="flex items-center">
             <ToolbarButton onClick={() => editor.chain().focus().setTextAlign('left').run()} isActive={editor.isActive({ textAlign: 'left' })} title="Linksbündig">
-              <AlignLeft size={15} />
+              <AlignLeft size={14} />
             </ToolbarButton>
             <ToolbarButton onClick={() => editor.chain().focus().setTextAlign('center').run()} isActive={editor.isActive({ textAlign: 'center' })} title="Zentriert">
-              <AlignCenter size={15} />
+              <AlignCenter size={14} />
             </ToolbarButton>
             <ToolbarButton onClick={() => editor.chain().focus().setTextAlign('right').run()} isActive={editor.isActive({ textAlign: 'right' })} title="Rechtsbündig">
-              <AlignRight size={15} />
+              <AlignRight size={14} />
             </ToolbarButton>
             <ToolbarButton onClick={() => editor.chain().focus().setTextAlign('justify').run()} isActive={editor.isActive({ textAlign: 'justify' })} title="Blocksatz">
-              <AlignJustify size={15} />
+              <AlignJustify size={14} />
             </ToolbarButton>
-            <div className="w-px h-5 bg-[#e1dfdd] mx-[2px]" />
+            <div className="w-px h-4 bg-[#e1dfdd] mx-[1px]" />
             <ToolbarButton onClick={() => editor.chain().focus().toggleBlockquote().run()} isActive={editor.isActive('blockquote')} title="Blockzitat">
-              <Quote size={15} />
+              <Quote size={14} />
             </ToolbarButton>
           </div>
         </div>
       </RibbonGroup>
 
-      {/* Formatvorlagen (Styles) */}
+      {/* Formatvorlagen */}
       <RibbonGroupLast label="Formatvorlagen">
-        <div className="flex flex-col gap-[5px] py-[2px]">
+        <div className="flex flex-col gap-[2px]">
           <ToolbarSelect
             value={getCurrentHeading()}
             onChange={handleHeadingChange}
             options={HEADING_OPTIONS}
             title="Absatzformat"
-            className="w-[140px]"
+            className="w-[130px]"
           />
           <button
             onClick={onToggleFindReplace}
             title="Suchen & Ersetzen (Ctrl+H)"
-            className="flex items-center gap-[6px] h-7 px-2 rounded-sm text-[12px] text-[#323130] hover:bg-[#e1dfdd] transition-all duration-100 cursor-pointer"
+            className="flex items-center gap-[4px] h-[26px] px-[6px] rounded-sm text-[11px] text-[#323130] hover:bg-[#e1dfdd] transition-all duration-100 cursor-pointer"
           >
-            <Search size={14} className="text-[#605e5c]" />
+            <Search size={13} className="text-[#605e5c]" />
             <span>Suchen & Ersetzen</span>
           </button>
         </div>

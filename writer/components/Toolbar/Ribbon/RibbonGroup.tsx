@@ -11,26 +11,26 @@ interface RibbonGroupProps {
 export function RibbonGroup({ label, children, className = '' }: RibbonGroupProps) {
   return (
     <>
-      <div className={`flex flex-col items-center px-3 h-full min-w-0 ${className}`}>
-        <div className="flex items-center gap-[3px] flex-1 py-[2px]">
+      <div className={`flex flex-col px-2 h-full ${className}`}>
+        <div className="flex items-start gap-[2px] pt-[4px] pb-[2px]">
           {children}
         </div>
-        <span className="text-[10.5px] text-[#8a8886] mt-auto leading-none pb-[5px] select-none font-medium uppercase tracking-[0.04em]">
+        <span className="text-[9px] text-[#a19f9d] leading-none pb-[3px] mt-auto text-center select-none tracking-[0.05em] uppercase">
           {label}
         </span>
       </div>
-      <div className="w-px bg-[#d2d0ce] mx-[2px] self-stretch my-[6px]" />
+      <div className="w-px bg-[#e1dfdd] self-stretch my-[4px]" />
     </>
   )
 }
 
 export function RibbonGroupLast({ label, children, className = '' }: RibbonGroupProps) {
   return (
-    <div className={`flex flex-col items-center px-3 h-full min-w-0 ${className}`}>
-      <div className="flex items-center gap-[3px] flex-1 py-[2px]">
+    <div className={`flex flex-col px-2 h-full ${className}`}>
+      <div className="flex items-start gap-[2px] pt-[4px] pb-[2px]">
         {children}
       </div>
-      <span className="text-[10.5px] text-[#8a8886] mt-auto leading-none pb-[5px] select-none font-medium uppercase tracking-[0.04em]">
+      <span className="text-[9px] text-[#a19f9d] leading-none pb-[3px] mt-auto text-center select-none tracking-[0.05em] uppercase">
         {label}
       </span>
     </div>
