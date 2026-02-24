@@ -52,3 +52,13 @@ export const LINE_HEIGHTS = [
   { label: '2.5', value: '2.5' },
   { label: '3.0', value: '3' },
 ]
+
+export const PARAGRAPH_SPACINGS = [
+  { label: '0pt', value: '0pt' },
+  { label: '3pt', value: '3pt' },
+  { label: '6pt', value: '6pt' },
+  { label: '8pt', value: '8pt' },
+  { label: '12pt', value: '12pt' },
+  { label: '18pt', value: '18pt' },
+  { label: '24pt', value: '24pt' },
+]

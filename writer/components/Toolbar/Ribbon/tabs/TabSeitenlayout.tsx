@@ -6,7 +6,7 @@ import {
 } from 'lucide-react'
 import { ToolbarButton, ToolbarSelect, RibbonLargeButton } from '../../ToolbarButton'
 import { RibbonGroup, RibbonGroupLast } from '../RibbonGroup'
-import { LINE_HEIGHTS } from '../constants'
+import { LINE_HEIGHTS, PARAGRAPH_SPACINGS } from '../constants'
 
 interface TabSeitenlayoutProps {
   editor: Editor
@@ -47,12 +47,32 @@ export function TabSeitenlayout({ editor }: TabSeitenlayoutProps) {
             </ToolbarButton>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-            <span style={{ fontSize: 11, color: '#605e5c', width: 42 }}>Abstand:</span>
+            <span style={{ fontSize: 11, color: '#605e5c', width: 42 }}>Zeile:</span>
             <ToolbarSelect
-              value="1.5"
+              value={editor.getAttributes('paragraph').lineHeight || '1.5'}
               onChange={(v) => editor.chain().focus().setLineHeight(v).run()}
               options={LINE_HEIGHTS}
               title="Zeilenabstand"
+              className="w-[54px]"
+            />
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <span style={{ fontSize: 11, color: '#605e5c', width: 42 }}>Davor:</span>
+            <ToolbarSelect
+              value={editor.getAttributes('paragraph').spaceBefore || '0pt'}
+              onChange={(v) => editor.chain().focus().setSpaceBefore(v).run()}
+              options={PARAGRAPH_SPACINGS}
+              title="Abstand davor"
+              className="w-[54px]"
+            />
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <span style={{ fontSize: 11, color: '#605e5c', width: 42 }}>Danach:</span>
+            <ToolbarSelect
+              value={editor.getAttributes('paragraph').spaceAfter || '8pt'}
+              onChange={(v) => editor.chain().focus().setSpaceAfter(v).run()}
+              options={PARAGRAPH_SPACINGS}
+              title="Abstand danach"
               className="w-[54px]"
             />
           </div>

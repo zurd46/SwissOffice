@@ -113,6 +113,7 @@ export function WriterEditor() {
       LineHeight,
       PageBreak,
       PasteHandler,
+      ParagraphSpacing,
     ],
     content: defaultContent,
     editorProps: {
@@ -228,6 +229,9 @@ export function WriterEditor() {
         case 'zoom-reset':
           setZoom(100)
           break
+        case 'open-settings':
+          setShowSettings(true)
+          break
       }
     })
 
@@ -260,6 +264,7 @@ export function WriterEditor() {
           setDocumentName={setDocumentName}
           onToggleFindReplace={toggleFindReplace}
           onToggleSidebar={toggleSidebar}
+          onOpenSettings={() => setShowSettings(true)}
         />
       )}
 
@@ -312,6 +317,9 @@ export function WriterEditor() {
 
       {/* AI Settings Dialog */}
       <AISettingsDialog />
+
+      {/* App Settings Dialog */}
+      <SettingsDialog open={showSettings} onClose={() => setShowSettings(false)} />
     </div>
     </AIContextProvider>
   )

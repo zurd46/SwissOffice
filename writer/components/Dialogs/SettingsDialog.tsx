@@ -1,7 +1,7 @@
 'use client'
 
 import { X, Globe, Type, Save, SpellCheck } from 'lucide-react'
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useRef } from 'react'
 import {
   type AppSettings,
   AVAILABLE_LANGUAGES,
@@ -59,13 +59,14 @@ const toggleRowStyle: React.CSSProperties = {
 export function SettingsDialog({ open, onClose }: SettingsDialogProps) {
   const [settings, setSettings] = useState<AppSettings>(loadAppSettings)
   const [saved, setSaved] = useState(false)
+  const prevOpenRef = useRef(false)
 
-  useEffect(() => {
-    if (open) {
-      setSettings(loadAppSettings())
-      setSaved(false)
-    }
-  }, [open])
+  // Reload settings from localStorage when dialog opens
+  if (open && !prevOpenRef.current) {
+    setSettings(loadAppSettings())
+    setSaved(false)
+  }
+  prevOpenRef.current = open
 
   const updateField = useCallback(<K extends keyof AppSettings>(key: K, value: AppSettings[K]) => {
     setSettings(prev => ({ ...prev, [key]: value }))
