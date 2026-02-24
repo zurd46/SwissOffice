@@ -18,7 +18,7 @@ import { RibbonGroup, RibbonGroupLast } from '../RibbonGroup'
 import { useAI } from '@/lib/ai/aiContext'
 import { SUPPORTED_LANGUAGES } from '@/lib/ai/types'
 import type { AIOperation } from '@/lib/ai/types'
-import { useCallback, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 
 interface TabKIProps {
   editor: Editor
@@ -33,10 +33,46 @@ export function TabKI({ editor, onToggleAIChat, showAIChat }: TabKIProps) {
     isConfigured,
     performOperation,
     isOperationLoading,
+    performOCRImport,
+    isOCRLoading,
     setShowSettingsDialog,
   } = useAI()
 
   const [translateLanguage, setTranslateLanguage] = useState('Englisch')
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const isAnyLoading = isOperationLoading || isOCRLoading
+
+  const handleOCRImport = useCallback(() => {
+    if (!isConfigured) {
+      setShowSettingsDialog(true)
+      return
+    }
+    fileInputRef.current?.click()
+  }, [isConfigured, setShowSettingsDialog])
+
+  const handleFileSelected = useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0]
+      if (!file) return
+
+      // Reset damit gleiche Datei erneut gewählt werden kann
+      e.target.value = ''
+
+      const result = await performOCRImport(file)
+
+      if (result.success && result.html) {
+        editor.chain().focus().insertContent(result.html).run()
+        if (result.error) {
+          // Teilweiser Erfolg (z.B. PDF > 20 Seiten)
+          alert(result.error)
+        }
+      } else if (result.error) {
+        alert(`OCR-Fehler: ${result.error}`)
+      }
+    },
+    [performOCRImport, editor],
+  )
 
   const getSelectedOrAllText = useCallback((): {
     text: string
@@ -126,7 +162,7 @@ export function TabKI({ editor, onToggleAIChat, showAIChat }: TabKIProps) {
               )
             }
             label="Korrektur"
-            disabled={isOperationLoading}
+            disabled={isAnyLoading}
           />
           <RibbonLargeButton
             onClick={() => handleOperation('grammar')}
@@ -138,7 +174,7 @@ export function TabKI({ editor, onToggleAIChat, showAIChat }: TabKIProps) {
               )
             }
             label="Grammatik"
-            disabled={isOperationLoading}
+            disabled={isAnyLoading}
           />
         </div>
       </RibbonGroup>
@@ -155,7 +191,7 @@ export function TabKI({ editor, onToggleAIChat, showAIChat }: TabKIProps) {
               )
             }
             label="Verbessern"
-            disabled={isOperationLoading}
+            disabled={isAnyLoading}
           />
           <RibbonLargeButton
             onClick={() => handleOperation('summarize')}
@@ -167,7 +203,7 @@ export function TabKI({ editor, onToggleAIChat, showAIChat }: TabKIProps) {
               )
             }
             label="Zusammenfassen"
-            disabled={isOperationLoading}
+            disabled={isAnyLoading}
           />
         </div>
       </RibbonGroup>
@@ -206,9 +242,32 @@ export function TabKI({ editor, onToggleAIChat, showAIChat }: TabKIProps) {
               )
             }
             label="Übersetzen"
-            disabled={isOperationLoading}
+            disabled={isAnyLoading}
           />
         </div>
+      </RibbonGroup>
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*,.pdf,application/pdf"
+        onChange={handleFileSelected}
+        style={{ display: 'none' }}
+      />
+
+      <RibbonGroup label="Dokument-Scan">
+        <RibbonLargeButton
+          onClick={handleOCRImport}
+          icon={
+            isOCRLoading ? (
+              loadingIcon
+            ) : (
+              <ScanText size={20} style={{ color: '#ca5010' }} />
+            )
+          }
+          label="OCR Import"
+          disabled={isAnyLoading}
+        />
       </RibbonGroup>
 
       <RibbonGroupLast label="AI-Chat">

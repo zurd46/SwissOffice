@@ -54,7 +54,7 @@ async function renderPDFPageToImage(page: PDFPageProxy): Promise<string> {
   if (!ctx) {
     throw new Error('Canvas-Kontext konnte nicht erstellt werden.')
   }
-  await page.render({ canvasContext: ctx, viewport }).promise
+  await page.render({ canvasContext: ctx, viewport, canvas }).promise
   return canvas.toDataURL('image/png')
 }
 

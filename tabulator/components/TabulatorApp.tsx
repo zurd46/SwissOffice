@@ -14,7 +14,12 @@ import { StatusBar } from '@/components/StatusBar/StatusBar'
 import { FindReplaceDialog } from '@/components/Dialogs/FindReplaceDialog'
 import { FormatCellsDialog } from '@/components/Dialogs/FormatCellsDialog'
 import { SortDialog } from '@/components/Dialogs/SortDialog'
+import { CloudSaveDialog } from '@/components/Dialogs/CloudSaveDialog'
+import { CloudOpenDialog } from '@/components/Dialogs/CloudOpenDialog'
 import { saveDocument, loadDocument, exportCSV, importCSV, printDocument } from '@/lib/fileOperations'
+import { loadCloudSpreadsheet } from '@/lib/cloud/cloudSpreadsheetService'
+import { useAuth } from '@shared/contexts/AuthContext'
+import { useCloud } from '@shared/contexts/CloudContext'
 
 // Electron API Typen
 declare global {
@@ -45,7 +50,12 @@ function TabulatorAppInner() {
   const [showFindReplace, setShowFindReplace] = useState(false)
   const [showFormatCells, setShowFormatCells] = useState(false)
   const [showSortDialog, setShowSortDialog] = useState(false)
+  const [cloudDocumentId, setCloudDocumentId] = useState<string | null>(null)
+  const [showCloudSave, setShowCloudSave] = useState(false)
+  const [showCloudOpen, setShowCloudOpen] = useState(false)
 
+  const { isAuthenticated, apiClient } = useAuth()
+  const { status: cloudStatus } = useCloud()
   const isElectron = typeof window !== 'undefined' && !!window.electronAPI?.isElectron
 
   // Dokument-Titel aktualisieren
@@ -104,6 +114,26 @@ function TabulatorAppInner() {
     printDocument(state.workbook, state.workbook.activeSheetIndex)
   }, [state.workbook])
 
+  // Cloud öffnen
+  const handleCloudOpen = useCallback(async (docId: string) => {
+    const doc = await loadCloudSpreadsheet(apiClient, docId)
+    if (doc?.content?.workbook) {
+      dispatch({
+        type: 'LOAD_WORKBOOK',
+        workbook: doc.content.workbook,
+        name: doc.title,
+      })
+      setCloudDocumentId(doc.id)
+      setShowCloudOpen(false)
+    }
+  }, [apiClient, dispatch])
+
+  // Cloud gespeichert
+  const handleCloudSaved = useCallback((cloudId: string) => {
+    setCloudDocumentId(cloudId)
+    dispatch({ type: 'SET_MODIFIED', modified: false })
+  }, [dispatch])
+
   // Tastatur-Shortcuts (Datei-Operationen)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -146,6 +176,8 @@ function TabulatorAppInner() {
         case 'format-cells': setShowFormatCells(true); break
         case 'undo': dispatch({ type: 'UNDO' }); break
         case 'redo': dispatch({ type: 'REDO' }); break
+        case 'cloud-save': setShowCloudSave(true); break
+        case 'cloud-open': setShowCloudOpen(true); break
       }
     })
     return cleanup
