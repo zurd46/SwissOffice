@@ -24,7 +24,7 @@ import Typography from '@tiptap/extension-typography'
 import { FontSize } from './extensions/FontSize'
 import { LineHeight } from './extensions/LineHeight'
 import { PageBreak } from './extensions/PageBreak'
-import { Toolbar } from '../Toolbar/Toolbar'
+import { RibbonToolbar } from '../Toolbar/Ribbon/RibbonToolbar'
 import { MenuBar } from '../Toolbar/MenuBar'
 import { StatusBar } from '../StatusBar/StatusBar'
 import { FindReplace } from '../Dialogs/FindReplace'
@@ -246,7 +246,14 @@ export function WriterEditor() {
       )}
 
       {/* Toolbar / Ribbon */}
-      <Toolbar editor={editor} />
+      <RibbonToolbar
+        editor={editor}
+        onToggleFindReplace={toggleFindReplace}
+        onToggleSidebar={toggleSidebar}
+        showSidebar={showSidebar}
+        zoom={zoom}
+        setZoom={setZoom}
+      />
 
       {/* Find & Replace */}
       {showFindReplace && (
