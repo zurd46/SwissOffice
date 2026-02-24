@@ -419,6 +419,39 @@ body {
   user-select: none;
 }
 
+/* Comment Highlights */
+.ProseMirror .comment-highlight {
+  background-color: #fff3cd;
+  border-bottom: 2px solid #ffc107;
+  cursor: pointer;
+  padding: 1px 0;
+}
+
+.ProseMirror .comment-highlight:hover {
+  background-color: #ffe69c;
+}
+
+.ProseMirror .comment-resolved {
+  background-color: #d1e7dd;
+  border-bottom: 2px solid #198754;
+  opacity: 0.6;
+}
+
+/* Track Changes */
+.ProseMirror .track-insert {
+  color: #166534;
+  background-color: #dcfce7;
+  text-decoration: none;
+  border-bottom: 1px solid #16a34a;
+}
+
+.ProseMirror .track-delete {
+  color: #991b1b;
+  background-color: #fee2e2;
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
 /* AI Spinner Animation */
 @keyframes spin {
   from { transform: rotate(0deg); }

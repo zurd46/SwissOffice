@@ -7,6 +7,7 @@ import { RibbonPanel } from './RibbonPanel'
 import { TabStart } from './tabs/TabStart'
 import { TabEinfuegen } from './tabs/TabEinfuegen'
 import { TabSeitenlayout } from './tabs/TabSeitenlayout'
+import { TabUeberpruefen } from './tabs/TabUeberpruefen'
 import { TabAnsicht } from './tabs/TabAnsicht'
 import { TabKI } from './tabs/TabKI'
 
@@ -20,6 +21,13 @@ interface RibbonToolbarProps {
   zoom: number
   setZoom: (zoom: number) => void
   isElectron?: boolean
+  onAddComment?: (commentId: string) => void
+  trackingEnabled?: boolean
+  onToggleTracking?: () => void
+  onAcceptAll?: () => void
+  onRejectAll?: () => void
+  spellCheckEnabled?: boolean
+  onToggleSpellCheck?: () => void
 }
 
 export function RibbonToolbar({
@@ -32,6 +40,13 @@ export function RibbonToolbar({
   zoom,
   setZoom,
   isElectron,
+  onAddComment,
+  trackingEnabled = false,
+  onToggleTracking,
+  onAcceptAll,
+  onRejectAll,
+  spellCheckEnabled = false,
+  onToggleSpellCheck,
 }: RibbonToolbarProps) {
   const [activeTab, setActiveTab] = useState('start')
 
@@ -47,6 +62,18 @@ export function RibbonToolbar({
         )}
         {activeTab === 'seitenlayout' && (
           <TabSeitenlayout editor={editor} />
+        )}
+        {activeTab === 'ueberpruefen' && (
+          <TabUeberpruefen
+            editor={editor}
+            onAddComment={onAddComment ?? (() => {})}
+            trackingEnabled={trackingEnabled}
+            onToggleTracking={onToggleTracking ?? (() => {})}
+            onAcceptAll={onAcceptAll ?? (() => {})}
+            onRejectAll={onRejectAll ?? (() => {})}
+            spellCheckEnabled={spellCheckEnabled}
+            onToggleSpellCheck={onToggleSpellCheck ?? (() => {})}
+          />
         )}
         {activeTab === 'ansicht' && (
           <TabAnsicht

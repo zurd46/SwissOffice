@@ -6,6 +6,7 @@ const RIBBON_TABS = [
   { id: 'start', label: 'Start' },
   { id: 'einfuegen', label: 'Einfügen' },
   { id: 'seitenlayout', label: 'Seitenlayout' },
+  { id: 'ueberpruefen', label: 'Überprüfen' },
   { id: 'ansicht', label: 'Ansicht' },
   { id: 'ki', label: 'AI' },
 ]

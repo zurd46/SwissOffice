@@ -30,6 +30,11 @@ import { PasteHandler } from './extensions/PasteHandler'
 import { ParagraphSpacing } from './extensions/ParagraphSpacing'
 import { Indent } from './extensions/Indent'
 import { SectionBreak } from './extensions/SectionBreak'
+import { Comment as CommentMark } from './extensions/Comment'
+import { TrackInsert } from './extensions/TrackInsert'
+import { TrackDelete } from './extensions/TrackDelete'
+import type { Comment } from '../../lib/types/comments'
+import { generateCommentId } from '../../lib/types/comments'
 import { RibbonToolbar } from '../Toolbar/Ribbon/RibbonToolbar'
 import { MenuBar } from '../Toolbar/MenuBar'
 import { StatusBar } from '../StatusBar/StatusBar'
@@ -78,6 +83,9 @@ function WriterEditorInner() {
   const [zoom, setZoom] = useState(100)
   const [documentName, setDocumentName] = useState('Unbenannt')
   const [pageCount, setPageCount] = useState(1)
+  const [comments, setComments] = useState<Comment[]>([])
+  const [trackingEnabled, setTrackingEnabled] = useState(false)
+  const [spellCheckEnabled, setSpellCheckEnabled] = useState(false)
   const isElectron = typeof window !== 'undefined' && !!window.electronAPI?.isElectron
 
   const { settings, setSettings } = useDocumentSettings()
@@ -137,6 +145,11 @@ function WriterEditorInner() {
       ParagraphSpacing,
       Indent,
       SectionBreak,
+      ParagraphBorder,
+      TableCellBackground,
+      CommentMark,
+      TrackInsert,
+      TrackDelete,
     ],
     content: defaultContent,
     editorProps: {
@@ -193,6 +206,80 @@ function WriterEditorInner() {
 
   const toggleAIChat = useCallback(() => {
     setShowAIChat(prev => !prev)
+  }, [])
+
+  // Comment handlers
+  const handleAddComment = useCallback((commentId: string) => {
+    const text = prompt('Kommentar eingeben:')
+    if (text) {
+      setComments(prev => [...prev, {
+        id: commentId,
+        author: 'Benutzer',
+        text,
+        timestamp: Date.now(),
+        resolved: false,
+      }])
+    }
+  }, [])
+
+  const handleAddReply = useCallback((parentId: string, text: string) => {
+    setComments(prev => [...prev, {
+      id: generateCommentId(),
+      author: 'Benutzer',
+      text,
+      timestamp: Date.now(),
+      parentId,
+      resolved: false,
+    }])
+  }, [])
+
+  const handleResolveComment = useCallback((commentId: string) => {
+    setComments(prev => prev.map(c => c.id === commentId ? { ...c, resolved: true } : c))
+  }, [])
+
+  const handleDeleteComment = useCallback((commentId: string) => {
+    setComments(prev => prev.filter(c => c.id !== commentId && c.parentId !== commentId))
+  }, [])
+
+  // Track Changes handlers
+  const handleToggleTracking = useCallback(() => {
+    setTrackingEnabled(prev => !prev)
+  }, [])
+
+  const handleAcceptAll = useCallback(() => {
+    if (!editor) return
+    const { doc, tr } = editor.state
+    doc.descendants((node, pos) => {
+      node.marks.forEach(mark => {
+        if (mark.type.name === 'trackInsert') {
+          tr.removeMark(pos, pos + node.nodeSize, mark.type)
+        }
+        if (mark.type.name === 'trackDelete') {
+          tr.delete(pos, pos + node.nodeSize)
+        }
+      })
+    })
+    editor.view.dispatch(tr)
+  }, [editor])
+
+  const handleRejectAll = useCallback(() => {
+    if (!editor) return
+    const { doc, tr } = editor.state
+    doc.descendants((node, pos) => {
+      node.marks.forEach(mark => {
+        if (mark.type.name === 'trackDelete') {
+          tr.removeMark(pos, pos + node.nodeSize, mark.type)
+        }
+        if (mark.type.name === 'trackInsert') {
+          tr.delete(pos, pos + node.nodeSize)
+        }
+      })
+    })
+    editor.view.dispatch(tr)
+  }, [editor])
+
+  const handleToggleSpellCheck = useCallback(() => {
+    setSpellCheckEnabled(prev => !prev)
   }, [])
 
   // Electron native menu handler
@@ -257,7 +344,7 @@ function WriterEditorInner() {
             if (!file) return
             const reader = new FileReader()
             reader.onload = () => {
-              editor.chain().focus().setImage({ src: reader.result as string }).run()
+              editor.chain().focus().setResizableImage({ src: reader.result as string }).run()
             }
             reader.readAsDataURL(file)
           }
@@ -348,6 +435,13 @@ function WriterEditorInner() {
         zoom={zoom}
         setZoom={setZoom}
         isElectron={isElectron}
+        onAddComment={handleAddComment}
+        trackingEnabled={trackingEnabled}
+        onToggleTracking={handleToggleTracking}
+        onAcceptAll={handleAcceptAll}
+        onRejectAll={handleRejectAll}
+        spellCheckEnabled={spellCheckEnabled}
+        onToggleSpellCheck={handleToggleSpellCheck}
       />
 
       {/* Find & Replace */}
@@ -358,7 +452,15 @@ function WriterEditorInner() {
       {/* Main Content Area */}
       <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
         {/* Sidebar */}
-        {showSidebar && <Sidebar editor={editor} />}
+        {showSidebar && (
+          <Sidebar
+            editor={editor}
+            comments={comments}
+            onAddReply={handleAddReply}
+            onResolveComment={handleResolveComment}
+            onDeleteComment={handleDeleteComment}
+          />
+        )}
 
         {/* Editor Area with paginated view */}
         <div style={{ flex: 1, overflow: 'auto', backgroundColor: '#e5e5e5', padding: '32px 0', display: 'flex', justifyContent: 'center' }}>

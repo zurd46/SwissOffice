@@ -26,7 +26,7 @@ export function TabEinfuegen({ editor }: TabEinfuegenProps) {
       const reader = new FileReader()
       reader.onload = () => {
         const src = reader.result as string
-        editor.chain().focus().setImage({ src }).run()
+        editor.chain().focus().setResizableImage({ src }).run()
       }
       reader.readAsDataURL(file)
     }
@@ -36,7 +36,7 @@ export function TabEinfuegen({ editor }: TabEinfuegenProps) {
   const insertImageFromUrl = useCallback(() => {
     const url = prompt('Bild-URL eingeben:')
     if (url) {
-      editor.chain().focus().setImage({ src: url }).run()
+      editor.chain().focus().setResizableImage({ src: url }).run()
     }
   }, [editor])
 

@@ -90,7 +90,7 @@ export function MenuBar({ editor, documentName, setDocumentName, onToggleFindRep
               if (!file) return
               const reader = new FileReader()
               reader.onload = () => {
-                editor.chain().focus().setImage({ src: reader.result as string }).run()
+                editor.chain().focus().setResizableImage({ src: reader.result as string }).run()
               }
               reader.readAsDataURL(file)
             }
