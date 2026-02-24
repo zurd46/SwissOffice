@@ -25,6 +25,7 @@ import { FontSize } from './extensions/FontSize'
 import { LineHeight } from './extensions/LineHeight'
 import { PageBreak } from './extensions/PageBreak'
 import { PasteHandler } from './extensions/PasteHandler'
+import { ParagraphSpacing } from './extensions/ParagraphSpacing'
 import { RibbonToolbar } from '../Toolbar/Ribbon/RibbonToolbar'
 import { MenuBar } from '../Toolbar/MenuBar'
 import { StatusBar } from '../StatusBar/StatusBar'
@@ -32,6 +33,7 @@ import { FindReplace } from '../Dialogs/FindReplace'
 import { Sidebar } from '../Sidebar/Sidebar'
 import { AIChatSidebar } from '../AI/AIChatSidebar'
 import { AISettingsDialog } from '../AI/AISettingsDialog'
+import { SettingsDialog } from '../Dialogs/SettingsDialog'
 import { AIContextProvider } from '../../lib/ai/aiContext'
 import { defaultContent } from '../../lib/defaultContent'
 import { saveDocument, saveAsHTML, loadDocument, newDocument, printDocument } from '../../lib/fileOperations'
@@ -55,6 +57,7 @@ export function WriterEditor() {
   const [showFindReplace, setShowFindReplace] = useState(false)
   const [showSidebar, setShowSidebar] = useState(false)
   const [showAIChat, setShowAIChat] = useState(false)
+  const [showSettings, setShowSettings] = useState(false)
   const [zoom, setZoom] = useState(100)
   const [documentName, setDocumentName] = useState('Unbenannt')
   const isElectron = typeof window !== 'undefined' && !!window.electronAPI?.isElectron
