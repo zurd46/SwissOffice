@@ -1,7 +1,7 @@
 'use client'
 
 import {
-  PanelLeft, ZoomIn, ZoomOut, RotateCcw,
+  PanelLeft, ZoomIn, ZoomOut, RotateCcw, Ruler,
 } from 'lucide-react'
 import { ToolbarButton, RibbonLargeButton } from '../../ToolbarButton'
 import { RibbonGroup, RibbonGroupLast } from '../RibbonGroup'
@@ -11,18 +11,28 @@ interface TabAnsichtProps {
   showSidebar: boolean
   zoom: number
   setZoom: (zoom: number) => void
+  showRuler?: boolean
+  onToggleRuler?: () => void
 }
 
-export function TabAnsicht({ onToggleSidebar, showSidebar, zoom, setZoom }: TabAnsichtProps) {
+export function TabAnsicht({ onToggleSidebar, showSidebar, zoom, setZoom, showRuler = true, onToggleRuler }: TabAnsichtProps) {
   return (
     <>
       <RibbonGroup label="Anzeigen">
-        <RibbonLargeButton
-          onClick={onToggleSidebar}
-          isActive={showSidebar}
-          icon={<PanelLeft size={20} style={{ color: '#0078d4' }} />}
-          label="Seitenleiste"
-        />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <RibbonLargeButton
+            onClick={onToggleSidebar}
+            isActive={showSidebar}
+            icon={<PanelLeft size={20} style={{ color: '#0078d4' }} />}
+            label="Seitenleiste"
+          />
+          <RibbonLargeButton
+            onClick={onToggleRuler ?? (() => {})}
+            isActive={showRuler}
+            icon={<Ruler size={20} style={{ color: showRuler ? '#0078d4' : '#605e5c' }} />}
+            label="Lineal"
+          />
+        </div>
       </RibbonGroup>
 
       <RibbonGroupLast label="Zoom">

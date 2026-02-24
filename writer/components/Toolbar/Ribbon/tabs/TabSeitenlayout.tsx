@@ -140,6 +140,31 @@ export function TabSeitenlayout({ editor, watermarkText = '', onSetWatermark }: 
         </div>
       </RibbonGroup>
 
+      <RibbonGroup label="Spalten & Wasserzeichen">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <RibbonLargeButton
+            onClick={() => {
+              const count = editor.getAttributes('paragraph').columnCount || 1
+              const next = count >= 3 ? 1 : count + 1
+              editor.chain().focus().setColumns(next as 1 | 2 | 3).run()
+            }}
+            icon={<Columns3 size={20} style={{ color: '#605e5c' }} />}
+            label={`${editor.getAttributes('paragraph').columnCount || 1} Spalte${(editor.getAttributes('paragraph').columnCount || 1) > 1 ? 'n' : ''}`}
+          />
+          <RibbonLargeButton
+            onClick={() => {
+              const text = prompt('Wasserzeichentext eingeben (leer = entfernen):', watermarkText)
+              if (text !== null && onSetWatermark) {
+                onSetWatermark(text)
+              }
+            }}
+            icon={<Droplets size={20} style={{ color: watermarkText ? '#0078d4' : '#605e5c' }} />}
+            label="Wasserzeichen"
+            isActive={!!watermarkText}
+          />
+        </div>
+      </RibbonGroup>
+
       <RibbonGroupLast label="Absatz">
         <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>

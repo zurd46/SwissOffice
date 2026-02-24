@@ -31,6 +31,10 @@ interface RibbonToolbarProps {
   onInsertFootnote?: () => void
   onInsertCitation?: () => void
   onInsertBibliography?: () => void
+  watermarkText?: string
+  onSetWatermark?: (text: string) => void
+  showRuler?: boolean
+  onToggleRuler?: () => void
 }
 
 export function RibbonToolbar({
@@ -53,6 +57,10 @@ export function RibbonToolbar({
   onInsertFootnote,
   onInsertCitation,
   onInsertBibliography,
+  watermarkText = '',
+  onSetWatermark,
+  showRuler = true,
+  onToggleRuler,
 }: RibbonToolbarProps) {
   const [activeTab, setActiveTab] = useState('start')
 
@@ -72,7 +80,11 @@ export function RibbonToolbar({
           />
         )}
         {activeTab === 'seitenlayout' && (
-          <TabSeitenlayout editor={editor} />
+          <TabSeitenlayout
+            editor={editor}
+            watermarkText={watermarkText}
+            onSetWatermark={onSetWatermark}
+          />
         )}
         {activeTab === 'ueberpruefen' && (
           <TabUeberpruefen
@@ -92,6 +104,8 @@ export function RibbonToolbar({
             showSidebar={showSidebar}
             zoom={zoom}
             setZoom={setZoom}
+            showRuler={showRuler}
+            onToggleRuler={onToggleRuler}
           />
         )}
         {activeTab === 'ki' && (

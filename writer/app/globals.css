@@ -452,6 +452,63 @@ body {
   opacity: 0.7;
 }
 
+/* Text Box */
+.ProseMirror .text-box {
+  border: 1px solid #333;
+  padding: 8px;
+  margin: 8px 0;
+  min-height: 40px;
+  position: relative;
+}
+
+.ProseMirror .text-box:hover {
+  border-color: #0078d4;
+}
+
+.ProseMirror .text-box.ProseMirror-selectednode {
+  outline: 2px solid #0078d4;
+}
+
+/* Shape */
+.ProseMirror .shape-node {
+  display: inline-block;
+  margin: 8px 0;
+}
+
+.ProseMirror .shape-node.ProseMirror-selectednode {
+  outline: 2px solid #0078d4;
+  outline-offset: 2px;
+}
+
+/* Footnote reference */
+.ProseMirror .footnote-ref {
+  color: #0078d4;
+  cursor: pointer;
+  font-size: 0.75em;
+  vertical-align: super;
+}
+
+.ProseMirror .footnote-ref:hover {
+  text-decoration: underline;
+}
+
+/* Citation reference */
+.ProseMirror .citation-ref {
+  color: #0078d4;
+  cursor: pointer;
+}
+
+.ProseMirror .citation-ref:hover {
+  text-decoration: underline;
+}
+
+/* Bibliography block */
+.ProseMirror .bibliography-block {
+  border-top: 2px solid #d1d5db;
+  margin-top: 2em;
+  padding-top: 1em;
+}
+
 /* AI Spinner Animation */
 @keyframes spin {
   from { transform: rotate(0deg); }

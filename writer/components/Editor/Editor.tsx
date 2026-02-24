@@ -512,6 +512,10 @@ function WriterEditorInner() {
         onInsertFootnote={handleInsertFootnote}
         onInsertCitation={handleInsertCitation}
         onInsertBibliography={handleInsertBibliography}
+        watermarkText={watermarkText}
+        onSetWatermark={setWatermarkText}
+        showRuler={showRuler}
+        onToggleRuler={() => setShowRuler(prev => !prev)}
       />
 
       {/* Ruler */}

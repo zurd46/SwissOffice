@@ -3,7 +3,7 @@
 import { Editor } from '@tiptap/react'
 import {
   FileDown, FileImage, Link, Minus, Table, ImagePlus,
-  Footprints, BookOpen, ListOrdered,
+  Footprints, BookOpen, ListOrdered, Square, Type,
 } from 'lucide-react'
 import { RibbonLargeButton } from '../../ToolbarButton'
 import { RibbonGroup, RibbonGroupLast } from '../RibbonGroup'
@@ -121,6 +121,21 @@ export function TabEinfuegen({ editor, onInsertFootnote, onInsertCitation, onIns
             onClick={onInsertBibliography ?? (() => {})}
             icon={<ListOrdered size={20} style={{ color: '#605e5c' }} />}
             label="Bibliografie"
+          />
+        </div>
+      </RibbonGroup>
+
+      <RibbonGroup label="Objekte">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <RibbonLargeButton
+            onClick={() => editor.chain().focus().insertTextBox().run()}
+            icon={<Type size={20} style={{ color: '#605e5c' }} />}
+            label="Textfeld"
+          />
+          <RibbonLargeButton
+            onClick={() => editor.chain().focus().insertShape('rectangle').run()}
+            icon={<Square size={20} style={{ color: '#4a90d9' }} />}
+            label="Form"
           />
         </div>
       </RibbonGroup>
