@@ -12,7 +12,7 @@ import {
   Image, Table, Minus, FileDown as PageBreak, Link,
   Bold, Italic, Underline, Strikethrough, RemoveFormatting,
   TableProperties, Columns2, Rows3, Trash2, Merge, Split,
-  PanelLeft, Settings,
+  PanelLeft, Settings, Cloud, CloudDownload,
 } from 'lucide-react'
 
 interface MenuBarProps {
@@ -22,6 +22,10 @@ interface MenuBarProps {
   onToggleFindReplace: () => void
   onToggleSidebar: () => void
   onOpenSettings: () => void
+  isAuthenticated?: boolean
+  isCloudReachable?: boolean
+  onCloudSave?: () => void
+  onCloudOpen?: () => void
 }
 
 type MenuItem = {
@@ -37,7 +41,7 @@ type Menu = {
   items: MenuItem[]
 }
 
-export function MenuBar({ editor, documentName, setDocumentName, onToggleFindReplace, onToggleSidebar, onOpenSettings }: MenuBarProps) {
+export function MenuBar({ editor, documentName, setDocumentName, onToggleFindReplace, onToggleSidebar, onOpenSettings, isAuthenticated, isCloudReachable, onCloudSave, onCloudOpen }: MenuBarProps) {
   const [activeMenu, setActiveMenu] = useState<string | null>(null)
   const menuRef = useRef<HTMLDivElement>(null)
   const { settings } = useDocumentSettings()

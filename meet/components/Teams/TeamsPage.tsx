@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Plus, ChevronDown, ChevronRight, Hash, Lock, Megaphone, Settings, UserPlus } from 'lucide-react'
 import type { Team, Channel } from '@/lib/types'
 import { Avatar } from '@/components/Shared/Avatar'
@@ -14,40 +14,33 @@ import { CreateChannelDialog } from './CreateChannelDialog'
 import { ChannelView } from './ChannelView'
 import { cn } from '@/lib/utils/cn'
 import { Users } from 'lucide-react'
+import { useAuth as useSharedAuth } from '@shared/contexts/AuthContext'
+import { fetchTeams, type ApiTeam } from '@/lib/api/meetApi'
 
-// Demo-Daten
-const demoTeams: Team[] = [
-  {
-    id: 'team-1',
-    name: 'Produktentwicklung',
-    description: 'Hauptteam für Produktentwicklung',
-    isPublic: true,
-    memberCount: 12,
-    createdAt: new Date().toISOString(),
-    createdBy: 'user-1',
-    channels: [
-      { id: 'ch-1', teamId: 'team-1', name: 'Allgemein', type: 'public', isDefault: true, memberCount: 12, unreadCount: 3, createdAt: '', createdBy: 'user-1' },
-      { id: 'ch-2', teamId: 'team-1', name: 'Design', type: 'public', isDefault: false, memberCount: 5, unreadCount: 0, createdAt: '', createdBy: 'user-1' },
-      { id: 'ch-3', teamId: 'team-1', name: 'Backend', type: 'public', isDefault: false, memberCount: 4, unreadCount: 7, createdAt: '', createdBy: 'user-1' },
-      { id: 'ch-4', teamId: 'team-1', name: 'Führungskräfte', type: 'private', isDefault: false, memberCount: 3, unreadCount: 0, createdAt: '', createdBy: 'user-1' },
-      { id: 'ch-5', teamId: 'team-1', name: 'Ankündigungen', type: 'announcement', isDefault: false, memberCount: 12, unreadCount: 1, createdAt: '', createdBy: 'user-1' },
-    ],
-  },
-  {
-    id: 'team-2',
-    name: 'Marketing',
-    description: 'Marketing und Kommunikation',
-    isPublic: true,
-    memberCount: 8,
-    createdAt: new Date().toISOString(),
-    createdBy: 'user-1',
-    channels: [
-      { id: 'ch-6', teamId: 'team-2', name: 'Allgemein', type: 'public', isDefault: true, memberCount: 8, unreadCount: 0, createdAt: '', createdBy: 'user-1' },
-      { id: 'ch-7', teamId: 'team-2', name: 'Social Media', type: 'public', isDefault: false, memberCount: 4, unreadCount: 2, createdAt: '', createdBy: 'user-1' },
-      { id: 'ch-8', teamId: 'team-2', name: 'Kampagnen', type: 'public', isDefault: false, memberCount: 6, unreadCount: 0, createdAt: '', createdBy: 'user-1' },
-    ],
-  },
-]
+// API-Team → Frontend-Team mappen
+function mapTeam(apiTeam: ApiTeam): Team {
+  return {
+    id: apiTeam.id,
+    name: apiTeam.name,
+    description: apiTeam.description ?? undefined,
+    isPublic: apiTeam.isPublic,
+    memberCount: 0,
+    createdAt: apiTeam.createdAt,
+    createdBy: apiTeam.createdBy,
+    channels: apiTeam.channels.map(ch => ({
+      id: ch.id,
+      teamId: ch.teamId,
+      name: ch.name,
+      type: ch.type as Channel['type'],
+      isDefault: ch.isDefault,
+      memberCount: 0,
+      unreadCount: 0,
+      createdAt: ch.createdAt,
+      createdBy: ch.createdBy,
+      description: ch.description ?? undefined,
+    })),
+  }
+}
 
 const channelIcons: Record<string, React.ReactNode> = {
   public: <Hash size={16} />,
@@ -56,12 +49,32 @@ const channelIcons: Record<string, React.ReactNode> = {
 }
 
 export function TeamsPage() {
-  const [teams] = useState<Team[]>(demoTeams)
-  const [expandedTeams, setExpandedTeams] = useState<Set<string>>(new Set(['team-1', 'team-2']))
+  const { apiClient, user } = useSharedAuth()
+  const [teams, setTeams] = useState<Team[]>([])
+  const [expandedTeams, setExpandedTeams] = useState<Set<string>>(new Set())
   const [activeChannel, setActiveChannel] = useState<Channel | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [showCreateTeam, setShowCreateTeam] = useState(false)
   const [showCreateChannel, setShowCreateChannel] = useState<string | null>(null)
+
+  // Teams vom Server laden
+  useEffect(() => {
+    if (!user) return
+    let cancelled = false
+
+    async function loadTeams() {
+      const apiTeams = await fetchTeams(apiClient)
+      if (!cancelled) {
+        const mapped = apiTeams.map(mapTeam)
+        setTeams(mapped)
+        // Alle Teams expanded
+        setExpandedTeams(new Set(mapped.map(t => t.id)))
+      }
+    }
+
+    loadTeams()
+    return () => { cancelled = true }
+  }, [apiClient, user])
 
   const toggleTeam = (teamId: string) => {
     setExpandedTeams(prev => {
@@ -97,6 +110,11 @@ export function TeamsPage() {
         </div>
 
         <div className="flex-1 overflow-y-auto py-2">
+          {filteredTeams.length === 0 && !searchQuery && (
+            <div className="px-4 py-8 text-center text-sm text-[#605e5c]">
+              Noch keine Teams. Erstelle dein erstes Team!
+            </div>
+          )}
           {filteredTeams.map(team => (
             <div key={team.id}>
               {/* Team Header */}

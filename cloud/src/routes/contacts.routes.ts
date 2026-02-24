@@ -13,7 +13,7 @@ export const contactRoutes = new Hono()
 
 contactRoutes.use('*', authMiddleware)
 
-// ── Contacts CRUD ──
+// ── Contacts List + Create ──
 
 contactRoutes.get('/', zValidator('query', listContactsSchema), async (c) => {
   const user = c.get('user')
@@ -29,6 +29,8 @@ contactRoutes.post('/', zValidator('json', createContactSchema), async (c) => {
   return c.json({ ok: true, data: result }, 201)
 })
 
+// ── Static routes BEFORE /:id ──
+
 contactRoutes.get('/autocomplete', zValidator('query', autocompleteContactSchema), async (c) => {
   const user = c.get('user')
   const { q, limit } = c.req.valid('query')
@@ -36,26 +38,7 @@ contactRoutes.get('/autocomplete', zValidator('query', autocompleteContactSchema
   return c.json({ ok: true, data: result })
 })
 
-contactRoutes.get('/:id', async (c) => {
-  const user = c.get('user')
-  const result = contactService.getContact(c.req.param('id'), user.userId)
-  return c.json({ ok: true, data: result })
-})
-
-contactRoutes.put('/:id', zValidator('json', updateContactSchema), async (c) => {
-  const user = c.get('user')
-  const body = c.req.valid('json')
-  const result = contactService.updateContact(c.req.param('id'), user.userId, body)
-  return c.json({ ok: true, data: result })
-})
-
-contactRoutes.delete('/:id', async (c) => {
-  const user = c.get('user')
-  contactService.deleteContact(c.req.param('id'), user.userId)
-  return c.json({ ok: true })
-})
-
-// ── Contact Groups ──
+// ── Contact Groups (before /:id to avoid conflict) ──
 
 contactRoutes.get('/groups', async (c) => {
   const user = c.get('user')
@@ -103,4 +86,25 @@ contactRoutes.post('/import/microsoft', async (c) => {
   const { accountId } = await c.req.json()
   const result = await importMicrosoftContacts(accountId, user.userId)
   return c.json({ ok: true, data: result })
+})
+
+// ── Contacts by ID (AFTER static routes) ──
+
+contactRoutes.get('/:id', async (c) => {
+  const user = c.get('user')
+  const result = contactService.getContact(c.req.param('id'), user.userId)
+  return c.json({ ok: true, data: result })
+})
+
+contactRoutes.put('/:id', zValidator('json', updateContactSchema), async (c) => {
+  const user = c.get('user')
+  const body = c.req.valid('json')
+  const result = contactService.updateContact(c.req.param('id'), user.userId, body)
+  return c.json({ ok: true, data: result })
+})
+
+contactRoutes.delete('/:id', async (c) => {
+  const user = c.get('user')
+  contactService.deleteContact(c.req.param('id'), user.userId)
+  return c.json({ ok: true })
 })

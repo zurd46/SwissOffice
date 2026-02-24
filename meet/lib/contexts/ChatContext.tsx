@@ -1,13 +1,21 @@
 'use client'
 
-import { createContext, useContext, useState, useCallback, type ReactNode } from 'react'
+// ChatContext — verbunden mit Cloud-Backend via REST API + WebSocket
+// Conversations und Messages werden vom Server geladen, nicht mehr Demo-Daten
+
+import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react'
+import { useAuth as useSharedAuth } from '@shared/contexts/AuthContext'
+import { useWebSocket } from './WebSocketContext'
+import { fetchConversations, fetchMessages, sendMessage as apiSendMessage, createConversation as apiCreateConversation } from '@/lib/api/meetApi'
 import type { Conversation, Message } from '@/lib/types'
+import type { ApiConversation, ApiMessage } from '@/lib/api/meetApi'
 
 interface ChatContextValue {
   conversations: Conversation[]
   activeConversationId: string | null
   activeConversation: Conversation | null
   messages: Map<string, Message[]>
+  isLoading: boolean
   setActiveConversation: (id: string | null) => void
   addMessage: (conversationId: string, message: Message) => void
   updateMessage: (conversationId: string, messageId: string, updates: Partial<Message>) => void
@@ -17,168 +25,189 @@ interface ChatContextValue {
   markAsRead: (conversationId: string) => void
   typingUsers: Map<string, string[]>
   setTypingUsers: (conversationId: string, userIds: string[]) => void
+  sendChatMessage: (conversationId: string, content: string, replyToId?: string) => Promise<void>
+  createNewConversation: (type: 'direct' | 'group', name: string, memberIds: string[]) => Promise<string | null>
 }
 
 const ChatContext = createContext<ChatContextValue | null>(null)
 
-// Demo-Daten
-const demoConversations: Conversation[] = [
-  {
-    id: 'conv-1',
-    type: 'direct',
-    name: 'Anna Müller',
+// API-Conversation → Frontend-Conversation mappen
+function mapConversation(apiConv: ApiConversation): Conversation {
+  return {
+    id: apiConv.id,
+    type: apiConv.type,
+    name: apiConv.name ?? 'Unbenannt',
     members: [],
-    lastMessage: {
-      id: 'msg-1',
-      conversationId: 'conv-1',
-      senderId: 'user-2',
-      senderName: 'Anna Müller',
-      type: 'text',
-      content: 'Hast du die Präsentation fertig?',
-      attachments: [],
-      reactions: [],
-      isEdited: false,
-      isPinned: false,
-      readBy: ['user-2'],
-      createdAt: new Date(Date.now() - 300000).toISOString(),
-    },
-    unreadCount: 1,
-    isPinned: false,
-    isMuted: false,
-    createdAt: new Date(Date.now() - 86400000).toISOString(),
-    updatedAt: new Date(Date.now() - 300000).toISOString(),
-  },
-  {
-    id: 'conv-2',
-    type: 'group',
-    name: 'Projektteam Alpha',
-    members: [],
-    lastMessage: {
-      id: 'msg-2',
-      conversationId: 'conv-2',
-      senderId: 'user-3',
-      senderName: 'Max Weber',
-      type: 'text',
-      content: 'Meeting morgen um 10 Uhr!',
-      attachments: [],
-      reactions: [],
-      isEdited: false,
-      isPinned: false,
-      readBy: ['user-3'],
-      createdAt: new Date(Date.now() - 600000).toISOString(),
-    },
-    unreadCount: 3,
-    isPinned: true,
-    isMuted: false,
-    createdAt: new Date(Date.now() - 172800000).toISOString(),
-    updatedAt: new Date(Date.now() - 600000).toISOString(),
-  },
-  {
-    id: 'conv-3',
-    type: 'direct',
-    name: 'Lisa Schmidt',
-    members: [],
-    lastMessage: {
-      id: 'msg-3',
-      conversationId: 'conv-3',
-      senderId: 'user-1',
-      senderName: 'Daniel Zurmühle',
-      type: 'text',
-      content: 'Perfekt, danke dir! 👍',
-      attachments: [],
-      reactions: [],
-      isEdited: false,
-      isPinned: false,
-      readBy: ['user-1', 'user-4'],
-      createdAt: new Date(Date.now() - 3600000).toISOString(),
-    },
     unreadCount: 0,
     isPinned: false,
     isMuted: false,
-    createdAt: new Date(Date.now() - 259200000).toISOString(),
-    updatedAt: new Date(Date.now() - 3600000).toISOString(),
-  },
-  {
-    id: 'conv-4',
-    type: 'group',
-    name: 'Design Review',
-    members: [],
-    lastMessage: {
-      id: 'msg-4',
-      conversationId: 'conv-4',
-      senderId: 'user-5',
-      senderName: 'Julia Koch',
-      type: 'image',
-      content: 'Neues Mockup angehängt',
-      attachments: [],
-      reactions: [{ emoji: '🔥', count: 3, userIds: ['user-1', 'user-2', 'user-3'], hasReacted: true }],
-      isEdited: false,
-      isPinned: false,
-      readBy: ['user-5'],
-      createdAt: new Date(Date.now() - 7200000).toISOString(),
-    },
-    unreadCount: 5,
-    isPinned: false,
-    isMuted: false,
-    createdAt: new Date(Date.now() - 604800000).toISOString(),
-    updatedAt: new Date(Date.now() - 7200000).toISOString(),
-  },
-]
+    createdAt: apiConv.createdAt,
+    updatedAt: apiConv.updatedAt,
+  }
+}
 
-const demoMessages: Map<string, Message[]> = new Map([
-  ['conv-1', [
-    {
-      id: 'msg-1a',
-      conversationId: 'conv-1',
-      senderId: 'user-2',
-      senderName: 'Anna Müller',
-      type: 'text',
-      content: 'Hey Daniel!',
-      attachments: [],
-      reactions: [],
-      isEdited: false,
-      isPinned: false,
-      readBy: ['user-1', 'user-2'],
-      createdAt: new Date(Date.now() - 600000).toISOString(),
-    },
-    {
-      id: 'msg-1b',
-      conversationId: 'conv-1',
-      senderId: 'user-1',
-      senderName: 'Daniel Zurmühle',
-      type: 'text',
-      content: 'Hi Anna, alles klar?',
-      attachments: [],
-      reactions: [{ emoji: '👋', count: 1, userIds: ['user-2'], hasReacted: false }],
-      isEdited: false,
-      isPinned: false,
-      readBy: ['user-1', 'user-2'],
-      createdAt: new Date(Date.now() - 540000).toISOString(),
-    },
-    {
-      id: 'msg-1c',
-      conversationId: 'conv-1',
-      senderId: 'user-2',
-      senderName: 'Anna Müller',
-      type: 'text',
-      content: 'Ja, alles gut! Hast du die Präsentation fertig?',
-      attachments: [],
-      reactions: [],
-      isEdited: false,
-      isPinned: false,
-      readBy: ['user-2'],
-      createdAt: new Date(Date.now() - 300000).toISOString(),
-    },
-  ]],
-])
+// API-Message → Frontend-Message mappen
+function mapMessage(apiMsg: ApiMessage): Message {
+  return {
+    id: apiMsg.id,
+    conversationId: apiMsg.conversationId ?? '',
+    senderId: apiMsg.senderId,
+    senderName: apiMsg.senderId, // Wird später mit User-Lookup ersetzt
+    type: apiMsg.type as Message['type'],
+    content: apiMsg.content,
+    attachments: [],
+    reactions: [],
+    isEdited: apiMsg.isEdited,
+    isPinned: apiMsg.isPinned,
+    readBy: [],
+    replyToId: apiMsg.replyToId ?? undefined,
+    createdAt: apiMsg.createdAt,
+  }
+}
 
 export function ChatProvider({ children }: { children: ReactNode }) {
-  const [conversations, setConversations] = useState<Conversation[]>(demoConversations)
+  const { apiClient, user } = useSharedAuth()
+  const ws = useWebSocket()
+
+  const [conversations, setConversations] = useState<Conversation[]>([])
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null)
-  const [messages, setMessages] = useState<Map<string, Message[]>>(demoMessages)
+  const [messages, setMessages] = useState<Map<string, Message[]>>(new Map())
   const [typingUsers, setTypingUsersState] = useState<Map<string, string[]>>(new Map())
+  const [isLoading, setIsLoading] = useState(true)
 
   const activeConversation = conversations.find(c => c.id === activeConversationId) ?? null
+
+  // Conversations vom Server laden
+  useEffect(() => {
+    if (!user) {
+      setConversations([])
+      setIsLoading(false)
+      return
+    }
+
+    let cancelled = false
+
+    async function loadConversations() {
+      setIsLoading(true)
+      const apiConvs = await fetchConversations(apiClient)
+      if (!cancelled) {
+        setConversations(apiConvs.map(mapConversation))
+        setIsLoading(false)
+      }
+    }
+
+    loadConversations()
+    return () => { cancelled = true }
+  }, [apiClient, user])
+
+  // Messages laden wenn Conversation gewechselt wird
+  useEffect(() => {
+    if (!activeConversationId || !user) return
+
+    // Nur laden wenn noch keine Messages gecached sind
+    if (messages.has(activeConversationId)) return
+
+    let cancelled = false
+
+    async function loadMessages() {
+      const apiMsgs = await fetchMessages(apiClient, activeConversationId!)
+      if (!cancelled) {
+        setMessages(prev => {
+          const next = new Map(prev)
+          next.set(activeConversationId!, apiMsgs.map(mapMessage))
+          return next
+        })
+      }
+    }
+
+    loadMessages()
+    return () => { cancelled = true }
+  }, [activeConversationId, apiClient, user, messages])
+
+  // WebSocket-Events für Echtzeit-Nachrichten
+  useEffect(() => {
+    if (!ws.isConnected) return
+
+    function handleNewMessage(data: Record<string, unknown>) {
+      const msg = data as unknown as {
+        messageId: string
+        conversationId: string
+        senderId: string
+        senderName: string
+        content: string
+        type: string
+        createdAt: string
+      }
+
+      const message: Message = {
+        id: msg.messageId,
+        conversationId: msg.conversationId,
+        senderId: msg.senderId,
+        senderName: msg.senderName ?? msg.senderId,
+        type: (msg.type as Message['type']) ?? 'text',
+        content: msg.content,
+        attachments: [],
+        reactions: [],
+        isEdited: false,
+        isPinned: false,
+        readBy: [msg.senderId],
+        createdAt: msg.createdAt ?? new Date().toISOString(),
+      }
+
+      setMessages(prev => {
+        const next = new Map(prev)
+        const existing = next.get(msg.conversationId) ?? []
+        // Duplikat-Check
+        if (existing.some(m => m.id === message.id)) return prev
+        next.set(msg.conversationId, [...existing, message])
+        return next
+      })
+
+      setConversations(prev => prev.map(c =>
+        c.id === msg.conversationId
+          ? { ...c, lastMessage: message, updatedAt: message.createdAt }
+          : c
+      ))
+    }
+
+    function handleTyping(data: Record<string, unknown>) {
+      const { conversationId, userId, isTyping } = data as {
+        conversationId: string
+        userId: string
+        isTyping: boolean
+      }
+
+      setTypingUsersState(prev => {
+        const next = new Map(prev)
+        const current = next.get(conversationId) ?? []
+        if (isTyping && !current.includes(userId)) {
+          next.set(conversationId, [...current, userId])
+        } else if (!isTyping) {
+          next.set(conversationId, current.filter(id => id !== userId))
+        }
+        return next
+      })
+    }
+
+    ws.on('chat:new_message', handleNewMessage)
+    ws.on('chat:typing', handleTyping)
+
+    return () => {
+      ws.off('chat:new_message', handleNewMessage)
+      ws.off('chat:typing', handleTyping)
+    }
+  }, [ws])
+
+  // Chat-Room joinen wenn Conversation gewechselt wird
+  useEffect(() => {
+    if (!activeConversationId || !ws.isConnected) return
+
+    ws.send('chat:join', { conversationId: activeConversationId })
+
+    return () => {
+      ws.send('chat:leave', { conversationId: activeConversationId })
+    }
+  }, [activeConversationId, ws])
 
   const setActiveConversation = useCallback((id: string | null) => {
     setActiveConversationId(id)
@@ -188,6 +217,81 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       ))
     }
   }, [])
+
+  // Nachricht senden — über REST API + WebSocket
+  const sendChatMessage = useCallback(async (conversationId: string, content: string, replyToId?: string) => {
+    // Optimistisches Update: sofort lokal anzeigen
+    const tempId = crypto.randomUUID()
+    const optimisticMessage: Message = {
+      id: tempId,
+      conversationId,
+      senderId: user?.id ?? '',
+      senderName: user?.displayName ?? '',
+      type: 'text',
+      content,
+      attachments: [],
+      reactions: [],
+      isEdited: false,
+      isPinned: false,
+      readBy: [user?.id ?? ''],
+      replyToId,
+      createdAt: new Date().toISOString(),
+    }
+
+    setMessages(prev => {
+      const next = new Map(prev)
+      const existing = next.get(conversationId) ?? []
+      next.set(conversationId, [...existing, optimisticMessage])
+      return next
+    })
+
+    // API-Call
+    const serverMsgId = await apiSendMessage(apiClient, conversationId, content, 'text', replyToId)
+
+    // Temp-ID mit Server-ID ersetzen
+    if (serverMsgId) {
+      setMessages(prev => {
+        const next = new Map(prev)
+        const existing = next.get(conversationId) ?? []
+        next.set(conversationId, existing.map(m =>
+          m.id === tempId ? { ...m, id: serverMsgId } : m
+        ))
+        return next
+      })
+    }
+
+    // WebSocket benachrichtigen (für andere Clients)
+    ws.send('chat:send_message', {
+      conversationId,
+      content,
+      type: 'text',
+      replyToId,
+    })
+  }, [apiClient, user, ws])
+
+  // Neue Conversation erstellen
+  const createNewConversation = useCallback(async (
+    type: 'direct' | 'group',
+    name: string,
+    memberIds: string[],
+  ): Promise<string | null> => {
+    const convId = await apiCreateConversation(apiClient, { type, name, memberIds })
+    if (convId) {
+      const newConv: Conversation = {
+        id: convId,
+        type,
+        name,
+        members: [],
+        unreadCount: 0,
+        isPinned: false,
+        isMuted: false,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }
+      setConversations(prev => [newConv, ...prev])
+    }
+    return convId
+  }, [apiClient])
 
   const addMessage = useCallback((conversationId: string, message: Message) => {
     setMessages(prev => {
@@ -235,7 +339,8 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     setConversations(prev => prev.map(c =>
       c.id === conversationId ? { ...c, unreadCount: 0 } : c
     ))
-  }, [])
+    ws.send('chat:mark_read', { conversationId })
+  }, [ws])
 
   const setTypingUsers = useCallback((conversationId: string, userIds: string[]) => {
     setTypingUsersState(prev => {
@@ -251,6 +356,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       activeConversationId,
       activeConversation,
       messages,
+      isLoading,
       setActiveConversation,
       addMessage,
       updateMessage,
@@ -260,6 +366,8 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       markAsRead,
       typingUsers,
       setTypingUsers,
+      sendChatMessage,
+      createNewConversation,
     }}>
       {children}
     </ChatContext.Provider>

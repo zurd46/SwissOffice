@@ -1,5 +1,7 @@
 'use client'
 
+// NotificationContext — Benachrichtigungen aus WebSocket-Events
+
 import { createContext, useContext, useState, useCallback, type ReactNode } from 'react'
 import type { Notification } from '@/lib/types'
 
@@ -14,35 +16,8 @@ interface NotificationContextValue {
 
 const NotificationContext = createContext<NotificationContextValue | null>(null)
 
-const demoNotifications: Notification[] = [
-  {
-    id: 'notif-1',
-    type: 'new_message',
-    title: 'Anna Müller',
-    body: 'Hast du die Präsentation fertig?',
-    isRead: false,
-    createdAt: new Date(Date.now() - 300000).toISOString(),
-  },
-  {
-    id: 'notif-2',
-    type: 'mention',
-    title: 'Projektteam Alpha',
-    body: 'Max Weber hat dich erwähnt',
-    isRead: false,
-    createdAt: new Date(Date.now() - 600000).toISOString(),
-  },
-  {
-    id: 'notif-3',
-    type: 'meeting_reminder',
-    title: 'Sprint Planning',
-    body: 'Beginnt in 15 Minuten',
-    isRead: true,
-    createdAt: new Date(Date.now() - 900000).toISOString(),
-  },
-]
-
 export function NotificationProvider({ children }: { children: ReactNode }) {
-  const [notifications, setNotifications] = useState<Notification[]>(demoNotifications)
+  const [notifications, setNotifications] = useState<Notification[]>([])
 
   const unreadCount = notifications.filter(n => !n.isRead).length
 

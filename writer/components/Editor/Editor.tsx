@@ -45,6 +45,11 @@ import { Shape } from './extensions/Shape'
 import { MergeField } from './extensions/MergeField'
 import { WatermarkOverlay } from './WatermarkOverlay'
 import { RulerBar } from './RulerBar'
+import { CloudSaveDialog } from '../Dialogs/CloudSaveDialog'
+import { CloudOpenDialog } from '../Dialogs/CloudOpenDialog'
+import { loadCloudDocument } from '../../lib/cloud/cloudDocumentService'
+import { useAuth } from '@shared/contexts/AuthContext'
+import { useCloud } from '@shared/contexts/CloudContext'
 import type { Comment } from '../../lib/types/comments'
 import { generateCommentId } from '../../lib/types/comments'
 import type { Footnote } from '../../lib/types/footnotes'
@@ -114,9 +119,14 @@ function WriterEditorInner() {
   const [showRuler, setShowRuler] = useState(true)
   const [showTemplateChooser, setShowTemplateChooser] = useState(false)
   const [showVersionHistory, setShowVersionHistory] = useState(false)
+  const [cloudDocumentId, setCloudDocumentId] = useState<string | null>(null)
+  const [showCloudSave, setShowCloudSave] = useState(false)
+  const [showCloudOpen, setShowCloudOpen] = useState(false)
   const isElectron = typeof window !== 'undefined' && !!window.electronAPI?.isElectron
 
   const { settings, setSettings } = useDocumentSettings()
+  const { isAuthenticated, apiClient } = useAuth()
+  const { status: cloudStatus } = useCloud()
   const editorWrapperRef = useRef<HTMLDivElement>(null)
 
   const editor = useEditor({
@@ -213,6 +223,23 @@ function WriterEditorInner() {
     if (!editor) return
     editor.commands.setContent(content as Parameters<typeof editor.commands.setContent>[0])
   }, [editor])
+
+  // Cloud open handler
+  const handleCloudOpen = useCallback(async (docId: string) => {
+    if (!editor) return
+    const doc = await loadCloudDocument(apiClient, docId)
+    if (doc) {
+      editor.commands.setContent(doc.content as Parameters<typeof editor.commands.setContent>[0])
+      setDocumentName(doc.title)
+      setCloudDocumentId(doc.id)
+      setShowCloudOpen(false)
+    }
+  }, [editor, apiClient])
+
+  // Cloud saved handler
+  const handleCloudSaved = useCallback((cloudId: string) => {
+    setCloudDocumentId(cloudId)
+  }, [])
 
   // Calculate page count based on content height
   const calculatePageCount = useCallback(() => {
@@ -556,6 +583,12 @@ function WriterEditorInner() {
         case 'toggle-ruler':
           setShowRuler(prev => !prev)
           break
+        case 'cloud-save':
+          setShowCloudSave(true)
+          break
+        case 'cloud-open':
+          setShowCloudOpen(true)
+          break
         case 'about':
           alert('ImpulsWriter\nVersion 1.0\n\nProfessionelle Textverarbeitung')
           break
@@ -597,6 +630,10 @@ function WriterEditorInner() {
           onToggleFindReplace={toggleFindReplace}
           onToggleSidebar={toggleSidebar}
           onOpenSettings={() => setShowSettings(true)}
+          isAuthenticated={isAuthenticated}
+          isCloudReachable={cloudStatus.isCloudReachable}
+          onCloudSave={() => setShowCloudSave(true)}
+          onCloudOpen={() => setShowCloudOpen(true)}
         />
       )}
 
