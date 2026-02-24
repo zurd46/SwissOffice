@@ -39,10 +39,22 @@ export function TabSeitenlayout({ editor }: TabSeitenlayoutProps) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
             <span style={{ fontSize: 11, color: '#605e5c', width: 42 }}>Einzug:</span>
-            <ToolbarButton onClick={() => editor.chain().focus().liftListItem('listItem').run()} title="Einzug verkleinern" disabled={!editor.can().liftListItem('listItem')}>
+            <ToolbarButton onClick={() => {
+              if (editor.can().liftListItem('listItem')) {
+                editor.chain().focus().liftListItem('listItem').run()
+              } else {
+                editor.chain().focus().decreaseIndent().run()
+              }
+            }} title="Einzug verkleinern">
               <Outdent size={14} />
             </ToolbarButton>
-            <ToolbarButton onClick={() => editor.chain().focus().sinkListItem('listItem').run()} title="Einzug vergrössern" disabled={!editor.can().sinkListItem('listItem')}>
+            <ToolbarButton onClick={() => {
+              if (editor.can().sinkListItem('listItem')) {
+                editor.chain().focus().sinkListItem('listItem').run()
+              } else {
+                editor.chain().focus().increaseIndent().run()
+              }
+            }} title="Einzug vergrössern">
               <Indent size={14} />
             </ToolbarButton>
           </div>

@@ -7,7 +7,7 @@ import { Plugin, PluginKey } from '@tiptap/pm/state'
  */
 function sanitizePastedHTML(html: string): string {
   // Remove Microsoft Office conditional comments and tags
-  let cleaned = html
+  const cleaned = html
     .replace(/<!--\[if[\s\S]*?endif\]-->/gi, '')
     .replace(/<o:p[\s\S]*?<\/o:p>/gi, '')
     .replace(/<v:[\s\S]*?<\/v:[\s\S]*?>/gi, '')
@@ -121,7 +121,8 @@ export const PasteHandler = Extension.create({
           },
           handlePaste(view, event) {
             // Shift+V: paste as plain text only
-            if (event.shiftKey) {
+            const nativeEvent = event as unknown as KeyboardEvent & ClipboardEvent
+            if (nativeEvent.shiftKey) {
               const text = event.clipboardData?.getData('text/plain')
               if (text) {
                 const { tr } = view.state
