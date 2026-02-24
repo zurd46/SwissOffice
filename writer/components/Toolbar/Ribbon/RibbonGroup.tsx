@@ -8,29 +8,29 @@ interface RibbonGroupProps {
   className?: string
 }
 
-export function RibbonGroup({ label, children, className = '' }: RibbonGroupProps) {
+export function RibbonGroup({ label, children }: RibbonGroupProps) {
   return (
     <>
-      <div className={`flex flex-col px-3 h-full ${className}`}>
-        <div className="flex items-start gap-[3px] pt-[6px] pb-[2px]">
+      <div style={{ display: 'flex', flexDirection: 'column', padding: '0 14px', height: '100%' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 3, paddingTop: 6, paddingBottom: 2 }}>
           {children}
         </div>
-        <span className="text-[9px] text-[#a19f9d] leading-none pb-[4px] mt-auto text-center select-none tracking-[0.05em] uppercase">
+        <span style={{ fontSize: 9, color: '#a19f9d', lineHeight: 1, paddingBottom: 5, marginTop: 'auto', textAlign: 'center', userSelect: 'none', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
           {label}
         </span>
       </div>
-      <div className="w-px bg-[#d2d0ce] self-stretch my-[6px]" />
+      <div style={{ width: 1, backgroundColor: '#d2d0ce', alignSelf: 'stretch', margin: '8px 0' }} />
     </>
   )
 }
 
-export function RibbonGroupLast({ label, children, className = '' }: RibbonGroupProps) {
+export function RibbonGroupLast({ label, children }: RibbonGroupProps) {
   return (
-    <div className={`flex flex-col px-3 h-full ${className}`}>
-      <div className="flex items-start gap-[3px] pt-[6px] pb-[2px]">
+    <div style={{ display: 'flex', flexDirection: 'column', padding: '0 14px', height: '100%' }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 3, paddingTop: 6, paddingBottom: 2 }}>
         {children}
       </div>
-      <span className="text-[9px] text-[#a19f9d] leading-none pb-[4px] mt-auto text-center select-none tracking-[0.05em] uppercase">
+      <span style={{ fontSize: 9, color: '#a19f9d', lineHeight: 1, paddingBottom: 5, marginTop: 'auto', textAlign: 'center', userSelect: 'none', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
         {label}
       </span>
     </div>

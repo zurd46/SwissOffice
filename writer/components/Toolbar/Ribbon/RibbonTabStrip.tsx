@@ -14,7 +14,7 @@ interface RibbonTabStripProps {
 
 export function RibbonTabStrip({ activeTab, onTabChange }: RibbonTabStripProps) {
   return (
-    <div className="flex items-end pl-3 gap-[2px] bg-[#f3f3f3]">
+    <div className="flex items-end pl-3 electron-pl gap-[2px] bg-[#f3f3f3]">
       {RIBBON_TABS.map(tab => (
         <button
           key={tab.id}

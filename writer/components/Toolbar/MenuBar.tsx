@@ -169,7 +169,7 @@ export function MenuBar({ editor, documentName, setDocumentName, onToggleFindRep
       <div style={{ width: 1, height: 18, backgroundColor: '#d9d9d9' }} />
 
       {/* Menu Items */}
-      <nav style={{ display: 'flex', alignItems: 'center', height: '100%', marginLeft: 8, gap: 2 }}>
+      <nav style={{ display: 'flex', alignItems: 'center', height: '100%', marginLeft: 12, gap: 4 }}>
         {menus.map(menu => (
           <div key={menu.label} style={{ position: 'relative', height: '100%', display: 'flex', alignItems: 'center' }}>
             <button
