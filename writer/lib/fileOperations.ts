@@ -1,9 +1,21 @@
 import { Editor } from '@tiptap/react'
 import { saveAs } from 'file-saver'
+import type { DocumentSettings, ImpulsDocument } from './types/document'
+import { defaultDocumentSettings } from './documentContext'
 
-export function saveDocument(editor: Editor, filename: string = 'dokument') {
-  const json = editor.getJSON()
-  const blob = new Blob([JSON.stringify(json, null, 2)], { type: 'application/json' })
+const CURRENT_VERSION = 2
+
+export function saveDocument(
+  editor: Editor,
+  filename: string = 'dokument',
+  settings?: DocumentSettings
+) {
+  const doc: ImpulsDocument = {
+    version: CURRENT_VERSION,
+    settings: settings ?? { ...defaultDocumentSettings },
+    content: editor.getJSON(),
+  }
+  const blob = new Blob([JSON.stringify(doc, null, 2)], { type: 'application/json' })
   saveAs(blob, `${filename}.impuls`)
 }
 
@@ -29,7 +41,40 @@ ${editor.getHTML()}
   saveAs(blob, `${filename}.html`)
 }
 
-export function loadDocument(editor: Editor): Promise<void> {
+interface LoadResult {
+  settings: DocumentSettings
+  documentName?: string
+}
+
+function migrateDocument(json: Record<string, unknown>): { content: Record<string, unknown>; settings: DocumentSettings } {
+  // Version 2+: new format with settings and content
+  if ('version' in json && 'settings' in json && 'content' in json) {
+    const doc = json as unknown as ImpulsDocument
+    return {
+      content: doc.content,
+      settings: { ...defaultDocumentSettings, ...doc.settings },
+    }
+  }
+
+  // Version 1 / legacy: raw Tiptap JSON (has "type": "doc")
+  if ('type' in json && json.type === 'doc') {
+    return {
+      content: json,
+      settings: { ...defaultDocumentSettings },
+    }
+  }
+
+  // Unknown format, try as content
+  return {
+    content: json,
+    settings: { ...defaultDocumentSettings },
+  }
+}
+
+export function loadDocument(
+  editor: Editor,
+  onSettingsLoaded?: (result: LoadResult) => void
+): Promise<void> {
   return new Promise((resolve) => {
     const input = document.createElement('input')
     input.type = 'file'
@@ -40,7 +85,10 @@ export function loadDocument(editor: Editor): Promise<void> {
       const text = await file.text()
       try {
         const json = JSON.parse(text)
-        editor.commands.setContent(json)
+        const { content, settings } = migrateDocument(json)
+        editor.commands.setContent(content)
+        const docName = file.name.replace(/\.(impuls|json)$/, '')
+        onSettingsLoaded?.({ settings, documentName: docName })
       } catch {
         alert('Ungültige Datei')
       }
