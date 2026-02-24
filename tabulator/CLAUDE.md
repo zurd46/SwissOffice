@@ -1,54 +1,118 @@
-# ImpulsTabulator
+# Tabulator — Next.js Tabellenkalkulation
 
-Professionelle Tabellenkalkulation (Excel-Alternative) als Next.js-Modul im ImpulsOffice-Monorepo.
+Excel-Alternative mit custom Spreadsheet-Engine, Formel-Parser und Dependency Graph.
 
-## Architektur
+## Stack
 
-- **Next.js 16** App (React 19, TypeScript strict, Tailwind CSS 4)
-- Eigenständiges Modul unter `tabulator/`, läuft auf Port 3001
-- Komplett custom gebaute Spreadsheet-Engine (kein externes Spreadsheet-Framework)
-- Eigene Formel-Engine mit Parser, Evaluator und Dependency Graph
+- Next.js 16 (App Router, React 19)
+- TypeScript 5 (strict)
+- Tailwind CSS 4
+- Lucide React Icons
+- Port 3001
 
-## Entwicklung
+## Struktur
 
-```bash
-cd tabulator && npm run dev    # http://localhost:3001
-cd tabulator && npm run lint   # ESLint
-cd tabulator && npm run build  # Production Build
+```
+app/
+  layout.tsx              Root-Layout
+  page.tsx                Hauptseite (Spreadsheet)
+  globals.css             Globale Stile
+  login/                  Login-Seite
+  register/               Registrierungs-Seite
+
+components/
+  Grid/                   Spreadsheet-Grid
+    SpreadsheetGrid.tsx     Haupt-Grid (Virtual Scrolling, Zellenauswahl)
+    Cell.tsx                Zellen-Komponente
+    ColumnHeader.tsx        Spaltenköpfe (A, B, C, ...)
+    RowHeader.tsx           Zeilenköpfe (1, 2, 3, ...)
+    SelectionOverlay.tsx    Auswahl-Hervorhebung
+    CellEditor.tsx          Inline-Zellen-Editor
+    ContextMenu.tsx         Rechtsklick-Menü
+  FormulaBar/
+    FormulaBar.tsx          Formelleiste mit Namensfeld und Eingabe
+    FunctionInsert.tsx      Funktions-Einfüge-Dialog
+  SheetTabs/
+    SheetTabs.tsx           Arbeitsblatt-Tabs (Umbenennen, Duplizieren, Löschen)
+  Toolbar/
+    Ribbon/                 Office-Ribbon-UI
+      tabs/
+        TabStart.tsx        Schrift, Ausrichtung, Zahlenformat
+        TabFormeln.tsx      Formel-Funktionen
+        TabDaten.tsx        Sortierung, Filter, Validierung
+        TabEinfuegen.tsx    Diagramme, Bilder (geplant)
+        TabSeitenlayout.tsx Druckbereich, Seitenformat
+  StatusBar/
+    StatusBar.tsx           Summe/Durchschnitt/Anzahl, Zoom
+  Dialogs/
+    FormatCellsDialog.tsx   Zellformatierung
+    ConditionalFormatDialog.tsx  Bedingte Formatierung
+    SortDialog.tsx          Sortier-Dialog
+    DataValidationDialog.tsx  Datenvalidierung
+    FindReplaceDialog.tsx   Suchen & Ersetzen
+  Export/
+    exportCSV.ts            CSV Export/Import (RFC 4180)
+
+lib/
+  engine/
+    FormulaParser.ts        Formel-Parser (Tokenizer + AST)
+    FormulaEvaluator.ts     Formel-Auswertung
+    DependencyGraph.ts      Abhängigkeitsgraph für Neuberechnung
+    functions/              40+ eingebaute Funktionen
+      math.ts               SUMME, MIN, MAX, DURCHSCHNITT, RUNDEN, ...
+      logic.ts              WENN, UND, ODER, NICHT, ...
+      text.ts               VERKETTEN, LINKS, RECHTS, LÄNGE, ...
+      statistics.ts         ANZAHL, MITTELWERT, STABW, ...
+      lookup.ts             SVERWEIS, WVERWEIS, INDEX, VERGLEICH
+  state/
+    workbookState.ts        Workbook State Management
+    historyState.ts         Undo/Redo History
+    selectionState.ts       Zellauswahl-State
+  types/
+    cell.ts                 Zell-Typen (Wert, Formel, Format)
+    workbook.ts             Workbook/Sheet-Typen
+    format.ts               Formatierungs-Typen
+  hooks/
+    useVirtualGrid.ts       Virtual Scrolling Hook
+    useKeyboardNavigation.ts  Tastatur-Navigation
+    useSelection.ts         Auswahl-Hook
 ```
 
-## Code-Konventionen
+## Formel-Engine
 
-- **Strict TypeScript** (`strict: true`)
-- **Funktionale Komponenten** mit Named Exports: `export function ComponentName()`
-- **`'use client'`** Directive für alle interaktiven Komponenten
-- **Path-Alias:** `@/*` mappt auf `tabulator/*`
-- **Styling:** Tailwind CSS Utility-Klassen, globale Stile in `app/globals.css`
-- **Icons:** Lucide React (`lucide-react`)
-- **UI-Sprache:** Deutsch (alle Labels, Menüs, Platzhalter)
-- **Dateiformat:** `.impuls-tabelle` (JSON-Serialisierung des Workbook-State)
+```ts
+// Formel-Syntax
+=SUMME(A1:A10)
+=WENN(A1>100; "Hoch"; "Niedrig")
+=SVERWEIS(A1; B1:C10; 2; FALSCH)
 
-## Wichtige Verzeichnisse
+// Abhängigkeitsgraph berechnet nur betroffene Zellen neu
+// Zirkuläre Referenzen werden erkannt und als #ZIRKULAR! angezeigt
+```
 
-| Verzeichnis | Beschreibung |
-|---|---|
-| `components/Grid/` | Spreadsheet-Grid (Virtual Scrolling, Zellen, Auswahl) |
-| `components/FormulaBar/` | Formelleiste |
-| `components/SheetTabs/` | Tabellenblatt-Tabs |
-| `components/Toolbar/Ribbon/` | Office-Ribbon-UI |
-| `components/StatusBar/` | Statusleiste |
-| `components/Dialogs/` | Dialoge (Formatierung, Sortieren, etc.) |
-| `components/Export/` | Export-Module (CSV, PDF) |
-| `lib/engine/` | Formel-Engine (Parser, Evaluator, Functions) |
-| `lib/state/` | State Management (Workbook, History, Selection) |
-| `lib/types/` | TypeScript-Typen |
-| `lib/hooks/` | Custom Hooks (Virtual Grid, Keyboard, Selection) |
+## Dateiformat
 
-## Regeln
+`.impuls-tabelle` (JSON):
+```json
+{
+  "sheets": [{
+    "name": "Tabelle1",
+    "cells": { "A1": { "value": "Hallo", "formula": null, "format": {} } },
+    "columnWidths": {},
+    "rowHeights": {}
+  }],
+  "activeSheet": 0
+}
+```
 
-- Alle neuen UI-Texte auf Deutsch
-- Keine neuen Dependencies ohne Begründung
+## Konventionen
+
+- Named Export: `export function Name() {}`
+- `'use client'` für alle interaktiven Komponenten
+- Path-Alias: `@/*` mappt auf `tabulator/*`
+- Styling: Tailwind CSS
+- Icons: `lucide-react`
+- Labels: Deutsch
 - Grid-Komponenten unter `components/Grid/`
-- Export-Formate als separate Dateien unter `components/Export/`
-- Neue Komponenten folgen der bestehenden Ordnerstruktur
-- Keine `default exports` — immer Named Exports verwenden
+- Export-Module unter `components/Export/`
+- Engine-Logik unter `lib/engine/`

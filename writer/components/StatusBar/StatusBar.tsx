@@ -2,6 +2,7 @@
 
 import { Editor } from '@tiptap/react'
 import { ZoomIn, ZoomOut } from 'lucide-react'
+import { OnlineIndicator } from '@shared/components/OnlineIndicator'
 
 interface StatusBarProps {
   editor: Editor
@@ -39,6 +40,7 @@ export function StatusBar({ editor, zoom, setZoom, lastSaved, pageCount = 1 }: S
         {savedText && (
           <span style={{ opacity: 0.7 }}>{savedText}</span>
         )}
+        <OnlineIndicator />
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>

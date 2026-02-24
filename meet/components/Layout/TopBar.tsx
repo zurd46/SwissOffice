@@ -5,11 +5,13 @@ import { useState } from 'react'
 import { Badge } from '@/components/Shared/Badge'
 import { useNotifications } from '@/lib/contexts/NotificationContext'
 import { NotificationCenter } from '@/components/Notifications/NotificationCenter'
+import { useCloud } from '@shared/contexts/CloudContext'
 
 export function TopBar() {
   const [searchQuery, setSearchQuery] = useState('')
   const [showNotifications, setShowNotifications] = useState(false)
   const { unreadCount } = useNotifications()
+  const { status: cloudStatus } = useCloud()
 
   return (
     <div className="h-12 bg-[#6264a7] flex items-center px-4 gap-3 shrink-0">
@@ -33,7 +35,16 @@ export function TopBar() {
         </div>
       </div>
 
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-2">
+        {/* Online-Indikator */}
+        <div className="flex items-center gap-1.5 text-white/70 text-xs" title={cloudStatus.isOnline && cloudStatus.isCloudReachable ? 'Verbunden' : 'Offline'}>
+          <div
+            className="w-2 h-2 rounded-full"
+            style={{ backgroundColor: cloudStatus.isOnline && cloudStatus.isCloudReachable ? '#4ade80' : '#9ca3af' }}
+          />
+          <span className="hidden sm:inline">{cloudStatus.isOnline && cloudStatus.isCloudReachable ? 'Verbunden' : 'Offline'}</span>
+        </div>
+
         <div className="relative">
           <button
             onClick={() => setShowNotifications(!showNotifications)}

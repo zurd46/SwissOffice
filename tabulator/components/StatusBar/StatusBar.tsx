@@ -8,6 +8,7 @@ import { useMemo } from 'react'
 import { Minus, Plus } from 'lucide-react'
 import { useSpreadsheet, useActiveSheet } from '@/lib/spreadsheetContext'
 import { cellAddressToString, normalizeRange, iterateRange } from '@/lib/engine/cellAddressUtils'
+import { OnlineIndicator } from '@shared/components/OnlineIndicator'
 
 interface StatusBarProps {
   zoom: number
@@ -83,8 +84,9 @@ export function StatusBar({ zoom, setZoom }: StatusBarProps) {
         )}
       </div>
 
-      {/* Rechter Bereich: Zoom */}
+      {/* Rechter Bereich: Online-Status + Zoom */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <OnlineIndicator />
         <button
           onClick={() => setZoom(Math.max(25, zoom - 10))}
           style={{ background: 'none', border: 'none', color: '#5f6368', cursor: 'pointer', display: 'flex', alignItems: 'center' }}

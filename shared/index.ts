@@ -16,6 +16,7 @@ export { CloudProvider, useCloud } from './contexts/CloudContext'
 
 // Components
 export { AuthGuard } from './components/AuthGuard'
+export { OnlineIndicator } from './components/OnlineIndicator'
 
 // Hooks
 export { useCloudStatus } from './hooks/useCloudStatus'

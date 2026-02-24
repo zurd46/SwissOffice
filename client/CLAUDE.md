@@ -1,4 +1,4 @@
-# Client — Electron Shell
+# Client — Electron Desktop-Shell
 
 Electron-Wrapper der die Next.js Writer-App als Desktop-Anwendung bereitstellt.
 
@@ -11,18 +11,19 @@ Electron-Wrapper der die Next.js Writer-App als Desktop-Anwendung bereitstellt.
 
 ## Dateien
 
-| Datei | Beschreibung |
+| Datei | Zweck |
 |---|---|
-| `main.js` | Main Process — Fenster erstellen, Next.js laden, IPC Handler |
-| `preload.js` | Context Bridge — Stellt `window.electronAPI` bereit |
-| `menu.js` | Native Menü-Definition (Datei, Bearbeiten, Format, etc.) |
-| `dev.js` | Dev-Script — Startet Next.js + Electron parallel |
+| `main.js` | Main Process — BrowserWindow erstellen, Next.js laden, IPC Handler, Datei-Dialoge |
+| `preload.js` | Context Bridge — Stellt `window.electronAPI` im Renderer bereit |
+| `menu.js` | Native Menü-Definition (Datei, Bearbeiten, Format, Ansicht, Hilfe) |
+| `dev.js` | Dev-Script — Startet Next.js Dev-Server + Electron parallel |
+| `resources/` | App-Icons: `icon.icns` (macOS), `icon.ico` (Windows), `icon.png` (Linux) |
 
 ## Sicherheitsmodell
 
 - `contextIsolation: true` — Renderer hat keinen Zugriff auf Node.js
 - `nodeIntegration: false` — Kein `require()` im Renderer
-- `sandbox: false` — Für Preload-Script Zugriff nötig
+- `sandbox: false` — Nötig für Preload-Script
 - Alle IPC-Kanäle über `contextBridge.exposeInMainWorld()`
 
 ## IPC-Pattern
@@ -30,26 +31,42 @@ Electron-Wrapper der die Next.js Writer-App als Desktop-Anwendung bereitstellt.
 ```javascript
 // preload.js — API exponieren
 contextBridge.exposeInMainWorld('electronAPI', {
-  onMenuAction: (callback) => { /* ... */ },
+  onMenuAction: (callback) => ipcRenderer.on('menu-action', (_, action) => callback(action)),
   setTitle: (title) => ipcRenderer.send('set-title', title),
+  saveFile: (data) => ipcRenderer.invoke('save-file', data),
+  openFile: () => ipcRenderer.invoke('open-file'),
   isElectron: true
 })
 
-// main.js — Nachricht an Renderer senden
-mainWindow.webContents.send('menu-action', action)
+// main.js — Handler registrieren
+ipcMain.handle('save-file', async (event, data) => { /* ... */ })
+
+// main.js — Nachricht an Renderer
+mainWindow.webContents.send('menu-action', 'save')
 ```
+
+### Neuen IPC-Kanal hinzufügen
+
+1. Handler in `main.js`: `ipcMain.handle('mein-kanal', handler)` oder `ipcMain.on('mein-kanal', handler)`
+2. In `preload.js` exponieren: `meinKanal: (...args) => ipcRenderer.invoke('mein-kanal', ...args)`
+3. In Writer aufrufen: `window.electronAPI.meinKanal(...)`
 
 ## Build-Konfiguration
 
-- **macOS:** DMG + ZIP (hardened runtime, dark mode support)
-- **Windows:** NSIS Installer + Portable
-- **Linux:** AppImage + DEB
+| Plattform | Formate | Details |
+|---|---|---|
+| macOS | DMG + ZIP | Hardened Runtime, Dark Mode, `com.impulsoffice.writer` |
+| Windows | NSIS + Portable | One-Click Install |
+| Linux | AppImage + DEB | — |
+
 - App-ID: `com.impulsoffice.writer`
 - Next.js standalone Output wird als `extraResources` eingebettet
+- Icons unter `resources/`
 
 ## Konventionen
 
-- Alle Dateien in CommonJS (`require` / `module.exports`)
-- Neue IPC-Kanäle immer in `preload.js` registrieren
-- Menü-Einträge in `menu.js` pflegen — Labels auf Deutsch
-- Keine externen URLs öffnen ohne `shell.openExternal()`
+- Alle Dateien in **CommonJS** (`require` / `module.exports`)
+- Neue IPC-Kanäle **immer** in `preload.js` registrieren
+- Menü-Einträge in `menu.js` pflegen — Labels auf **Deutsch**
+- Keine externen URLs ohne `shell.openExternal()`
+- Kein direkter Node.js-Zugriff aus dem Renderer
