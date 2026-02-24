@@ -28,9 +28,13 @@ export function TableGridPicker({ onInsert, onClose }: TableGridPickerProps) {
   return (
     <div
       ref={ref}
-      className="absolute top-full left-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg p-3 z-50"
+      className="absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-white border border-[#d2d0ce] rounded shadow-[0_4px_16px_rgba(0,0,0,0.12)] p-3 z-50"
     >
-      <div className="grid gap-0.5" style={{ gridTemplateColumns: `repeat(${MAX_COLS}, 1fr)` }}>
+      <div
+        className="grid gap-[3px]"
+        style={{ gridTemplateColumns: `repeat(${MAX_COLS}, 1fr)` }}
+        onMouseLeave={() => { setHoveredRow(0); setHoveredCol(0) }}
+      >
         {Array.from({ length: MAX_ROWS }).map((_, row) =>
           Array.from({ length: MAX_COLS }).map((_, col) => (
             <div
@@ -38,19 +42,19 @@ export function TableGridPicker({ onInsert, onClose }: TableGridPickerProps) {
               onMouseEnter={() => { setHoveredRow(row + 1); setHoveredCol(col + 1) }}
               onClick={() => { onInsert(row + 1, col + 1); onClose() }}
               className={`
-                w-5 h-5 border cursor-pointer transition-colors duration-75
+                w-[18px] h-[18px] border rounded-[2px] cursor-pointer transition-all duration-75
                 ${row < hoveredRow && col < hoveredCol
-                  ? 'bg-blue-200 border-blue-400'
-                  : 'bg-white border-gray-300 hover:border-gray-400'
+                  ? 'bg-[#c7e0f4] border-[#0078d4]'
+                  : 'bg-[#fafafa] border-[#d2d0ce] hover:border-[#a19f9d]'
                 }
               `}
             />
           ))
         )}
       </div>
-      <div className="text-center text-xs text-gray-600 mt-2">
+      <div className="text-center text-[11px] text-[#605e5c] mt-2 font-medium">
         {hoveredRow > 0 && hoveredCol > 0
-          ? `${hoveredCol} × ${hoveredRow} Tabelle`
+          ? `${hoveredCol} x ${hoveredRow} Tabelle`
           : 'Tabelle einfügen'
         }
       </div>

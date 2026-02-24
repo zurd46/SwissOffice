@@ -1,6 +1,7 @@
 'use client'
 
-import { ReactNode } from 'react'
+import { ReactNode, useRef } from 'react'
+import { Type, Highlighter } from 'lucide-react'
 
 interface ToolbarButtonProps {
   onClick: () => void
@@ -18,9 +19,12 @@ export function ToolbarButton({ onClick, isActive, disabled, title, children, cl
       disabled={disabled}
       title={title}
       className={`
-        p-1.5 rounded hover:bg-blue-100 transition-colors duration-150
-        ${isActive ? 'bg-blue-200 text-blue-800' : 'text-gray-700'}
-        ${disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}
+        w-7 h-7 flex items-center justify-center rounded-sm transition-all duration-100
+        ${isActive
+          ? 'bg-[#c7e0f4] text-[#1a5276] shadow-[inset_0_0_0_1px_rgba(26,82,118,0.25)]'
+          : 'text-[#323130] hover:bg-[#e1dfdd]'
+        }
+        ${disabled ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer active:bg-[#c8c6c4]'}
         ${className}
       `}
     >
@@ -43,7 +47,12 @@ export function ToolbarSelect({ value, onChange, options, title, className = '' 
       value={value}
       onChange={(e) => onChange(e.target.value)}
       title={title}
-      className={`h-8 px-2 text-sm border border-gray-300 rounded bg-white hover:border-blue-400 focus:outline-none focus:border-blue-500 ${className}`}
+      className={`
+        h-[26px] px-2 text-[12px] border border-[#c8c6c4] rounded-sm bg-white
+        hover:border-[#0078d4] focus:outline-none focus:border-[#0078d4] focus:shadow-[0_0_0_1px_rgba(0,120,212,0.3)]
+        text-[#323130] cursor-pointer transition-all duration-100
+        ${className}
+      `}
     >
       {options.map(opt => (
         <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -53,24 +62,35 @@ export function ToolbarSelect({ value, onChange, options, title, className = '' 
 }
 
 export function ToolbarDivider() {
-  return <div className="w-px h-6 bg-gray-300 mx-1" />
+  return <div className="w-px h-6 bg-[#d2d0ce] mx-1" />
 }
 
-interface ToolbarColorInputProps {
+interface ToolbarColorButtonProps {
   value: string
   onChange: (color: string) => void
   title: string
+  icon: 'text' | 'highlight'
 }
 
-export function ToolbarColorInput({ value, onChange, title }: ToolbarColorInputProps) {
+export function ToolbarColorButton({ value, onChange, title, icon }: ToolbarColorButtonProps) {
+  const inputRef = useRef<HTMLInputElement>(null)
   return (
-    <input
-      type="color"
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
+    <button
+      onClick={() => inputRef.current?.click()}
       title={title}
-      className="w-8 h-8 p-0.5 border border-gray-300 rounded cursor-pointer"
-    />
+      className="w-7 h-7 flex flex-col items-center justify-center rounded-sm hover:bg-[#e1dfdd] cursor-pointer transition-all duration-100 relative"
+    >
+      {icon === 'text' ? <Type size={14} className="text-[#323130]" /> : <Highlighter size={14} className="text-[#323130]" />}
+      <div className="w-4 h-[3px] rounded-full mt-px" style={{ backgroundColor: value }} />
+      <input
+        ref={inputRef}
+        type="color"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
+        tabIndex={-1}
+      />
+    </button>
   )
 }
 
@@ -89,13 +109,16 @@ export function RibbonLargeButton({ onClick, icon, label, disabled, isActive }: 
       disabled={disabled}
       title={label}
       className={`
-        flex flex-col items-center gap-1 px-3 py-1.5 rounded hover:bg-blue-50 transition-colors duration-150
-        text-[11px] leading-tight min-w-[56px]
-        ${isActive ? 'bg-blue-100 text-blue-800' : 'text-gray-700'}
-        ${disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}
+        flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-sm transition-all duration-100
+        text-[11px] leading-tight min-w-[60px]
+        ${isActive
+          ? 'bg-[#c7e0f4] text-[#1a5276]'
+          : 'text-[#323130] hover:bg-[#e1dfdd]'
+        }
+        ${disabled ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer active:bg-[#c8c6c4]'}
       `}
     >
-      {icon}
+      <div className="h-6 flex items-center justify-center">{icon}</div>
       <span className="whitespace-nowrap">{label}</span>
     </button>
   )

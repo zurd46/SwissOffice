@@ -8,7 +8,7 @@ interface RibbonPanelProps {
 
 export function RibbonPanel({ children }: RibbonPanelProps) {
   return (
-    <div className="bg-white border-t border-gray-300 px-1 py-1 flex items-stretch min-h-[90px]">
+    <div className="ribbon-panel bg-white border-t border-[#d2d0ce] px-2 py-[6px] flex items-stretch min-h-[94px] shadow-[0_1px_3px_rgba(0,0,0,0.08)]">
       {children}
     </div>
   )

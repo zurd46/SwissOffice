@@ -57,7 +57,7 @@ export function TabEinfuegen({ editor }: TabEinfuegenProps) {
       <RibbonGroup label="Seiten">
         <RibbonLargeButton
           onClick={() => editor.chain().focus().setPageBreak().run()}
-          icon={<FileDown size={24} />}
+          icon={<FileDown size={22} className="text-[#0078d4]" />}
           label="Seitenumbruch"
         />
       </RibbonGroup>
@@ -67,7 +67,7 @@ export function TabEinfuegen({ editor }: TabEinfuegenProps) {
         <div className="relative">
           <RibbonLargeButton
             onClick={() => setShowTablePicker(!showTablePicker)}
-            icon={<Table size={24} />}
+            icon={<Table size={22} className="text-[#0078d4]" />}
             label="Tabelle"
           />
           {showTablePicker && (
@@ -81,23 +81,25 @@ export function TabEinfuegen({ editor }: TabEinfuegenProps) {
 
       {/* Medien (Media) */}
       <RibbonGroup label="Medien">
-        <RibbonLargeButton
-          onClick={insertImageFromFile}
-          icon={<FileImage size={24} />}
-          label="Bild"
-        />
-        <RibbonLargeButton
-          onClick={insertImageFromUrl}
-          icon={<ImagePlus size={24} />}
-          label="Bild-URL"
-        />
+        <div className="flex items-center gap-1">
+          <RibbonLargeButton
+            onClick={insertImageFromFile}
+            icon={<FileImage size={22} className="text-[#107c10]" />}
+            label="Bild"
+          />
+          <RibbonLargeButton
+            onClick={insertImageFromUrl}
+            icon={<ImagePlus size={22} className="text-[#107c10]" />}
+            label="Bild-URL"
+          />
+        </div>
       </RibbonGroup>
 
       {/* Links */}
       <RibbonGroup label="Links">
         <RibbonLargeButton
           onClick={insertLink}
-          icon={<Link size={24} />}
+          icon={<Link size={22} className="text-[#0078d4]" />}
           label="Hyperlink"
           isActive={editor.isActive('link')}
         />
@@ -107,7 +109,7 @@ export function TabEinfuegen({ editor }: TabEinfuegenProps) {
       <RibbonGroupLast label="Elemente">
         <RibbonLargeButton
           onClick={() => editor.chain().focus().setHorizontalRule().run()}
-          icon={<Minus size={24} />}
+          icon={<Minus size={22} className="text-[#605e5c]" />}
           label="Linie"
         />
       </RibbonGroupLast>
