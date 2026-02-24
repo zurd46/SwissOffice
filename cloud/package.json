@@ -1,0 +1,32 @@
+{
+  "name": "impulscloud",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun run --hot src/index.ts",
+    "start": "bun run src/index.ts",
+    "lint": "tsc --noEmit",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "bun run src/db/migrate.ts",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio",
+    "docker:build": "docker compose build",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down"
+  },
+  "dependencies": {
+    "hono": "^4",
+    "@hono/zod-validator": "^0.4",
+    "drizzle-orm": "^0.36",
+    "better-sqlite3": "^11",
+    "zod": "^3.23",
+    "jose": "^5"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7",
+    "drizzle-kit": "^0.28",
+    "typescript": "^5",
+    "@types/bun": "latest"
+  }
+}
