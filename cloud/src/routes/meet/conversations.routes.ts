@@ -1,5 +1,5 @@
 import { Hono } from 'hono'
-import { db } from '../../db'
+import { db } from '../../db/client'
 import { conversations, conversationMembers, messages } from '../../db/schema'
 import { eq, desc } from 'drizzle-orm'
 
