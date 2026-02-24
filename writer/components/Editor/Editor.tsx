@@ -769,6 +769,25 @@ function WriterEditorInner() {
           onClose={() => setShowVersionHistory(false)}
         />
       )}
+
+      {/* Cloud Save Dialog */}
+      {showCloudSave && (
+        <CloudSaveDialog
+          documentTitle={documentName}
+          documentContent={editor.getJSON() as Record<string, unknown>}
+          existingCloudId={cloudDocumentId}
+          onSaved={handleCloudSaved}
+          onClose={() => setShowCloudSave(false)}
+        />
+      )}
+
+      {/* Cloud Open Dialog */}
+      {showCloudOpen && (
+        <CloudOpenDialog
+          onOpen={handleCloudOpen}
+          onClose={() => setShowCloudOpen(false)}
+        />
+      )}
     </div>
   )
 }

@@ -14,9 +14,11 @@ import type {
   AIProvider,
   AIOperationOptions,
   AIOperationResult,
+  OCRImportResult,
 } from './types'
 import { DEFAULT_AI_SETTINGS } from './types'
 import { createAIProvider } from './AIService'
+import { processFileForOCR } from './ocrImport'
 
 interface AIContextValue {
   settings: AISettings
@@ -30,6 +32,9 @@ interface AIContextValue {
 
   performOperation: (options: AIOperationOptions) => Promise<AIOperationResult>
   isOperationLoading: boolean
+
+  performOCRImport: (file: File) => Promise<OCRImportResult>
+  isOCRLoading: boolean
 
   showSettingsDialog: boolean
   setShowSettingsDialog: (show: boolean) => void
@@ -64,6 +69,7 @@ export function AIContextProvider({ children }: AIProviderWrapperProps) {
   const [chatMessages, setChatMessages] = useState<AIMessage[]>([])
   const [isChatLoading, setIsChatLoading] = useState(false)
   const [isOperationLoading, setIsOperationLoading] = useState(false)
+  const [isOCRLoading, setIsOCRLoading] = useState(false)
   const [showSettingsDialog, setShowSettingsDialog] = useState(false)
   const providerRef = useRef<AIProvider | null>(null)
 
@@ -157,6 +163,25 @@ export function AIContextProvider({ children }: AIProviderWrapperProps) {
     [getProvider],
   )
 
+  const performOCRImport = useCallback(
+    async (file: File): Promise<OCRImportResult> => {
+      if (!settings.apiKey) {
+        return { success: false, html: '', error: 'API-Schlüssel nicht konfiguriert.' }
+      }
+      setIsOCRLoading(true)
+      try {
+        return await processFileForOCR(file, settings)
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : 'Unbekannter Fehler'
+        return { success: false, html: '', error: message }
+      } finally {
+        setIsOCRLoading(false)
+      }
+    },
+    [settings],
+  )
+
   return (
     <AIContext.Provider
       value={{
@@ -169,6 +194,8 @@ export function AIContextProvider({ children }: AIProviderWrapperProps) {
         isChatLoading,
         performOperation,
         isOperationLoading,
+        performOCRImport,
+        isOCRLoading,
         showSettingsDialog,
         setShowSettingsDialog,
       }}

@@ -10,6 +10,7 @@ import {
   MessageSquare,
   Settings,
   Loader2,
+  ScanText,
 } from 'lucide-react'
 import { RibbonLargeButton } from '../../ToolbarButton'
 import { ToolbarSelect } from '../../ToolbarButton'

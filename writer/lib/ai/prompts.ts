@@ -24,6 +24,17 @@ export const SYSTEM_PROMPTS = {
     `Bewahre den Stil, Ton und die Formatierung des Originals. ` +
     `Gib NUR die Übersetzung zurück, ohne Erklärungen.`,
 
+  ocr: (documentLanguage: string) =>
+    `Du bist ein professioneller OCR-Spezialist. Extrahiere den gesamten sichtbaren Text aus den bereitgestellten Bildern. ` +
+    `Gib das Ergebnis als sauberes, gut formatiertes HTML zurück. ` +
+    `Verwende semantische HTML-Tags: <h1>-<h6> für Überschriften, <p> für Absätze, ` +
+    `<strong> für fetten Text, <em> für kursiven Text, <ul>/<ol>/<li> für Listen, ` +
+    `<table>/<tr>/<td>/<th> für Tabellen. ` +
+    `Bewahre die Struktur und Hierarchie des Originaldokuments so genau wie möglich. ` +
+    `Die Dokumentsprache ist ${documentLanguage}. ` +
+    `Gib NUR das HTML zurück, ohne Code-Blöcke, ohne Erklärungen, ohne Markdown-Formatierung. ` +
+    `Beginne direkt mit dem HTML-Inhalt.`,
+
   chat: (documentContent?: string) => {
     const base =
       `Du bist ein hilfreicher AI-Assistent in einer Textverarbeitung (ImpulsWriter). ` +

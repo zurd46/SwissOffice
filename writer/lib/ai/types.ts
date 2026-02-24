@@ -59,6 +59,13 @@ export const DEFAULT_AI_SETTINGS: AISettings = {
   documentLanguage: 'Deutsch',
 }
 
+export interface OCRImportResult {
+  success: boolean
+  html: string
+  error?: string
+  pageCount?: number
+}
+
 export const SUPPORTED_LANGUAGES = [
   { label: 'Deutsch', value: 'Deutsch' },
   { label: 'Englisch', value: 'Englisch' },
