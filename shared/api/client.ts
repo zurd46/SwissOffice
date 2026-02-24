@@ -1,16 +1,9 @@
 // Shared API-Client mit automatischer Auth-Token-Injection und Refresh-Logik
 
 import { getAccessToken, getRefreshToken, setTokens, clearTokens, isTokenExpired } from './tokenManager'
-import type { ApiResponse, RefreshResponse } from './types'
+import type { ApiResponse, ApiClient, RefreshResponse } from './types'
 
-export interface ApiClient {
-  get: <T>(path: string) => Promise<ApiResponse<T>>
-  post: <T>(path: string, body?: unknown) => Promise<ApiResponse<T>>
-  put: <T>(path: string, body?: unknown) => Promise<ApiResponse<T>>
-  delete: <T>(path: string) => Promise<ApiResponse<T>>
-  upload: <T>(path: string, formData: FormData) => Promise<ApiResponse<T>>
-  baseUrl: string
-}
+export type { ApiClient }
 
 let isRefreshing = false
 let refreshPromise: Promise<boolean> | null = null

@@ -11,6 +11,15 @@ export interface ApiError {
   message: string
 }
 
+export interface ApiClient {
+  get: <T>(path: string) => Promise<ApiResponse<T>>
+  post: <T>(path: string, body?: unknown) => Promise<ApiResponse<T>>
+  put: <T>(path: string, body?: unknown) => Promise<ApiResponse<T>>
+  delete: <T>(path: string) => Promise<ApiResponse<T>>
+  upload: <T>(path: string, formData: FormData) => Promise<ApiResponse<T>>
+  baseUrl: string
+}
+
 export interface AuthUser {
   id: string
   email: string

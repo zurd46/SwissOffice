@@ -1,0 +1,9 @@
+{
+  "name": "@impuls/shared",
+  "version": "0.0.1",
+  "private": true,
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "react": "^19.0.0"
+  }
+}

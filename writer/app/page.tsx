@@ -1,5 +1,5 @@
-import { WriterEditor } from '../components/Editor/Editor'
+import { WriterClientPage } from './WriterClientPage'
 
 export default function Home() {
-  return <WriterEditor />
+  return <WriterClientPage />
 }
