@@ -15,12 +15,29 @@ import { calendars } from './tables/calendars'
 import { events } from './tables/events'
 import { eventAttendees } from './tables/eventAttendees'
 import { eventReminders } from './tables/eventReminders'
+// Meet-Tabellen
+import { conversations } from './tables/conversations'
+import { conversationMembers } from './tables/conversationMembers'
+import { messages } from './tables/messages'
+import { attachments } from './tables/attachments'
+import { reactions } from './tables/reactions'
+import { teams } from './tables/teams'
+import { teamMembers } from './tables/teamMembers'
+import { channels } from './tables/channels'
+import { channelMembers } from './tables/channelMembers'
+import { calls } from './tables/calls'
+import { meetings } from './tables/meetings'
+import { userStatus } from './tables/userStatus'
 
 export {
   users, documents, documentVersions, shares, refreshTokens,
   emailAccounts, emailFolders, emails, emailAttachments,
   contacts, contactGroups, contactGroupMembers,
   calendars, events, eventAttendees, eventReminders,
+  // Meet
+  conversations, conversationMembers, messages, attachments, reactions,
+  teams, teamMembers, channels, channelMembers,
+  calls, meetings, userStatus,
 }
 
 // ── Users Relations ──

@@ -157,7 +157,7 @@ export function TeamsPage() {
 
       {/* Channel Content */}
       {activeChannel ? (
-        <ChannelView channel={activeChannel} />
+        <ChannelView key={activeChannel.id} channel={activeChannel} />
       ) : (
         <div className="flex-1 flex items-center justify-center bg-[#f5f5f5]">
           <EmptyState

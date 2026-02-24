@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { Phone, Video, PhoneIncoming, PhoneMissed, PhoneOutgoing, Clock, Plus } from 'lucide-react'
 import { Avatar } from '@/components/Shared/Avatar'
 import { Tabs } from '@/components/Shared/Tabs'
@@ -78,9 +78,9 @@ export function CallsPage() {
     !searchQuery || call.displayName.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
-  const handleStartCall = (type: 'audio' | 'video', name: string) => {
+  const handleStartCall = useCallback((type: 'audio' | 'video') => {
     startCall({
-      id: `call-${Date.now()}`,
+      id: `call-${crypto.randomUUID()}`,
       type,
       status: 'active',
       initiatorId: 'user-1',
@@ -93,7 +93,7 @@ export function CallsPage() {
       }],
       startedAt: new Date().toISOString(),
     })
-  }
+  }, [startCall])
 
   return (
     <div className="flex h-full">
@@ -146,7 +146,7 @@ export function CallsPage() {
                   <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <Tooltip content="Audioanruf">
                       <button
-                        onClick={() => handleStartCall('audio', call.displayName)}
+                        onClick={() => handleStartCall('audio')}
                         className="w-8 h-8 flex items-center justify-center rounded hover:bg-[#e8e6e4] text-[#605e5c]"
                       >
                         <Phone size={16} />
@@ -154,7 +154,7 @@ export function CallsPage() {
                     </Tooltip>
                     <Tooltip content="Videoanruf">
                       <button
-                        onClick={() => handleStartCall('video', call.displayName)}
+                        onClick={() => handleStartCall('video')}
                         className="w-8 h-8 flex items-center justify-center rounded hover:bg-[#e8e6e4] text-[#605e5c]"
                       >
                         <Video size={16} />
@@ -195,14 +195,14 @@ export function CallsPage() {
           </p>
           <div className="flex gap-3 justify-center">
             <button
-              onClick={() => handleStartCall('audio', 'Neuer Anruf')}
+              onClick={() => handleStartCall('audio')}
               className="flex items-center gap-2 px-4 py-2 bg-white border border-[#8a8886] rounded text-sm hover:bg-[#f3f2f1] transition-colors"
             >
               <Phone size={16} />
               Audioanruf
             </button>
             <button
-              onClick={() => handleStartCall('video', 'Neuer Anruf')}
+              onClick={() => handleStartCall('video')}
               className="flex items-center gap-2 px-4 py-2 bg-[#0078d4] text-white rounded text-sm hover:bg-[#106ebe] transition-colors"
             >
               <Video size={16} />

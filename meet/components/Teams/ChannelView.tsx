@@ -68,13 +68,9 @@ const channelMessages: Map<string, Message[]> = new Map([
 
 export function ChannelView({ channel }: ChannelViewProps) {
   const { currentUser } = useAuth()
-  const [messages, setMessages] = useState<Message[]>(channelMessages.get(channel.id) ?? [])
+  const [messages, setMessages] = useState<Message[]>(() => channelMessages.get(channel.id) ?? [])
   const [replyTo, setReplyTo] = useState<Message | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    setMessages(channelMessages.get(channel.id) ?? [])
-  }, [channel.id])
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })

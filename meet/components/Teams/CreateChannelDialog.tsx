@@ -9,7 +9,8 @@ interface CreateChannelDialogProps {
   onClose: () => void
 }
 
-export function CreateChannelDialog({ teamId: _teamId, onClose }: CreateChannelDialogProps) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function CreateChannelDialog({ teamId, onClose }: CreateChannelDialogProps) {
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
   const [type, setType] = useState<ChannelType>('public')

@@ -6,6 +6,7 @@ import { shareRoutes } from './shares.routes'
 import { emailRoutes } from './email.routes'
 import { contactRoutes } from './contacts.routes'
 import { calendarRoutes, eventRoutes } from './calendars.routes'
+import { meetRoutes } from './meet'
 
 export const routes = new Hono()
 
@@ -18,3 +19,5 @@ routes.route('/email', emailRoutes)
 routes.route('/contacts', contactRoutes)
 routes.route('/calendars', calendarRoutes)
 routes.route('/events', eventRoutes)
+// Meet — Chat, Teams, Channels, Calls
+routes.route('/meet', meetRoutes)
