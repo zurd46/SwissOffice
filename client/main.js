@@ -17,7 +17,7 @@ function createWindow() {
     minHeight: 600,
     title: 'ImpulsOffice Writer',
     titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'default',
-    trafficLightPosition: { x: 15, y: 15 },
+    trafficLightPosition: { x: 16, y: 8 },
     backgroundColor: '#f3f4f6',
     show: false,
     webPreferences: {
@@ -40,7 +40,7 @@ function createWindow() {
 
   if (isDev) {
     mainWindow.loadURL(DEV_URL)
-    mainWindow.webContents.openDevTools({ mode: 'detach' })
+    // mainWindow.webContents.openDevTools({ mode: 'detach' })
   } else {
     startNextServer()
   }

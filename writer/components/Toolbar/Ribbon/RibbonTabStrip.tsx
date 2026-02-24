@@ -1,5 +1,7 @@
 'use client'
 
+import React from 'react'
+
 const RIBBON_TABS = [
   { id: 'start', label: 'Start' },
   { id: 'einfuegen', label: 'Einfügen' },
@@ -15,7 +17,17 @@ interface RibbonTabStripProps {
 
 export function RibbonTabStrip({ activeTab, onTabChange, isElectron }: RibbonTabStripProps) {
   return (
-    <div style={{ display: 'flex', alignItems: 'flex-end', paddingLeft: isElectron ? 80 : 16, gap: 2, backgroundColor: '#f3f3f3' }}>
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'flex-end',
+        paddingLeft: isElectron ? 80 : 16,
+        gap: 2,
+        backgroundColor: '#f3f3f3',
+        // Make the tab strip area draggable on macOS Electron (window drag)
+        ...(isElectron ? { WebkitAppRegion: 'drag' } as React.CSSProperties : {}),
+      }}
+    >
       {RIBBON_TABS.map(tab => (
         <button
           key={tab.id}
@@ -29,6 +41,8 @@ export function RibbonTabStrip({ activeTab, onTabChange, isElectron }: RibbonTab
             position: 'relative',
             userSelect: 'none',
             cursor: 'pointer',
+            // Buttons must be no-drag so they remain clickable
+            ...(isElectron ? { WebkitAppRegion: 'no-drag' } as React.CSSProperties : {}),
             ...(activeTab === tab.id
               ? {
                   backgroundColor: 'white',

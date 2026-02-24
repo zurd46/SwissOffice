@@ -84,12 +84,14 @@ export function TabStart({ editor, onToggleFindReplace }: TabStartProps) {
     }
   }, [editor])
 
+  const dividerStyle = { width: 1, height: 16, backgroundColor: '#e1dfdd', margin: '0 4px', flexShrink: 0 } as const
+
   return (
     <>
       {/* Zwischenablage */}
       <RibbonGroup label="Zwischenablage">
-        <div className="flex flex-col gap-[3px]">
-          <div className="flex items-center gap-[1px]">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <ToolbarButton onClick={() => editor.chain().focus().undo().run()} title="Rückgängig (Ctrl+Z)" disabled={!editor.can().undo()}>
               <Undo2 size={14} />
             </ToolbarButton>
@@ -97,7 +99,7 @@ export function TabStart({ editor, onToggleFindReplace }: TabStartProps) {
               <Redo2 size={14} />
             </ToolbarButton>
           </div>
-          <div className="flex items-center gap-[1px]">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <ToolbarButton onClick={handleCut} title="Ausschneiden (Ctrl+X)">
               <Scissors size={14} />
             </ToolbarButton>
@@ -113,8 +115,8 @@ export function TabStart({ editor, onToggleFindReplace }: TabStartProps) {
 
       {/* Schriftart */}
       <RibbonGroup label="Schriftart">
-        <div className="flex flex-col gap-[3px]">
-          <div className="flex items-center gap-[3px]">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
             <ToolbarSelect
               value={getCurrentFontFamily()}
               onChange={(v) => editor.chain().focus().setFontFamily(v).run()}
@@ -136,7 +138,7 @@ export function TabStart({ editor, onToggleFindReplace }: TabStartProps) {
               <AArrowDown size={14} />
             </ToolbarButton>
           </div>
-          <div className="flex items-center gap-[1px]">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <ToolbarButton onClick={() => editor.chain().focus().toggleBold().run()} isActive={editor.isActive('bold')} title="Fett (Ctrl+B)">
               <Bold size={14} />
             </ToolbarButton>
@@ -155,7 +157,7 @@ export function TabStart({ editor, onToggleFindReplace }: TabStartProps) {
             <ToolbarButton onClick={() => editor.chain().focus().toggleSuperscript().run()} isActive={editor.isActive('superscript')} title="Hochgestellt">
               <Superscript size={14} />
             </ToolbarButton>
-            <div className="w-px h-4 bg-[#e1dfdd] mx-[3px]" />
+            <div style={dividerStyle} />
             <ToolbarColorButton
               value={textColor}
               onChange={(color) => { setTextColor(color); editor.chain().focus().setColor(color).run() }}
@@ -168,7 +170,7 @@ export function TabStart({ editor, onToggleFindReplace }: TabStartProps) {
               title="Hervorhebungsfarbe"
               icon="highlight"
             />
-            <div className="w-px h-4 bg-[#e1dfdd] mx-[3px]" />
+            <div style={dividerStyle} />
             <ToolbarButton onClick={() => editor.chain().focus().unsetAllMarks().run()} title="Formatierung entfernen">
               <RemoveFormatting size={14} />
             </ToolbarButton>
@@ -178,8 +180,8 @@ export function TabStart({ editor, onToggleFindReplace }: TabStartProps) {
 
       {/* Absatz */}
       <RibbonGroup label="Absatz">
-        <div className="flex flex-col gap-[3px]">
-          <div className="flex items-center gap-[3px]">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
             <ToolbarButton onClick={() => editor.chain().focus().toggleBulletList().run()} isActive={editor.isActive('bulletList')} title="Aufzählung">
               <List size={14} />
             </ToolbarButton>
@@ -189,14 +191,14 @@ export function TabStart({ editor, onToggleFindReplace }: TabStartProps) {
             <ToolbarButton onClick={() => editor.chain().focus().toggleTaskList().run()} isActive={editor.isActive('taskList')} title="Aufgabenliste">
               <ListChecks size={14} />
             </ToolbarButton>
-            <div className="w-px h-4 bg-[#e1dfdd] mx-[3px]" />
+            <div style={dividerStyle} />
             <ToolbarButton onClick={() => editor.chain().focus().liftListItem('listItem').run()} title="Einzug verkleinern" disabled={!editor.can().liftListItem('listItem')}>
               <Outdent size={14} />
             </ToolbarButton>
             <ToolbarButton onClick={() => editor.chain().focus().sinkListItem('listItem').run()} title="Einzug vergrössern" disabled={!editor.can().sinkListItem('listItem')}>
               <Indent size={14} />
             </ToolbarButton>
-            <div className="w-px h-4 bg-[#e1dfdd] mx-[3px]" />
+            <div style={dividerStyle} />
             <ToolbarSelect
               value="1.5"
               onChange={(v) => editor.chain().focus().setLineHeight(v).run()}
@@ -205,7 +207,7 @@ export function TabStart({ editor, onToggleFindReplace }: TabStartProps) {
               className="w-[44px]"
             />
           </div>
-          <div className="flex items-center gap-[1px]">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <ToolbarButton onClick={() => editor.chain().focus().setTextAlign('left').run()} isActive={editor.isActive({ textAlign: 'left' })} title="Linksbündig">
               <AlignLeft size={14} />
             </ToolbarButton>
@@ -218,7 +220,7 @@ export function TabStart({ editor, onToggleFindReplace }: TabStartProps) {
             <ToolbarButton onClick={() => editor.chain().focus().setTextAlign('justify').run()} isActive={editor.isActive({ textAlign: 'justify' })} title="Blocksatz">
               <AlignJustify size={14} />
             </ToolbarButton>
-            <div className="w-px h-4 bg-[#e1dfdd] mx-[3px]" />
+            <div style={dividerStyle} />
             <ToolbarButton onClick={() => editor.chain().focus().toggleBlockquote().run()} isActive={editor.isActive('blockquote')} title="Blockzitat">
               <Quote size={14} />
             </ToolbarButton>
@@ -228,7 +230,7 @@ export function TabStart({ editor, onToggleFindReplace }: TabStartProps) {
 
       {/* Formatvorlagen */}
       <RibbonGroupLast label="Formatvorlagen">
-        <div className="flex flex-col gap-[3px]">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
           <ToolbarSelect
             value={getCurrentHeading()}
             onChange={handleHeadingChange}
@@ -239,9 +241,24 @@ export function TabStart({ editor, onToggleFindReplace }: TabStartProps) {
           <button
             onClick={onToggleFindReplace}
             title="Suchen & Ersetzen (Ctrl+H)"
-            className="flex items-center gap-[4px] h-[26px] px-[6px] rounded-sm text-[11px] text-[#323130] hover:bg-[#e1dfdd] transition-all duration-100 cursor-pointer"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
+              height: 26,
+              padding: '0 6px',
+              borderRadius: 2,
+              fontSize: 11,
+              color: '#323130',
+              backgroundColor: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              transition: 'all 0.1s',
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#e1dfdd' }}
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent' }}
           >
-            <Search size={13} className="text-[#605e5c]" />
+            <Search size={13} style={{ color: '#605e5c' }} />
             <span>Suchen & Ersetzen</span>
           </button>
         </div>

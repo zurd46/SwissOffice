@@ -227,7 +227,7 @@ export function WriterEditor() {
   }
 
   return (
-    <div className={`h-screen flex flex-col bg-gray-100 overflow-hidden ${isElectron && window.electronAPI?.isElectron ? 'pt-8' : ''}`}>
+    <div className="h-screen flex flex-col bg-gray-100 overflow-hidden">
       {/* Menu Bar - hidden in Electron (native menu takes over) */}
       {!isElectron && (
         <MenuBar
@@ -238,12 +238,6 @@ export function WriterEditor() {
           onToggleSidebar={toggleSidebar}
         />
       )}
-      {/* Electron: draggable title area */}
-      {isElectron && (
-        <div className="h-8 bg-white border-b border-gray-200 flex items-center justify-center fixed top-0 left-0 right-0 z-50" style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}>
-          <span className="text-xs text-gray-500 font-medium">{documentName} - ImpulsOffice Writer</span>
-        </div>
-      )}
 
       {/* Toolbar / Ribbon */}
       <RibbonToolbar
@@ -253,6 +247,7 @@ export function WriterEditor() {
         showSidebar={showSidebar}
         zoom={zoom}
         setZoom={setZoom}
+        isElectron={isElectron}
       />
 
       {/* Find & Replace */}
