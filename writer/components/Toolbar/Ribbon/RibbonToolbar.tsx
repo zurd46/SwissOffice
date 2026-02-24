@@ -31,7 +31,7 @@ export function RibbonToolbar({
   const [activeTab, setActiveTab] = useState('start')
 
   return (
-    <div className="bg-[#f3f3f3] select-none">
+    <div style={{ backgroundColor: '#f3f3f3', userSelect: 'none' }}>
       <RibbonTabStrip activeTab={activeTab} onTabChange={setActiveTab} isElectron={isElectron} />
       <RibbonPanel>
         {activeTab === 'start' && (
