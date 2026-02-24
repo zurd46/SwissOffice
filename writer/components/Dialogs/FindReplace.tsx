@@ -2,7 +2,7 @@
 
 import { Editor } from '@tiptap/react'
 import { useState, useCallback } from 'react'
-import { X, Search, Replace, ChevronDown, ChevronUp } from 'lucide-react'
+import { X, Search, Replace, ChevronDown, ChevronUp, CaseSensitive, WholeWord } from 'lucide-react'
 
 interface FindReplaceProps {
   editor: Editor
@@ -14,6 +14,8 @@ export function FindReplace({ editor, onClose }: FindReplaceProps) {
   const [replaceTerm, setReplaceTerm] = useState('')
   const [matchCount, setMatchCount] = useState(0)
   const [currentMatch, setCurrentMatch] = useState(0)
+  const [caseSensitive, setCaseSensitive] = useState(false)
+  const [wholeWord, setWholeWord] = useState(false)
 
   const findMatches = useCallback(() => {
     if (!searchTerm) {
@@ -24,25 +26,37 @@ export function FindReplace({ editor, onClose }: FindReplaceProps) {
 
     const doc = editor.state.doc
     const matches: { from: number; to: number }[] = []
-    const searchLower = searchTerm.toLowerCase()
 
     doc.descendants((node, pos) => {
       if (node.isText && node.text) {
-        const text = node.text.toLowerCase()
-        let index = text.indexOf(searchLower)
+        const text = caseSensitive ? node.text : node.text.toLowerCase()
+        const search = caseSensitive ? searchTerm : searchTerm.toLowerCase()
+
+        let index = text.indexOf(search)
         while (index !== -1) {
-          matches.push({
-            from: pos + index,
-            to: pos + index + searchTerm.length,
-          })
-          index = text.indexOf(searchLower, index + 1)
+          const from = pos + index
+          const to = from + searchTerm.length
+
+          if (wholeWord) {
+            const beforeChar = index > 0 ? node.text![index - 1] : ' '
+            const afterChar = index + searchTerm.length < node.text!.length ? node.text![index + searchTerm.length] : ' '
+            const isWordBoundaryBefore = /\W/.test(beforeChar)
+            const isWordBoundaryAfter = /\W/.test(afterChar)
+            if (isWordBoundaryBefore && isWordBoundaryAfter) {
+              matches.push({ from, to })
+            }
+          } else {
+            matches.push({ from, to })
+          }
+
+          index = text.indexOf(search, index + 1)
         }
       }
     })
 
     setMatchCount(matches.length)
     return matches
-  }, [editor, searchTerm])
+  }, [editor, searchTerm, caseSensitive, wholeWord])
 
   const findNext = useCallback(() => {
     const matches = findMatches()
@@ -82,7 +96,6 @@ export function FindReplace({ editor, onClose }: FindReplaceProps) {
     const matches = findMatches()
     if (matches.length === 0) return
 
-    // Single transaction so "Alle ersetzen" is one undo step
     const { tr } = editor.state
     const sortedMatches = [...matches].sort((a, b) => b.from - a.from)
 
@@ -95,11 +108,50 @@ export function FindReplace({ editor, onClose }: FindReplaceProps) {
     setCurrentMatch(0)
   }, [editor, findMatches, replaceTerm])
 
+  const toggleBtnStyle = (active: boolean): React.CSSProperties => ({
+    padding: 4,
+    borderRadius: 3,
+    border: active ? '1px solid #0078d4' : '1px solid transparent',
+    backgroundColor: active ? '#e0f0ff' : 'transparent',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: active ? '#0078d4' : '#999',
+  })
+
+  const inputStyle: React.CSSProperties = {
+    border: '1px solid #c8c6c4',
+    borderRadius: 4,
+    padding: '4px 8px',
+    fontSize: 13,
+    width: 192,
+    outline: 'none',
+  }
+
+  const btnStyle: React.CSSProperties = {
+    padding: '4px 10px',
+    fontSize: 11,
+    backgroundColor: '#f3f2f1',
+    border: '1px solid #c8c6c4',
+    borderRadius: 3,
+    cursor: 'pointer',
+    color: '#323130',
+  }
+
   return (
-    <div className="bg-white border-b border-gray-200 px-4 py-2 flex items-center gap-3 shadow-sm">
+    <div style={{
+      backgroundColor: 'white',
+      borderBottom: '1px solid #e1dfdd',
+      padding: '8px 16px',
+      display: 'flex',
+      alignItems: 'center',
+      gap: 12,
+      boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+    }}>
       {/* Search */}
-      <div className="flex items-center gap-2">
-        <Search size={14} className="text-gray-400" />
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <Search size={14} style={{ color: '#a19f9d' }} />
         <input
           type="text"
           value={searchTerm}
@@ -111,46 +163,64 @@ export function FindReplace({ editor, onClose }: FindReplaceProps) {
             if (e.key === 'Enter') findNext()
           }}
           placeholder="Suchen..."
-          className="border border-gray-300 rounded px-2 py-1 text-sm w-48 focus:outline-none focus:border-blue-500"
+          style={inputStyle}
           autoFocus
         />
         {matchCount > 0 && (
-          <span className="text-xs text-gray-500">{currentMatch + 1}/{matchCount}</span>
+          <span style={{ fontSize: 11, color: '#a19f9d', whiteSpace: 'nowrap' }}>
+            {currentMatch + 1}/{matchCount}
+          </span>
         )}
-        <button onClick={findPrev} className="p-1 hover:bg-gray-100 rounded" title="Vorherige">
+        <button onClick={findPrev} style={toggleBtnStyle(false)} title="Vorherige">
           <ChevronUp size={14} />
         </button>
-        <button onClick={findNext} className="p-1 hover:bg-gray-100 rounded" title="Nächste">
+        <button onClick={findNext} style={toggleBtnStyle(false)} title="Nächste">
           <ChevronDown size={14} />
         </button>
       </div>
 
+      {/* Options */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        <button
+          onClick={() => setCaseSensitive(!caseSensitive)}
+          style={toggleBtnStyle(caseSensitive)}
+          title="Gross-/Kleinschreibung beachten"
+        >
+          <CaseSensitive size={14} />
+        </button>
+        <button
+          onClick={() => setWholeWord(!wholeWord)}
+          style={toggleBtnStyle(wholeWord)}
+          title="Ganzes Wort"
+        >
+          <WholeWord size={14} />
+        </button>
+      </div>
+
       {/* Replace */}
-      <div className="flex items-center gap-2">
-        <Replace size={14} className="text-gray-400" />
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <Replace size={14} style={{ color: '#a19f9d' }} />
         <input
           type="text"
           value={replaceTerm}
           onChange={(e) => setReplaceTerm(e.target.value)}
           placeholder="Ersetzen..."
-          className="border border-gray-300 rounded px-2 py-1 text-sm w-48 focus:outline-none focus:border-blue-500"
+          style={inputStyle}
         />
-        <button
-          onClick={replaceOne}
-          className="px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded border border-gray-300"
-        >
+        <button onClick={replaceOne} style={btnStyle}>
           Ersetzen
         </button>
-        <button
-          onClick={replaceAll}
-          className="px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded border border-gray-300"
-        >
+        <button onClick={replaceAll} style={btnStyle}>
           Alle ersetzen
         </button>
       </div>
 
       {/* Close */}
-      <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded ml-auto" title="Schliessen">
+      <button
+        onClick={onClose}
+        style={{ ...toggleBtnStyle(false), marginLeft: 'auto' }}
+        title="Schliessen"
+      >
         <X size={14} />
       </button>
     </div>

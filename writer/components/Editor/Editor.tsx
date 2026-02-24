@@ -298,8 +298,17 @@ function WriterEditorInner() {
 
   // Track Changes handlers
   const handleToggleTracking = useCallback(() => {
-    setTrackingEnabled(prev => !prev)
-  }, [])
+    if (!editor) return
+    setTrackingEnabled(prev => {
+      const next = !prev
+      if (next) {
+        editor.commands.enableTracking()
+      } else {
+        editor.commands.disableTracking()
+      }
+      return next
+    })
+  }, [editor])
 
   const handleAcceptAll = useCallback(() => {
     if (!editor) return
@@ -619,7 +628,7 @@ function WriterEditorInner() {
       />
 
       {/* Ruler */}
-      {showRuler && <RulerBar zoom={zoom} />}
+      {showRuler && <RulerBar zoom={zoom} editor={editor} />}
 
       {/* Find & Replace */}
       {showFindReplace && (

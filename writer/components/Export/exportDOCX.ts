@@ -389,11 +389,11 @@ export async function exportDOCX(editor: Editor, filename: string = 'dokument', 
     : mmToTwips(297)
 
   // Build header/footer if enabled
-  const headers: Record<string, { default?: Header }> = {}
-  const footers: Record<string, { default?: Footer }> = {}
+  let defaultHeader: Header | undefined
+  let defaultFooter: Footer | undefined
 
   if (settings?.headerContent?.enabled && settings.headerContent.html) {
-    headers.default = new Header({
+    defaultHeader = new Header({
       children: [new Paragraph({
         children: [new TextRun({ text: settings.headerContent.html, size: 18, color: '666666' })],
         alignment: AlignmentType.CENTER,
@@ -402,14 +402,14 @@ export async function exportDOCX(editor: Editor, filename: string = 'dokument', 
   }
 
   if (settings?.footerContent?.enabled && settings.footerContent.html) {
-    footers.default = new Footer({
+    defaultFooter = new Footer({
       children: [new Paragraph({
         children: [new TextRun({ text: settings.footerContent.html, size: 18, color: '666666' })],
         alignment: AlignmentType.CENTER,
       })],
     })
   } else if (settings?.showPageNumbers) {
-    footers.default = new Footer({
+    defaultFooter = new Footer({
       children: [new Paragraph({
         children: [
           new TextRun({ children: [PageNumber.CURRENT], size: 18, color: '666666' }),
@@ -454,8 +454,8 @@ export async function exportDOCX(editor: Editor, filename: string = 'dokument', 
           },
         },
       },
-      headers: headers.default ? { default: headers.default } : undefined,
-      footers: footers.default ? { default: footers.default } : undefined,
+      headers: defaultHeader ? { default: defaultHeader } : undefined,
+      footers: defaultFooter ? { default: defaultFooter } : undefined,
       children,
     }],
   })

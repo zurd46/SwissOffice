@@ -10,12 +10,13 @@ import {
   Scissors, Copy, ClipboardPaste,
   AArrowUp, AArrowDown,
   Undo2, Redo2,
+  Paintbrush,
 } from 'lucide-react'
 import { ToolbarButton, ToolbarSelect, ToolbarColorButton } from '../../ToolbarButton'
 import { RibbonGroup, RibbonGroupLast } from '../RibbonGroup'
 import { FONT_FAMILIES, FONT_SIZES, LINE_HEIGHTS } from '../constants'
 import { StyleGallery } from '../StyleGallery'
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef } from 'react'
 
 interface TabStartProps {
   editor: Editor
@@ -25,6 +26,59 @@ interface TabStartProps {
 export function TabStart({ editor, onToggleFindReplace }: TabStartProps) {
   const [textColor, setTextColor] = useState('#000000')
   const [highlightColor, setHighlightColor] = useState('#ffff00')
+  const [formatPainterActive, setFormatPainterActive] = useState(false)
+  const storedMarks = useRef<Record<string, unknown>[]>([])
+
+  const handleFormatPainter = useCallback(() => {
+    if (formatPainterActive) {
+      setFormatPainterActive(false)
+      return
+    }
+    // Capture current marks from selection
+    const { from, to } = editor.state.selection
+    if (from === to) return
+    const marks: Record<string, unknown>[] = []
+    editor.state.doc.nodesBetween(from, to, (node) => {
+      if (node.isText) {
+        node.marks.forEach(mark => {
+          marks.push({ type: mark.type.name, attrs: mark.attrs })
+        })
+      }
+    })
+    storedMarks.current = marks
+    setFormatPainterActive(true)
+
+    // Listen for next click to apply
+    const applyFormat = () => {
+      const sel = editor.state.selection
+      if (sel.from !== sel.to) {
+        let chain = editor.chain().focus()
+        // First clear existing marks
+        chain = chain.unsetAllMarks()
+        // Apply stored marks
+        storedMarks.current.forEach(mark => {
+          if (mark.type === 'bold') chain = chain.setBold()
+          else if (mark.type === 'italic') chain = chain.setItalic()
+          else if (mark.type === 'underline') chain = chain.setUnderline()
+          else if (mark.type === 'strike') chain = chain.setStrike()
+          else if (mark.type === 'textStyle') {
+            const attrs = mark.attrs as Record<string, string>
+            if (attrs.color) chain = chain.setColor(attrs.color)
+            if (attrs.fontFamily) chain = chain.setFontFamily(attrs.fontFamily)
+            if (attrs.fontSize) chain = chain.setFontSize(attrs.fontSize)
+          }
+          else if (mark.type === 'highlight') {
+            chain = chain.setHighlight({ color: (mark.attrs as Record<string, string>).color })
+          }
+        })
+        chain.run()
+      }
+      setFormatPainterActive(false)
+      editor.off('selectionUpdate', applyFormat)
+    }
+
+    editor.on('selectionUpdate', applyFormat)
+  }, [editor, formatPainterActive])
 
   const getCurrentFontSize = () => {
     const attrs = editor.getAttributes('textStyle')
@@ -93,6 +147,9 @@ export function TabStart({ editor, onToggleFindReplace }: TabStartProps) {
             </ToolbarButton>
             <ToolbarButton onClick={handlePaste} title="Einfügen (Ctrl+V)">
               <ClipboardPaste size={14} />
+            </ToolbarButton>
+            <ToolbarButton onClick={handleFormatPainter} isActive={formatPainterActive} title="Format übertragen">
+              <Paintbrush size={14} />
             </ToolbarButton>
           </div>
         </div>

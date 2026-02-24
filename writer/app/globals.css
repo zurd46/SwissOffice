@@ -288,11 +288,13 @@ body {
 
 /* Print Styles — @page size/margins are injected dynamically by printDocument() */
 @media print {
-  /* Reset html/body for print flow */
+  /* Reset html/body so content can flow across pages */
   html, body {
     overflow: visible !important;
     height: auto !important;
     width: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
     background: white !important;
   }
 
@@ -307,23 +309,31 @@ body {
     visibility: visible;
   }
 
+  /*
+   * CRITICAL: Collapse all wrapper divs outside ProseMirror.
+   * The editor is nested 6+ levels deep in divs with inline styles
+   * (transform, position:absolute, overflow:hidden, fixed widths).
+   * display:contents removes these boxes from layout entirely,
+   * so .ProseMirror flows directly within <body>.
+   */
+  div:not(.ProseMirror):where(:not(.ProseMirror *)) {
+    display: contents !important;
+  }
+
+  /* Editor content: fill the printable area, @page margins handle page margins */
   .ProseMirror {
-    position: absolute !important;
-    left: 0 !important;
-    top: 0 !important;
+    display: block !important;
+    position: static !important;
     width: 100% !important;
     padding: 0 !important;
     margin: 0 !important;
     min-height: auto !important;
     font-size: 12pt;
     line-height: 1.5;
+    color: #000;
     background: white !important;
     box-shadow: none !important;
     border: none !important;
-  }
-
-  /* Remove zoom transform from parent elements */
-  [style*="transform"] {
     transform: none !important;
   }
 
@@ -340,9 +350,12 @@ body {
   .ProseMirror img {
     break-inside: avoid;
     page-break-inside: avoid;
+    max-width: 100% !important;
+    height: auto !important;
   }
   .ProseMirror table {
     page-break-inside: auto;
+    width: 100% !important;
   }
   .ProseMirror tr {
     break-inside: avoid;
@@ -359,10 +372,18 @@ body {
     break-inside: avoid;
   }
 
-  /* Hide page break visual markers */
+  /* Hide page break / section break visual labels in print */
   .ProseMirror div[data-page-break]::after,
   .ProseMirror div[data-section-break]::after {
     display: none;
+  }
+  .ProseMirror div[data-page-break] {
+    border: none;
+    margin: 0;
+  }
+  .ProseMirror div[data-section-break] {
+    border: none;
+    margin: 0;
   }
 }
 
