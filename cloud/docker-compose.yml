@@ -1,0 +1,15 @@
+services:
+  impulscloud:
+    build: .
+    container_name: impulscloud
+    ports:
+      - "${PORT:-4000}:4000"
+    volumes:
+      - impulscloud-data:/app/data
+    env_file:
+      - .env
+    restart: unless-stopped
+
+volumes:
+  impulscloud-data:
+    driver: local
