@@ -16,6 +16,7 @@ interface RibbonToolbarProps {
   showSidebar: boolean
   zoom: number
   setZoom: (zoom: number) => void
+  isElectron?: boolean
 }
 
 export function RibbonToolbar({
@@ -25,12 +26,13 @@ export function RibbonToolbar({
   showSidebar,
   zoom,
   setZoom,
+  isElectron,
 }: RibbonToolbarProps) {
   const [activeTab, setActiveTab] = useState('start')
 
   return (
     <div className="bg-[#f3f3f3] select-none">
-      <RibbonTabStrip activeTab={activeTab} onTabChange={setActiveTab} />
+      <RibbonTabStrip activeTab={activeTab} onTabChange={setActiveTab} isElectron={isElectron} />
       <RibbonPanel>
         {activeTab === 'start' && (
           <TabStart editor={editor} onToggleFindReplace={onToggleFindReplace} />

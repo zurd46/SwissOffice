@@ -10,22 +10,45 @@ const RIBBON_TABS = [
 interface RibbonTabStripProps {
   activeTab: string
   onTabChange: (tab: string) => void
+  isElectron?: boolean
 }
 
-export function RibbonTabStrip({ activeTab, onTabChange }: RibbonTabStripProps) {
+export function RibbonTabStrip({ activeTab, onTabChange, isElectron }: RibbonTabStripProps) {
   return (
-    <div className="flex items-end pl-3 electron-pl gap-[2px] bg-[#f3f3f3]">
+    <div style={{ display: 'flex', alignItems: 'flex-end', paddingLeft: isElectron ? 80 : 16, gap: 2, backgroundColor: '#f3f3f3' }}>
       {RIBBON_TABS.map(tab => (
         <button
           key={tab.id}
           onClick={() => onTabChange(tab.id)}
-          className={`
-            px-5 py-[7px] text-[13px] tracking-[0.01em] rounded-t transition-all duration-100 relative select-none
-            ${activeTab === tab.id
-              ? 'bg-white text-[#0078d4] font-semibold border-t-[2px] border-t-[#0078d4] border-x border-x-[#d2d0ce] border-b-0 -mb-px z-10'
-              : 'text-[#616161] hover:text-[#323130] hover:bg-[#e8e8e8] border border-transparent'
-            }
-          `}
+          style={{
+            padding: '7px 20px',
+            fontSize: 13,
+            letterSpacing: '0.01em',
+            borderRadius: '4px 4px 0 0',
+            transition: 'all 0.1s',
+            position: 'relative',
+            userSelect: 'none',
+            cursor: 'pointer',
+            ...(activeTab === tab.id
+              ? {
+                  backgroundColor: 'white',
+                  color: '#0078d4',
+                  fontWeight: 600,
+                  borderTop: '2px solid #0078d4',
+                  borderLeft: '1px solid #d2d0ce',
+                  borderRight: '1px solid #d2d0ce',
+                  borderBottom: 'none',
+                  marginBottom: -1,
+                  zIndex: 10,
+                }
+              : {
+                  backgroundColor: 'transparent',
+                  color: '#616161',
+                  fontWeight: 400,
+                  border: '1px solid transparent',
+                }
+            ),
+          }}
         >
           {tab.label}
         </button>
