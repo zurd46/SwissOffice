@@ -1,3 +1,6 @@
+import type { DocumentSettings } from './types/document'
+import { defaultDocumentSettings } from './documentContext'
+
 export const defaultContent = {
   type: 'doc',
   content: [
@@ -21,3 +24,5 @@ export const defaultContent = {
     },
   ],
 }
+
+export const defaultSettings: DocumentSettings = { ...defaultDocumentSettings }
