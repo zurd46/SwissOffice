@@ -45,8 +45,8 @@ ImpulsOffice ist eine modulare Office-Suite mit dem Ziel, eine moderne, performa
 | Modul | Verzeichnis | Status | Beschreibung |
 |-------|-------------|--------|--------------|
 | **Writer** | `writer/` + `client/` | Aktiv | Professionelle Textverarbeitung mit Ribbon-UI |
-| **Tabulator** | `tabulator/` | Aktiv | Tabellenkalkulation mit Grid-Editor |
-| **Meet** | `meet/` | Aktiv | Kommunikation — Chat, Kalender, Kontakte, Videoanrufe, Dateien, Teams |
+| **Tabulator** | `tabulator/` | Aktiv | Tabellenkalkulation mit Formel-Engine |
+| **Meet** | `meet/` | UI-Prototyp | Kommunikation — Chat, Kalender, Anrufe, Teams (noch ohne Backend) |
 | **Cloud** | `cloud/` | Aktiv | Backend-API — Auth, Dokumente, Kalender, Kontakte, Versionierung |
 | **Email** | `email/` | Geplant | E-Mail-Client |
 | **Data** | `data/` | Geplant | Zentrale Datenschicht |
@@ -57,51 +57,60 @@ ImpulsOffice ist eine modulare Office-Suite mit dem Ziel, eine moderne, performa
 
 Desktop-Textverarbeitung (Word-Alternative) mit Office-aehnlicher Ribbon-UI, gebaut mit Next.js und Tiptap.
 
+- 23 Custom Extensions + 15+ Built-in Extensions (Tiptap 3)
+- Ribbon-Toolbar mit 7 Tabs (Start, Einfuegen, Seitenlayout, Ueberpruefen, Sendungen, Ansicht, KI)
 - Schriftart, -groesse, -farbe, Hervorhebung, Hoch-/Tiefgestellt
 - Ueberschriften H1–H6, Absatzausrichtung, Zeilenabstand, Einzuege
 - Tabellen, Bilder, Links, Seitenumbrueche, Listen, Checklisten
 - A4-WYSIWYG-Ansicht mit Zoom (25–200 %)
 - `.impuls`-Format (JSON), Export als **PDF**, **DOCX**, **HTML**
 - Suchen & Ersetzen, Undo/Redo, Woerter-/Seitenzaehlung
-- Ribbon-Toolbar (Start, Einfuegen, Seitenlayout, Ansicht)
-- Dark-Mode-Unterstuetzung
+- Formatvorlagen (6 Themes) und Dokumentvorlagen
+- Kopf-/Fusszeilen mit Seitenzahlen
+- Kommentar-System und Aenderungsverfolgung
+- Rechtschreibpruefung (Browser-basiert, mehrsprachig)
 
 ### Tabulator — Tabellenkalkulation
 
-Tabellenkalkulation (Excel-Alternative) mit Grid-basiertem Editor, gebaut mit Next.js.
+Tabellenkalkulation (Excel-Alternative) mit Grid-basiertem Editor und vollstaendiger Formel-Engine, gebaut mit Next.js.
 
-- Grid-Editor mit Zellenbearbeitung
-- Formelleiste (FormulaBar)
-- Mehrere Arbeitsblaetter (SheetTabs)
-- Toolbar fuer Formatierung
-- Statusleiste
-- Export-Funktionen
+- Grid-Editor mit Zellenbearbeitung, Tastaturnavigation und Kontextmenue
+- Formel-Engine mit 40+ Funktionen (Mathe, Logik, Text, Statistik)
+- Abhaengigkeitsgraph fuer effiziente Neuberechnung
+- Formelleiste (FormulaBar) mit Funktionseinfuegung
+- Mehrere Arbeitsblaetter (SheetTabs) mit Umbenennen/Duplizieren
+- Ribbon-Toolbar mit 5 Tabs (Start, Formeln, Daten, Einfuegen, Seitenlayout)
+- Bedingte Formatierung (13+ Regeltypen)
+- Datenvalidierung und Auto-Fill
+- CSV Import/Export (RFC 4180), natives `.impuls-tabelle`-Format
+- Zellformatierung (Schrift, Farben, Rahmen, Zahlenformate, Zusammenfuegen)
+- Suchen & Ersetzen, Undo/Redo, Sortierung, Filter
+- Statusleiste mit Summe/Durchschnitt/Anzahl und Zoom
 
 ### Meet — Kommunikation
 
-Kommunikationsplattform (Teams-Alternative), gebaut mit Next.js.
+Kommunikationsplattform (Teams-Alternative), gebaut mit Next.js. Aktuell als UI-Prototyp mit lokaler Datenhaltung — noch ohne Backend-Anbindung.
 
-- **Chat** — Einzel- und Gruppenchats mit Emoji-Support
-- **Kalender** — Terminplanung und -verwaltung
-- **Kontakte** — Kontaktverwaltung
-- **Anrufe** — Video- und Audioanrufe
-- **Dateien** — Dateiaustausch mit Drag & Drop
-- **Teams** — Teamverwaltung und -organisation
-- **Benachrichtigungen** — Echtzeit-Benachrichtigungen
-- **Einstellungen** — Benutzerkonfiguration
+- **Chat** — Einzel-/Gruppenchats, Dateianhänge, Reaktionen, Antworten, Emoji-Picker
+- **Kalender** — Tag/Woche/Monat-Ansichten, Terminplanung, wiederkehrende Termine
+- **Anrufe** — Anrufverlauf, Grid-/Speaker-Ansicht, Mediensteuerung (UI-Mockup, kein WebRTC)
+- **Teams** — Teamstruktur mit Kanaelen (oeffentlich, privat, Ankuendigungen)
+- **Dateien** — Dateiliste mit Filter, Grid-/Listenansicht, Drag & Drop
+- **Benachrichtigungen** — 9 Benachrichtigungstypen, Gelesen-Markierung
+- **Einstellungen** — Profil, Audio/Video, Benachrichtigungen, Darstellung, Datenschutz
 
 ### Cloud — Backend-API
 
 Zentrales Backend fuer die gesamte Suite, gebaut mit Hono und Bun.
 
-- **Auth** — JWT-basierte Authentifizierung (Access + Refresh Tokens)
-- **Dokumente** — Dokumentenspeicherung und -verwaltung
-- **Versionierung** — Dokumentversionen
-- **Kalender** — Kalender-API mit iCal-Support und Wiederholungsregeln
-- **Kontakte** — Kontakte-API
-- **Shares** — Freigaben und Berechtigungen
-- **Datenbank** — SQLite via Drizzle ORM
-- **Microsoft Graph** — OAuth2-Integration fuer E-Mail
+- **Auth** — JWT-basierte Authentifizierung (Access + Refresh Tokens, Argon2id)
+- **Dokumente** — CRUD mit Zugriffskontrolle (Owner/Read/Write)
+- **Versionierung** — Dokumentversionen mit Snapshots und Wiederherstellung
+- **Kalender** — Kalender-/Event-API mit iCal-Export/Import und Wiederholungsregeln
+- **Kontakte** — Kontakte und Kontaktgruppen mit Volltextsuche
+- **Shares** — Freigaben und Berechtigungen pro Dokument
+- **Microsoft Graph** — OAuth2-Flow, Kontakt- und Kalender-Import
+- **Datenbank** — SQLite via Drizzle ORM, Zod-Validierung auf allen Endpoints
 
 ---
 
@@ -333,47 +342,68 @@ cd cloud && bun run start
 ## Roadmap
 
 ### Writer
-- [x] Tiptap-Editor mit 25+ Extensions
-- [x] Ribbon-Toolbar (Office-Style mit Tabs)
+- [x] Tiptap-Editor mit 38+ Extensions (23 Custom + 15+ Built-in)
+- [x] Ribbon-Toolbar mit 7 Tabs (Start, Einfuegen, Seitenlayout, Ueberpruefen, Sendungen, Ansicht, KI)
 - [x] PDF-, DOCX- & HTML-Export
 - [x] Electron Desktop-App mit nativen Menues
 - [x] Suchen & Ersetzen
 - [x] Inhaltsverzeichnis-Sidebar
-- [x] Dark-Mode-Unterstuetzung
-- [ ] Formatvorlagen / Style Templates
-- [ ] Kopf- & Fusszeilen mit Seitenzahlen
-- [ ] Rechtschreibpruefung
+- [x] Formatvorlagen (6 Themes) & Dokumentvorlagen
+- [x] Kopf- & Fusszeilen mit Seitenzahlen
+- [x] Rechtschreibpruefung (Browser-basiert, mehrsprachig)
+- [x] Kommentar-System & Aenderungsverfolgung
+- [ ] Dark Mode
+- [ ] IMPULS-Datei Import (Lesen)
+- [ ] Erweiterte Rechtschreibpruefung (eigenes Woerterbuch)
 
 ### Tabulator
-- [x] Grid-Editor mit Zellenbearbeitung
-- [x] Formelleiste
-- [x] Mehrere Arbeitsblaetter
-- [ ] Formelberechnung
+- [x] Grid-Editor mit Zellenbearbeitung & Tastaturnavigation
+- [x] Formelleiste mit Funktionseinfuegung
+- [x] Mehrere Arbeitsblaetter (Umbenennen, Duplizieren, Loeschen)
+- [x] Formel-Engine mit 40+ Funktionen (Mathe, Logik, Text, Statistik)
+- [x] Abhaengigkeitsgraph & intelligente Neuberechnung
+- [x] Ribbon-Toolbar mit 5 Tabs
+- [x] Bedingte Formatierung (13+ Regeltypen)
+- [x] Datenvalidierung & Auto-Fill
+- [x] CSV Import/Export (RFC 4180)
+- [x] Zellformatierung (Schrift, Farben, Rahmen, Zahlenformate, Zusammenfuegen)
+- [x] Suchen & Ersetzen, Sortierung, Filter
+- [x] Undo/Redo
 - [ ] Diagramme
-- [ ] Import/Export (CSV, XLSX)
+- [ ] XLSX Import/Export
+- [ ] PDF-Export
 
-### Meet
-- [x] Chat mit Emoji-Support
-- [x] Kalender
-- [x] Kontaktverwaltung
-- [x] Dateiaustausch
-- [x] Teamverwaltung
-- [ ] Video-/Audioanrufe (WebRTC)
+### Meet (UI-Prototyp — noch ohne Backend-Anbindung)
+- [x] Chat UI (Einzel-/Gruppenchats, Reaktionen, Antworten, Emoji-Picker)
+- [x] Kalender UI (Tag/Woche/Monat, Terminplanung)
+- [x] Anruf UI (Verlauf, Grid-/Speaker-Ansicht, Mediensteuerung)
+- [x] Teams UI (Kanaele, Teamstruktur)
+- [x] Dateien UI (Dateiliste, Filter, Drag & Drop)
+- [x] Benachrichtigungen UI (9 Typen)
+- [x] Einstellungen (Profil, Darstellung, Datenschutz)
+- [ ] Backend-Anbindung (Cloud-API)
 - [ ] Echtzeit-Messaging (WebSocket)
+- [ ] Video-/Audioanrufe (WebRTC)
+- [ ] Kontaktverwaltung (Seite fehlt noch)
 
 ### Cloud
-- [x] JWT-Authentifizierung
-- [x] Dokumente-API mit Versionierung
-- [x] Kalender-API mit iCal & Wiederholungsregeln
-- [x] Kontakte-API
-- [x] Freigaben-System
+- [x] JWT-Authentifizierung (Access + Refresh Tokens, Argon2id)
+- [x] Dokumente-API mit Zugriffskontrolle
+- [x] Versionierung mit Snapshots & Wiederherstellung
+- [x] Kalender-API mit iCal-Export/Import & Wiederholungsregeln
+- [x] Kontakte-API mit Gruppen & Volltextsuche
+- [x] Freigaben-System (Read/Write pro Dokument)
+- [x] Microsoft Graph OAuth2-Flow & Kontakt-/Kalender-Import
+- [x] Zod-Validierung auf allen Endpoints
 - [ ] Echtzeit-Collaboration (CRDT/OT)
-- [ ] Microsoft Graph E-Mail-Integration
+- [ ] E-Mail-Versand via Microsoft Graph
+- [ ] Bidirektionale Microsoft-Synchronisation
 - [ ] Datei-Synchronisation
 
 ### Suite-uebergreifend
 - [ ] E-Mail-Client
-- [ ] Auto-Save & Dokumentversionierung
+- [ ] Meet-Backend-Integration
+- [ ] Auto-Save & Dokumentversionierung im Client
 - [ ] Gemeinsame Benutzerverwaltung
 - [ ] Einheitliches Design-System
 
