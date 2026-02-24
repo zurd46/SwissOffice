@@ -109,7 +109,7 @@ function WriterEditorInner() {
   const [spellCheckEnabled, setSpellCheckEnabled] = useState(false)
   const [footnotes, setFootnotes] = useState<Footnote[]>([])
   const [bibliography, setBibliography] = useState<BibEntry[]>([])
-  const [citationStyle] = useState<'apa' | 'mla' | 'chicago'>('apa')
+  const [citationStyle, setCitationStyle] = useState<'apa' | 'mla' | 'chicago'>('apa')
   const [watermarkText, setWatermarkText] = useState('')
   const [showRuler, setShowRuler] = useState(true)
   const [showTemplateChooser, setShowTemplateChooser] = useState(false)
@@ -304,15 +304,27 @@ function WriterEditorInner() {
   const handleAcceptAll = useCallback(() => {
     if (!editor) return
     const { doc, tr } = editor.state
+    // Collect all changes first, then apply in reverse order to avoid position drift
+    const removals: { from: number; to: number; markType: string }[] = []
+    const deletions: { from: number; to: number }[] = []
     doc.descendants((node, pos) => {
       node.marks.forEach(mark => {
         if (mark.type.name === 'trackInsert') {
-          tr.removeMark(pos, pos + node.nodeSize, mark.type)
+          removals.push({ from: pos, to: pos + node.nodeSize, markType: 'trackInsert' })
         }
         if (mark.type.name === 'trackDelete') {
-          tr.delete(pos, pos + node.nodeSize)
+          deletions.push({ from: pos, to: pos + node.nodeSize })
         }
       })
+    })
+    // Apply deletions in reverse order first (highest position first)
+    deletions.sort((a, b) => b.from - a.from)
+    deletions.forEach(({ from, to }) => tr.delete(from, to))
+    // Then remove trackInsert marks (positions may have shifted but removeMark is safer)
+    removals.sort((a, b) => b.from - a.from)
+    removals.forEach(({ from, to }) => {
+      const markType = editor.state.schema.marks.trackInsert
+      if (markType) tr.removeMark(from, to, markType)
     })
     editor.view.dispatch(tr)
   }, [editor])
@@ -320,21 +332,39 @@ function WriterEditorInner() {
   const handleRejectAll = useCallback(() => {
     if (!editor) return
     const { doc, tr } = editor.state
+    const removals: { from: number; to: number; markType: string }[] = []
+    const deletions: { from: number; to: number }[] = []
     doc.descendants((node, pos) => {
       node.marks.forEach(mark => {
         if (mark.type.name === 'trackDelete') {
-          tr.removeMark(pos, pos + node.nodeSize, mark.type)
+          removals.push({ from: pos, to: pos + node.nodeSize, markType: 'trackDelete' })
         }
         if (mark.type.name === 'trackInsert') {
-          tr.delete(pos, pos + node.nodeSize)
+          deletions.push({ from: pos, to: pos + node.nodeSize })
         }
       })
+    })
+    deletions.sort((a, b) => b.from - a.from)
+    deletions.forEach(({ from, to }) => tr.delete(from, to))
+    removals.sort((a, b) => b.from - a.from)
+    removals.forEach(({ from, to }) => {
+      const markType = editor.state.schema.marks.trackDelete
+      if (markType) tr.removeMark(from, to, markType)
     })
     editor.view.dispatch(tr)
   }, [editor])
 
   const handleToggleSpellCheck = useCallback(() => {
-    setSpellCheckEnabled(prev => !prev)
+    setSpellCheckEnabled(prev => {
+      const next = !prev
+      // Toggle native browser spellcheck on the editor element
+      const el = document.querySelector('.ProseMirror')
+      if (el) {
+        el.setAttribute('spellcheck', next ? 'true' : 'false')
+        el.setAttribute('lang', 'de')
+      }
+      return next
+    })
   }, [])
 
   // Footnote handler
@@ -384,23 +414,28 @@ function WriterEditorInner() {
         case 'new':
           newDocument(editor)
           setDocumentName('Unbenannt')
-          setSettings(({ ...settings }))
+          setFootnotes([])
+          setBibliography([])
+          setComments([])
           break
         case 'open':
           loadDocument(editor, (result) => {
             if (result.settings) setSettings(result.settings)
             if (result.documentName) setDocumentName(result.documentName)
+            if (result.footnotes) setFootnotes(result.footnotes)
+            if (result.bibliography) setBibliography(result.bibliography)
+            if (result.citationStyle) setCitationStyle(result.citationStyle)
           })
           break
         case 'save':
           createVersion(editor.getJSON(), documentName)
-          saveDocument(editor, documentName, settings)
+          saveDocument(editor, documentName, settings, { footnotes, bibliography, citationStyle })
           break
         case 'export-pdf':
-          exportPDF(editor, documentName)
+          exportPDF(editor, documentName, settings)
           break
         case 'export-docx':
-          exportDOCX(editor, documentName)
+          exportDOCX(editor, documentName, settings)
           break
         case 'export-html':
           saveAsHTML(editor, documentName)
@@ -483,9 +518,14 @@ function WriterEditorInner() {
         case 'version-history':
           setShowVersionHistory(true)
           break
-        case 'save-as':
-          saveDocument(editor, documentName, settings)
+        case 'save-as': {
+          const newName = prompt('Dateiname:', documentName)
+          if (newName) {
+            setDocumentName(newName)
+            saveDocument(editor, newName, settings, { footnotes, bibliography, citationStyle })
+          }
           break
+        }
         case 'insert-textbox':
           editor.chain().focus().insertContent({ type: 'textBox', content: [{ type: 'paragraph' }] }).run()
           break
@@ -514,7 +554,7 @@ function WriterEditorInner() {
     })
 
     return cleanup
-  }, [editor, documentName, settings, setSettings, handleInsertFootnote, handleInsertCitation, handleInsertBibliography])
+  }, [editor, documentName, settings, setSettings, handleInsertFootnote, handleInsertCitation, handleInsertBibliography, footnotes, bibliography, citationStyle])
 
   // Sync document title with Electron window
   useEffect(() => {
@@ -659,7 +699,7 @@ function WriterEditorInner() {
       </div>
 
       {/* Status Bar */}
-      <StatusBar editor={editor} zoom={zoom} setZoom={setZoom} lastSaved={lastSaved} />
+      <StatusBar editor={editor} zoom={zoom} setZoom={setZoom} lastSaved={lastSaved} pageCount={pageCount} />
 
       {/* AI Settings Dialog */}
       <AISettingsDialog />

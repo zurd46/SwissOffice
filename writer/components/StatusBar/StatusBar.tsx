@@ -8,15 +8,13 @@ interface StatusBarProps {
   zoom: number
   setZoom: (zoom: number) => void
   lastSaved?: number | null
+  pageCount?: number
 }
 
-export function StatusBar({ editor, zoom, setZoom, lastSaved }: StatusBarProps) {
+export function StatusBar({ editor, zoom, setZoom, lastSaved, pageCount = 1 }: StatusBarProps) {
   const characterCount = editor.storage.characterCount
   const words = characterCount?.words?.() ?? 0
   const characters = characterCount?.characters?.() ?? 0
-
-  // Estimate pages (A4 ~250 words per page)
-  const pages = Math.max(1, Math.ceil(words / 250))
 
   const savedText = lastSaved
     ? `Gespeichert ${new Date(lastSaved).toLocaleTimeString('de-CH', { hour: '2-digit', minute: '2-digit' })}`
@@ -35,8 +33,8 @@ export function StatusBar({ editor, zoom, setZoom, lastSaved }: StatusBarProps) 
       userSelect: 'none',
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-        <span>Seite {pages} von {pages}</span>
-        <span>{words} Woerter</span>
+        <span>Seite {pageCount} von {pageCount}</span>
+        <span>{words} Wörter</span>
         <span>{characters} Zeichen</span>
         {savedText && (
           <span style={{ opacity: 0.7 }}>{savedText}</span>
@@ -65,7 +63,7 @@ export function StatusBar({ editor, zoom, setZoom, lastSaved }: StatusBarProps) 
         <button
           onClick={() => setZoom(Math.min(200, zoom + 10))}
           style={{ border: 'none', background: 'none', color: 'white', cursor: 'pointer', padding: 2, borderRadius: 2 }}
-          title="Vergroessern"
+          title="Vergrössern"
         >
           <ZoomIn size={14} />
         </button>

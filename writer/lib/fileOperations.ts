@@ -2,18 +2,30 @@ import { Editor } from '@tiptap/react'
 import { saveAs } from 'file-saver'
 import type { DocumentSettings, ImpulsDocument } from './types/document'
 import { defaultDocumentSettings } from './documentContext'
+import type { Footnote } from './types/footnotes'
+import type { BibEntry } from './types/bibliography'
 
 const CURRENT_VERSION = 2
+
+interface SaveOptions {
+  footnotes?: Footnote[]
+  bibliography?: BibEntry[]
+  citationStyle?: 'apa' | 'mla' | 'chicago'
+}
 
 export function saveDocument(
   editor: Editor,
   filename: string = 'dokument',
-  settings?: DocumentSettings
+  settings?: DocumentSettings,
+  options?: SaveOptions
 ) {
   const doc: ImpulsDocument = {
     version: CURRENT_VERSION,
     settings: settings ?? { ...defaultDocumentSettings },
     content: editor.getJSON(),
+    footnotes: options?.footnotes?.map(f => ({ id: f.id, number: f.number, content: f.content })),
+    bibliography: options?.bibliography as unknown as Array<Record<string, unknown>>,
+    citationStyle: options?.citationStyle,
   }
   const blob = new Blob([JSON.stringify(doc, null, 2)], { type: 'application/json' })
   saveAs(blob, `${filename}.impuls`)
@@ -41,18 +53,24 @@ ${editor.getHTML()}
   saveAs(blob, `${filename}.html`)
 }
 
-interface LoadResult {
+export interface LoadResult {
   settings: DocumentSettings
   documentName?: string
+  footnotes?: Footnote[]
+  bibliography?: BibEntry[]
+  citationStyle?: 'apa' | 'mla' | 'chicago'
 }
 
-function migrateDocument(json: Record<string, unknown>): { content: Record<string, unknown>; settings: DocumentSettings } {
+function migrateDocument(json: Record<string, unknown>): LoadResult & { content: Record<string, unknown> } {
   // Version 2+: new format with settings and content
   if ('version' in json && 'settings' in json && 'content' in json) {
     const doc = json as unknown as ImpulsDocument
     return {
       content: doc.content,
       settings: { ...defaultDocumentSettings, ...doc.settings },
+      footnotes: doc.footnotes as Footnote[] | undefined,
+      bibliography: doc.bibliography as unknown as BibEntry[] | undefined,
+      citationStyle: doc.citationStyle,
     }
   }
 
@@ -85,10 +103,10 @@ export function loadDocument(
       const text = await file.text()
       try {
         const json = JSON.parse(text)
-        const { content, settings } = migrateDocument(json)
+        const { content, settings, footnotes, bibliography, citationStyle } = migrateDocument(json)
         editor.commands.setContent(content)
         const docName = file.name.replace(/\.(impuls|json)$/, '')
-        onSettingsLoaded?.({ settings, documentName: docName })
+        onSettingsLoaded?.({ settings, documentName: docName, footnotes, bibliography, citationStyle })
       } catch {
         alert('Ungültige Datei')
       }

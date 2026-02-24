@@ -33,7 +33,7 @@ export function TabUeberpruefen({
   const handleAddComment = () => {
     const { from, to } = editor.state.selection
     if (from === to) {
-      alert('Bitte markieren Sie zuerst Text, um einen Kommentar hinzuzufuegen.')
+      alert('Bitte markieren Sie zuerst Text, um einen Kommentar hinzuzufügen.')
       return
     }
     const commentId = generateCommentId()
@@ -69,7 +69,7 @@ export function TabUeberpruefen({
         </div>
       </RibbonGroup>
 
-      <RibbonGroupLast label="Aenderungen">
+      <RibbonGroupLast label="Änderungen">
         <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <RibbonLargeButton
             onClick={onToggleTracking}

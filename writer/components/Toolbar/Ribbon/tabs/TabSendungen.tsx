@@ -33,7 +33,7 @@ export function TabSendungen({ editor }: TabSendungenProps) {
         return
       }
       setDataSource(ds)
-      alert(`${ds.records.length} Datensaetze mit ${ds.fields.length} Feldern geladen:\n${ds.fields.join(', ')}`)
+      alert(`${ds.records.length} Datensätze mit ${ds.fields.length} Feldern geladen:\n${ds.fields.join(', ')}`)
     }
     input.click()
   }, [])
@@ -111,7 +111,7 @@ export function TabSendungen({ editor }: TabSendungenProps) {
           />
           {dataSource && (
             <div style={{ fontSize: 10, color: '#605e5c', padding: '0 4px' }}>
-              {dataSource.records.length} Eintraege
+              {dataSource.records.length} Einträge
             </div>
           )}
         </div>
@@ -122,7 +122,7 @@ export function TabSendungen({ editor }: TabSendungenProps) {
           <RibbonLargeButton
             onClick={insertField}
             icon={<Tag size={20} style={{ color: '#0078d4' }} />}
-            label="Feld einfuegen"
+            label="Feld einfügen"
           />
           {dataSource && dataSource.fields.slice(0, 3).map(field => (
             <button
@@ -140,7 +140,7 @@ export function TabSendungen({ editor }: TabSendungenProps) {
         </div>
       </RibbonGroup>
 
-      <RibbonGroupLast label="Vorschau & Zusammenfuehren">
+      <RibbonGroupLast label="Vorschau & Zusammenführen">
         <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <RibbonLargeButton
             onClick={togglePreview}
@@ -160,14 +160,14 @@ export function TabSendungen({ editor }: TabSendungenProps) {
                   borderRadius: 3, backgroundColor: 'white', cursor: 'pointer',
                 }}
               >
-                Naechster
+                Nächster
               </button>
             </div>
           )}
           <RibbonLargeButton
             onClick={() => alert('Serienbrief-Generierung ist noch in Entwicklung.')}
             icon={<Play size={20} style={{ color: '#605e5c' }} />}
-            label="Zusammenfuehren"
+            label="Zusammenführen"
           />
         </div>
       </RibbonGroupLast>
