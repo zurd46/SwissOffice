@@ -7,6 +7,7 @@ const RIBBON_TABS = [
   { id: 'einfuegen', label: 'Einfügen' },
   { id: 'seitenlayout', label: 'Seitenlayout' },
   { id: 'ansicht', label: 'Ansicht' },
+  { id: 'ki', label: 'KI' },
 ]
 
 interface RibbonTabStripProps {

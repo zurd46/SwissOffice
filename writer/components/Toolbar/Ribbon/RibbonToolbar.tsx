@@ -8,6 +8,7 @@ import { TabStart } from './tabs/TabStart'
 import { TabEinfuegen } from './tabs/TabEinfuegen'
 import { TabSeitenlayout } from './tabs/TabSeitenlayout'
 import { TabAnsicht } from './tabs/TabAnsicht'
+import { TabKI } from './tabs/TabKI'
 
 interface RibbonToolbarProps {
   editor: Editor
