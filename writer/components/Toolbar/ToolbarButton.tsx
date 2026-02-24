@@ -19,7 +19,7 @@ export function ToolbarButton({ onClick, isActive, disabled, title, children, cl
       disabled={disabled}
       title={title}
       className={`
-        w-7 h-7 flex items-center justify-center rounded-sm transition-all duration-100
+        w-[26px] h-[26px] flex items-center justify-center rounded-sm transition-all duration-100
         ${isActive
           ? 'bg-[#c7e0f4] text-[#1a5276] shadow-[inset_0_0_0_1px_rgba(26,82,118,0.25)]'
           : 'text-[#323130] hover:bg-[#e1dfdd]'
@@ -48,7 +48,7 @@ export function ToolbarSelect({ value, onChange, options, title, className = '' 
       onChange={(e) => onChange(e.target.value)}
       title={title}
       className={`
-        h-[26px] px-2 text-[12px] border border-[#c8c6c4] rounded-sm bg-white
+        h-[24px] px-[6px] text-[11px] border border-[#c8c6c4] rounded-sm bg-white
         hover:border-[#0078d4] focus:outline-none focus:border-[#0078d4] focus:shadow-[0_0_0_1px_rgba(0,120,212,0.3)]
         text-[#323130] cursor-pointer transition-all duration-100
         ${className}
@@ -78,7 +78,7 @@ export function ToolbarColorButton({ value, onChange, title, icon }: ToolbarColo
     <button
       onClick={() => inputRef.current?.click()}
       title={title}
-      className="w-7 h-7 flex flex-col items-center justify-center rounded-sm hover:bg-[#e1dfdd] cursor-pointer transition-all duration-100 relative"
+      className="w-[26px] h-[26px] flex flex-col items-center justify-center rounded-sm hover:bg-[#e1dfdd] cursor-pointer transition-all duration-100 relative"
     >
       {icon === 'text' ? <Type size={14} className="text-[#323130]" /> : <Highlighter size={14} className="text-[#323130]" />}
       <div className="w-4 h-[3px] rounded-full mt-px" style={{ backgroundColor: value }} />
@@ -109,8 +109,8 @@ export function RibbonLargeButton({ onClick, icon, label, disabled, isActive }: 
       disabled={disabled}
       title={label}
       className={`
-        flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-sm transition-all duration-100
-        text-[11px] leading-tight min-w-[60px]
+        flex flex-col items-center justify-center gap-[2px] px-[10px] py-[4px] rounded-sm transition-all duration-100
+        text-[10px] leading-tight min-w-[48px]
         ${isActive
           ? 'bg-[#c7e0f4] text-[#1a5276]'
           : 'text-[#323130] hover:bg-[#e1dfdd]'
