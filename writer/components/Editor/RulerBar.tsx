@@ -29,7 +29,7 @@ export function RulerBar({ zoom }: RulerBarProps) {
   return (
     <div
       style={{
-        height: 22,
+        height: 14,
         backgroundColor: '#fafafa',
         borderBottom: '1px solid #e0e0e0',
         display: 'flex',
@@ -66,26 +66,37 @@ export function RulerBar({ zoom }: RulerBarProps) {
             style={{
               position: 'absolute',
               left: `${tick.pos * scale}mm`,
-              bottom: 0,
+              top: 0,
               width: 1,
-              height: tick.major ? 10 : 5,
-              backgroundColor: '#b0b0b0',
+              height: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'flex-end',
             }}
           >
             {tick.label && (
               <span
                 style={{
-                  position: 'absolute',
-                  bottom: 10,
-                  left: -4,
-                  fontSize: 8 * Math.min(scale, 1),
-                  color: '#888',
+                  fontSize: 7 * Math.min(scale, 1),
+                  lineHeight: 1,
+                  color: '#999',
                   fontFamily: 'system-ui',
+                  position: 'absolute',
+                  top: 0,
+                  left: 2,
                 }}
               >
                 {tick.label}
               </span>
             )}
+            <div
+              style={{
+                width: 1,
+                height: tick.major ? 5 : 3,
+                backgroundColor: '#b0b0b0',
+              }}
+            />
           </div>
         ))}
       </div>
