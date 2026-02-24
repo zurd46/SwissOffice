@@ -70,6 +70,11 @@ export function MenuBar({ editor, documentName, setDocumentName, onToggleFindRep
         { label: 'Als DOCX exportieren', action: () => exportDOCX(editor, documentName), icon: <FileOutput size={15} /> },
         { label: '', divider: true },
         { label: 'Drucken', action: () => printDocument(settings), shortcut: 'Ctrl+P', icon: <Printer size={15} /> },
+        ...(isAuthenticated && isCloudReachable ? [
+          { label: '', divider: true },
+          { label: 'In Cloud speichern', action: onCloudSave, icon: <Cloud size={15} /> },
+          { label: 'Aus Cloud öffnen', action: onCloudOpen, icon: <CloudDownload size={15} /> },
+        ] as MenuItem[] : []),
       ],
     },
     {
