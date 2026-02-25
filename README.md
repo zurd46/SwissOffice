@@ -1,6 +1,6 @@
 <div align="center">
 
-<h1>ImpulsOffice</h1>
+<h1>SwissOffice</h1>
 
 <p><strong>Open-Source Office-Suite — modern, schnell, plattformübergreifend.</strong></p>
 
