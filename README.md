@@ -36,7 +36,7 @@ Textverarbeitung, Tabellenkalkulation, Kommunikation und Cloud-Backend — alles
 
 ## Übersicht
 
-ImpulsOffice ist eine modulare Office-Suite mit dem Ziel, eine moderne, performante und erweiterbare Alternative zu klassischen Office-Anwendungen bereitzustellen. Das Projekt ist als Monorepo organisiert — jedes Modul lebt in einem eigenen Verzeichnis.
+SwissOffice ist eine modulare Office-Suite mit dem Ziel, eine moderne, performante und erweiterbare Alternative zu klassischen Office-Anwendungen bereitzustellen. Das Projekt ist als Monorepo organisiert — jedes Modul lebt in einem eigenen Verzeichnis.
 
 ---
 
@@ -135,7 +135,7 @@ Zentrales Backend für die gesamte Suite, gebaut mit Hono und Bun.
 ## Projektstruktur
 
 ```
-ImpulsOffice/
+SwissOffice/
 │
 ├── writer/                  # Next.js — Textverarbeitung (Frontend)
 │   ├── app/                 #   Pages & Layout (App Router)
@@ -208,8 +208,8 @@ ImpulsOffice/
 ### Installation
 
 ```bash
-git clone https://github.com/<dein-username>/ImpulsOffice.git
-cd ImpulsOffice
+git clone https://github.com/<dein-username>/SwissOffice.git
+cd SwissOffice
 
 # Writer
 cd writer && npm install && cd ..
